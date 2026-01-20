@@ -353,18 +353,26 @@ const loadTicker = async (symbol) => {
       signal: tickerAbortController.signal,
     });
     // Ensure numeric fields are properly parsed
+    // IMPORTANT: Mutate existing object instead of replacing to preserve WebSocket reactivity
     if (response.data) {
-      ticker.value = {
-        ...response.data,
-        price: Number(response.data.price) || 0,
-        priceChangePercent: Number(response.data.priceChangePercent) || 0,
-        priceChange: Number(response.data.priceChange) || 0,
-        volume: Number(response.data.volume) || 0,
-        highPrice: Number(response.data.highPrice) || 0,
-        lowPrice: Number(response.data.lowPrice) || 0,
-      };
-    } else {
-      ticker.value = null;
+      if (!ticker.value) {
+        ticker.value = {
+          price: Number(response.data.price) || 0,
+          priceChangePercent: Number(response.data.priceChangePercent) || 0,
+          priceChange: Number(response.data.priceChange) || 0,
+          volume: Number(response.data.volume) || 0,
+          highPrice: Number(response.data.highPrice) || 0,
+          lowPrice: Number(response.data.lowPrice) || 0,
+        };
+      } else {
+        // Mutate existing object to preserve WebSocket reactivity
+        ticker.value.price = Number(response.data.price) || ticker.value.price;
+        ticker.value.priceChangePercent = Number(response.data.priceChangePercent) || ticker.value.priceChangePercent;
+        ticker.value.priceChange = Number(response.data.priceChange) || ticker.value.priceChange;
+        ticker.value.volume = Number(response.data.volume) || ticker.value.volume;
+        ticker.value.highPrice = Number(response.data.highPrice) || ticker.value.highPrice;
+        ticker.value.lowPrice = Number(response.data.lowPrice) || ticker.value.lowPrice;
+      }
     }
   } catch (error) {
     // Ignore abort errors
@@ -851,18 +859,8 @@ const processTickerUpdate = (tickerData) => {
   
   const symbol = tickerData.s;
   const currentSymbol = selectedSymbol.value.replace('/', '');
-  if (symbol !== currentSymbol) return;
-  
-  if (!ticker.value) {
-    // Initialize ticker if it doesn't exist
-    ticker.value = {
-      price: 0,
-      priceChangePercent: 0,
-      priceChange: 0,
-      volume: 0,
-      highPrice: 0,
-      lowPrice: 0,
-    };
+  if (symbol !== currentSymbol) {
+    return; // Not the current symbol, skip
   }
   
   const price = Number.parseFloat(tickerData.c);
@@ -874,13 +872,27 @@ const processTickerUpdate = (tickerData) => {
   
   if (!Number.isFinite(price)) return;
   
-  // Directly mutate properties (same as Home page) - Vue reactivity will detect changes
-  ticker.value.price = price;
-  ticker.value.priceChangePercent = changePercent;
-  ticker.value.priceChange = change;
-  ticker.value.volume = volume;
-  ticker.value.highPrice = highPrice;
-  ticker.value.lowPrice = lowPrice;
+  // Always update - mutate existing object or create new one
+  if (!ticker.value) {
+    ticker.value = {
+      price: price,
+      priceChangePercent: changePercent,
+      priceChange: change,
+      volume: volume,
+      highPrice: highPrice,
+      lowPrice: lowPrice,
+    };
+  } else {
+    // Directly mutate properties - Vue reactivity will detect changes
+    ticker.value.price = price;
+    ticker.value.priceChangePercent = changePercent;
+    ticker.value.priceChange = change;
+    ticker.value.volume = volume;
+    ticker.value.highPrice = highPrice;
+    ticker.value.lowPrice = lowPrice;
+  }
+  
+  console.log('[Kline WS] Updated ticker:', symbol, 'price:', price);
 };
 
 // WebSocket connection management (same as Home page)
@@ -909,16 +921,19 @@ const connectWebSocket = () => {
       wsBackoffMs = 1000;
     };
     
-    tickerWs.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        if (Array.isArray(data)) {
-          data.forEach(processTickerUpdate);
+      tickerWs.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (Array.isArray(data)) {
+            data.forEach(processTickerUpdate);
+          } else if (data.s) {
+            // Handle single ticker update
+            processTickerUpdate(data);
+          }
+        } catch (e) {
+          console.error('[Kline WS] Parse error:', e);
         }
-      } catch (e) {
-        console.error('[Kline WS] Parse error:', e);
-      }
-    };
+      };
     
     tickerWs.onerror = (e) => {
       console.error('[Kline WS] Error:', e);

@@ -111,27 +111,33 @@
                 @click="$router.push('/deposit')"
                 class="flex-1 glass-button rounded-md p-2 flex flex-col items-center gap-1.5 transition-all hover:scale-105"
               >
-                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                </svg>
+                <img 
+                  :src="depositIcon" 
+                  alt="Deposit" 
+                  class="w-[100px] h-[100px] object-contain"
+                />
                 <span class="text-white text-xs font-medium">{{ t('common.deposit') }}</span>
               </button>
               <button
                 @click="showWithdrawModal = true"
                 class="flex-1 glass-button rounded-md p-2 flex flex-col items-center gap-1.5 transition-all hover:scale-105"
               >
-                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
-                </svg>
+                <img 
+                  :src="withdrawIcon" 
+                  alt="Withdraw" 
+                  class="w-[100px] h-[100px] object-contain"
+                />
                 <span class="text-white text-xs font-medium">{{ t('common.withdraw') }}</span>
               </button>
               <button
                 @click="openTransferModal"
                 class="flex-1 glass-button rounded-md p-2 flex flex-col items-center gap-1.5 transition-all hover:scale-105"
               >
-                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                </svg>
+                <img 
+                  :src="transferIcon" 
+                  alt="Transfer" 
+                  class="w-[100px] h-[100px] object-contain"
+                />
                 <span class="text-white text-xs font-medium">{{ t('common.transfer') }}</span>
               </button>
             </div>
@@ -339,6 +345,9 @@ import { useAlert } from '../composables/useAlert';
 import MobileNav from '../components/MobileNav.vue';
 import DesktopNav from '../components/DesktopNav.vue';
 import CustomSelect from '../components/CustomSelect.vue';
+import depositIcon from '@/assets/dp-wd-tf-icons/deposit.png';
+import withdrawIcon from '@/assets/dp-wd-tf-icons/withdraw.png';
+import transferIcon from '@/assets/dp-wd-tf-icons/transfer.png';
 import SkeletonLoader from '../components/SkeletonLoader.vue';
 import api from '../utils/api';
 import { getAllCoins } from '../utils/coinLogos';
