@@ -87,13 +87,13 @@
           
           <!-- Actual Content -->
           <template v-else>
-          <!-- Asset Center Card -->
+          <!-- Balance Card - Big Glass Card -->
           <div class="glass-card rounded-lg p-4 mb-3">
             <div class="text-white/70 text-xs mb-1.5">{{ t('assets.assetCenter') }}(USDT)</div>
             <div class="text-white text-3xl font-bold mb-3">≈{{ formatBalance(totalBalance) }}</div>
             
             <!-- Account Balances -->
-            <div class="flex items-center justify-between py-2 px-2 bg-white/5 rounded-md mb-3">
+            <div class="flex items-center justify-between py-2 px-2 bg-white/5 rounded-md">
               <div class="flex-1 text-center">
                 <div class="text-white/60 text-xs mb-1">{{ t('assets.contractAccount') }}</div>
                 <div class="text-white text-base font-semibold">{{ formatBalance(contractBalance) }}</div>
@@ -104,39 +104,41 @@
                 <div class="text-white text-base font-semibold">{{ formatSpotBalance(spotBalance) }}</div>
               </div>
             </div>
-            
-            <!-- Action Buttons -->
-            <div class="flex gap-2 mt-4">
+          </div>
+          
+          <!-- Action Buttons Card - Separate Glass Card -->
+          <div class="glass-card rounded-lg p-4 mb-3">
+            <div class="flex gap-2">
               <button
                 @click="$router.push('/deposit')"
-                class="flex-1 glass-button rounded-md p-2 flex flex-col items-center gap-1.5 transition-all hover:scale-105"
+                class="flex-1 flex flex-col items-center gap-1.5 transition-all hover:scale-105 active:scale-95"
               >
                 <img 
                   :src="depositIcon" 
                   alt="Deposit" 
-                  class="w-[100px] h-[100px] object-contain"
+                  class="w-8 h-8 object-contain"
                 />
                 <span class="text-white text-xs font-medium">{{ t('common.deposit') }}</span>
               </button>
               <button
-                @click="showWithdrawModal = true"
-                class="flex-1 glass-button rounded-md p-2 flex flex-col items-center gap-1.5 transition-all hover:scale-105"
+                @click="$router.push('/withdraw')"
+                class="flex-1 flex flex-col items-center gap-1.5 transition-all hover:scale-105 active:scale-95"
               >
                 <img 
                   :src="withdrawIcon" 
                   alt="Withdraw" 
-                  class="w-[100px] h-[100px] object-contain"
+                  class="w-8 h-8 object-contain"
                 />
                 <span class="text-white text-xs font-medium">{{ t('common.withdraw') }}</span>
               </button>
               <button
                 @click="openTransferModal"
-                class="flex-1 glass-button rounded-md p-2 flex flex-col items-center gap-1.5 transition-all hover:scale-105"
+                class="flex-1 flex flex-col items-center gap-1.5 transition-all hover:scale-105 active:scale-95"
               >
                 <img 
                   :src="transferIcon" 
                   alt="Transfer" 
-                  class="w-[100px] h-[100px] object-contain"
+                  class="w-8 h-8 object-contain"
                 />
                 <span class="text-white text-xs font-medium">{{ t('common.transfer') }}</span>
               </button>

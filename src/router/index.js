@@ -63,6 +63,12 @@ const routes = [
     meta: { requiresAuth: true, title: 'Deposit' },
   },
   {
+    path: '/withdraw',
+    name: 'Withdraw',
+    component: () => import('../views/Withdraw.vue'),
+    meta: { requiresAuth: true, title: 'Withdraw' },
+  },
+  {
     path: '/flash-exchange',
     name: 'FlashExchange',
     component: () => import('../views/FlashExchange.vue'),

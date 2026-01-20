@@ -192,6 +192,7 @@ import axios from 'axios';
 const { t } = useI18n();
 
 const BINANCE_HTTP_API = 'https://api.binance.com/api/v3';
+const BINANCE_WS_URL = 'wss://stream.binance.com:9443/ws/!ticker@arr';
 
 const route = useRoute();
 const router = useRouter();
@@ -821,44 +822,19 @@ const initChart = async () => {
   }
 };
 
-// Watch for symbol changes
-watch(() => route.query.symbol, (newSymbol) => {
-  if (newSymbol) {
-    let symbol = newSymbol.trim();
-    // If symbol already has a slash, use it as is
-    if (symbol.includes('/')) {
-      // Already in format like "BCH/USDT"
-      if (symbols.value.includes(symbol)) {
-        selectedSymbol.value = symbol;
-        loadMarketData();
-        // Ensure WebSocket is connected when symbol changes
-        if (!tickerWs || tickerWs.readyState !== WebSocket.OPEN) {
-          connectWebSocket();
-        }
-      }
-    } else {
-      // Format like "BCHUSDT" - add slash before USDT
-      symbol = symbol.replace(/USDT$/, '/USDT');
-      if (symbols.value.includes(symbol)) {
-        selectedSymbol.value = symbol;
-        loadMarketData();
-        // Ensure WebSocket is connected when symbol changes
-        if (!tickerWs || tickerWs.readyState !== WebSocket.OPEN) {
-          connectWebSocket();
-        }
-      }
-    }
-  }
-}, { immediate: true });
-
-let dataInterval = null;
-
 // Process WebSocket updates - MUTATE existing ticker object (same as Home page)
+// Must be defined before connectWebSocket since it's used inside it
 const processTickerUpdate = (tickerData) => {
   if (!tickerData?.s) return;
   
   const symbol = tickerData.s;
   const currentSymbol = selectedSymbol.value.replace('/', '');
+  
+  // Debug logging
+  if (symbol === currentSymbol) {
+    console.log('[Kline WS] Processing update for', symbol, 'price:', tickerData.c);
+  }
+  
   if (symbol !== currentSymbol) {
     return; // Not the current symbol, skip
   }
@@ -882,6 +858,7 @@ const processTickerUpdate = (tickerData) => {
       highPrice: highPrice,
       lowPrice: lowPrice,
     };
+    console.log('[Kline WS] Created new ticker object:', ticker.value);
   } else {
     // Directly mutate properties - Vue reactivity will detect changes
     ticker.value.price = price;
@@ -890,12 +867,11 @@ const processTickerUpdate = (tickerData) => {
     ticker.value.volume = volume;
     ticker.value.highPrice = highPrice;
     ticker.value.lowPrice = lowPrice;
+    console.log('[Kline WS] Updated ticker:', symbol, 'price:', price, 'change%:', changePercent);
   }
-  
-  console.log('[Kline WS] Updated ticker:', symbol, 'price:', price);
 };
 
-// WebSocket connection management (same as Home page)
+// WebSocket connection management (same as Home page) - defined before watch
 const connectWebSocket = () => {
   if (tickerWs?.readyState === WebSocket.OPEN) return;
   
@@ -921,19 +897,24 @@ const connectWebSocket = () => {
       wsBackoffMs = 1000;
     };
     
-      tickerWs.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          if (Array.isArray(data)) {
-            data.forEach(processTickerUpdate);
-          } else if (data.s) {
-            // Handle single ticker update
-            processTickerUpdate(data);
+    tickerWs.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (Array.isArray(data)) {
+          // Log first few updates to verify we're receiving data
+          if (data.length > 0) {
+            console.log('[Kline WS] Received array of', data.length, 'tickers');
           }
-        } catch (e) {
-          console.error('[Kline WS] Parse error:', e);
+          data.forEach(processTickerUpdate);
+        } else if (data.s) {
+          // Handle single ticker update
+          console.log('[Kline WS] Received single ticker:', data.s);
+          processTickerUpdate(data);
         }
-      };
+      } catch (e) {
+        console.error('[Kline WS] Parse error:', e);
+      }
+    };
     
     tickerWs.onerror = (e) => {
       console.error('[Kline WS] Error:', e);
@@ -960,6 +941,50 @@ const scheduleReconnect = () => {
   
   wsBackoffMs = Math.min(wsBackoffMs * 2, MAX_BACKOFF_MS);
 };
+
+// Watch for symbol changes
+watch(() => route.query.symbol, (newSymbol) => {
+  if (newSymbol) {
+    let symbol = newSymbol.trim();
+    // If symbol already has a slash, use it as is
+    if (symbol.includes('/')) {
+      // Already in format like "BCH/USDT"
+      if (symbols.value.includes(symbol)) {
+        selectedSymbol.value = symbol;
+        loadMarketData();
+        // Reconnect WebSocket when symbol changes to ensure we get updates
+        if (tickerWs) {
+          try {
+            tickerWs.close();
+          } catch (e) {
+            console.warn('[Kline WS] Error closing old connection:', e);
+          }
+          tickerWs = null;
+        }
+        connectWebSocket();
+      }
+    } else {
+      // Format like "BCHUSDT" - add slash before USDT
+      symbol = symbol.replace(/USDT$/, '/USDT');
+      if (symbols.value.includes(symbol)) {
+        selectedSymbol.value = symbol;
+        loadMarketData();
+        // Reconnect WebSocket when symbol changes to ensure we get updates
+        if (tickerWs) {
+          try {
+            tickerWs.close();
+          } catch (e) {
+            console.warn('[Kline WS] Error closing old connection:', e);
+          }
+          tickerWs = null;
+        }
+        connectWebSocket();
+      }
+    }
+  }
+}, { immediate: true });
+
+let dataInterval = null;
 
 const refreshMarketData = async () => {
   const symbol = selectedSymbol.value.replace('/', '');
@@ -1022,24 +1047,6 @@ onMounted(async () => {
   };
   window.addEventListener('resize', handleResize, { passive: true });
   // One extra resize tick for mobile browsers after layout settles
-  setTimeout(handleResize, 250);
-  
-  // WebSocket for real-time ticker updates (header price/change/volume)
-  handleResize = () => {
-    try {
-      if (chart && chartContainer.value) {
-        const w = chartContainer.value.clientWidth;
-        if (w > 0) chart.applyOptions({ width: w, height: chartHeight.value });
-      }
-      if (volumeChart && volumeChartContainer.value) {
-        const w = volumeChartContainer.value.clientWidth;
-        if (w > 0) volumeChart.applyOptions({ width: w, height: volumeHeight.value });
-      }
-    } catch (error) {
-      console.warn('Error resizing charts:', error);
-    }
-  };
-  window.addEventListener('resize', handleResize);
   setTimeout(handleResize, 250);
   
   // Connect WebSocket for real-time updates (same as Home page)

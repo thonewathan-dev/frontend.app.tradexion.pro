@@ -155,6 +155,29 @@
     "submitButton": "SUBMIT",
     "waitForReview": "Please wait patiently for the staff to review after submitting the recharge information"
   },
+  "withdraw": {
+    "title": "Withdraw",
+    "history": "Withdrawal records",
+    "selectCurrency": "Select currency",
+    "network": "Network",
+    "extractableQuantity": "Extractable quantity:",
+    "enterAddress": "Please enter the withdrawal address",
+    "addressWarning": "The coin pick-up address should not contain spaces",
+    "amount": "Amount of coin drawn",
+    "fee": "Fee",
+    "arrivedAmount": "Arrived amount",
+    "button": "WITHDRAW",
+    "invalidInput": "Please check your input",
+    "insufficientBalance": "Insufficient balance",
+    "success": "Withdrawal request submitted successfully",
+    "error": "Failed to submit withdrawal request",
+    "noHistory": "No withdrawal records",
+    "status": {
+      "pending": "Pending",
+      "completed": "Completed",
+      "rejected": "Rejected"
+    }
+  },
   "auth": {
     "welcomeBack": "Welcome Back",
     "signIn": "Sign in to your account",

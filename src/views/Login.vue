@@ -92,9 +92,14 @@
                 />
               </div>
 
+              <!-- Cloudflare Turnstile CAPTCHA -->
+              <div class="flex justify-center">
+                <div ref="turnstileWidget" id="turnstile-widget-login"></div>
+              </div>
+
               <button
                 type="submit"
-                :disabled="loading"
+                :disabled="loading || !turnstileToken"
                 class="w-full py-3 glass-button-no-hover rounded-lg font-semibold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
               >
                 {{ loading ? t('auth.loggingIn') : t('auth.signInButton') }}
@@ -137,7 +142,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '../stores/auth';
@@ -147,6 +152,11 @@ const { t } = useI18n();
 
 const router = useRouter();
 const authStore = useAuthStore();
+
+const TURNSTILE_SITE_KEY = '0x4AAAAAACNscU1_JGFhgUPj';
+const turnstileWidget = ref(null);
+const turnstileToken = ref('');
+let turnstileWidgetId = null;
 
 const logoUrl = new URL('../assets/logo/Logo+SideText.png', import.meta.url).href;
 const year = new Date().getFullYear();
@@ -175,16 +185,72 @@ const password = ref('');
 const error = ref('');
 const loading = ref(false);
 
+const initTurnstile = () => {
+  if (window.turnstile && turnstileWidget.value) {
+    turnstileWidgetId = window.turnstile.render('#turnstile-widget-login', {
+      sitekey: TURNSTILE_SITE_KEY,
+      callback: (token) => {
+        turnstileToken.value = token;
+      },
+      'error-callback': () => {
+        turnstileToken.value = '';
+      },
+      'expired-callback': () => {
+        turnstileToken.value = '';
+      },
+    });
+  }
+};
+
+const resetTurnstile = () => {
+  if (turnstileWidgetId && window.turnstile) {
+    window.turnstile.reset(turnstileWidgetId);
+    turnstileToken.value = '';
+  }
+};
+
+onMounted(() => {
+  // Wait for Turnstile script to load
+  if (window.turnstile) {
+    initTurnstile();
+  } else {
+    const checkTurnstile = setInterval(() => {
+      if (window.turnstile) {
+        initTurnstile();
+        clearInterval(checkTurnstile);
+      }
+    }, 100);
+    
+    // Cleanup if script doesn't load within 5 seconds
+    setTimeout(() => {
+      clearInterval(checkTurnstile);
+    }, 5000);
+  }
+});
+
+onUnmounted(() => {
+  if (turnstileWidgetId && window.turnstile) {
+    window.turnstile.remove(turnstileWidgetId);
+  }
+});
+
 const handleLogin = async () => {
+  if (!turnstileToken.value) {
+    error.value = 'Please complete the CAPTCHA verification';
+    return;
+  }
+  
   error.value = '';
   loading.value = true;
   
-  const result = await authStore.login(email.value, password.value);
+  const result = await authStore.login(email.value, password.value, turnstileToken.value);
   
   if (result.success) {
+    resetTurnstile();
     router.push('/');
   } else {
     error.value = result.error;
+    resetTurnstile();
   }
   
   loading.value = false;

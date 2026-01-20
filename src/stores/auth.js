@@ -13,9 +13,9 @@ export const useAuthStore = defineStore('auth', () => {
     return !!accessToken.value;
   });
 
-  const login = async (email, password) => {
+  const login = async (email, password, turnstileToken) => {
     try {
-      const response = await api.post('/auth/login', { email, password });
+      const response = await api.post('/auth/login', { email, password, turnstileToken });
       accessToken.value = response.data.accessToken;
       refreshToken.value = response.data.refreshToken;
       user.value = response.data.user;
@@ -29,9 +29,9 @@ export const useAuthStore = defineStore('auth', () => {
     }
   };
 
-  const register = async (email, password) => {
+  const register = async (email, password, turnstileToken) => {
     try {
-      const response = await api.post('/auth/register', { email, password });
+      const response = await api.post('/auth/register', { email, password, turnstileToken });
       return { 
         success: true, 
         data: response.data,

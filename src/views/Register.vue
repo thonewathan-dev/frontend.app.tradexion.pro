@@ -101,9 +101,14 @@
                 <p class="text-xs text-white/50 mt-1">{{ t('auth.minimumChars') }}</p>
               </div>
 
+              <!-- Cloudflare Turnstile CAPTCHA -->
+              <div class="flex justify-center">
+                <div ref="turnstileWidget" id="turnstile-widget-register"></div>
+              </div>
+
               <button
                 type="submit"
-                :disabled="loading"
+                :disabled="loading || !turnstileToken"
                 class="w-full py-3 glass-button-no-hover rounded-lg font-semibold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
               >
                 {{ loading ? t('auth.registering') : t('auth.createAccountButton') }}
@@ -188,7 +193,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '../stores/auth';
@@ -198,6 +203,11 @@ const { t } = useI18n();
 
 const router = useRouter();
 const authStore = useAuthStore();
+
+const TURNSTILE_SITE_KEY = '0x4AAAAAACNscU1_JGFhgUPj';
+const turnstileWidget = ref(null);
+const turnstileToken = ref('');
+let turnstileWidgetId = null;
 
 const logoUrl = new URL('../assets/logo/Logo+SideText.png', import.meta.url).href;
 const year = new Date().getFullYear();
@@ -230,17 +240,72 @@ const loading = ref(false);
 const showVerification = ref(false);
 const displayedOTP = ref('');
 
+const initTurnstile = () => {
+  if (window.turnstile && turnstileWidget.value) {
+    turnstileWidgetId = window.turnstile.render('#turnstile-widget-register', {
+      sitekey: TURNSTILE_SITE_KEY,
+      callback: (token) => {
+        turnstileToken.value = token;
+      },
+      'error-callback': () => {
+        turnstileToken.value = '';
+      },
+      'expired-callback': () => {
+        turnstileToken.value = '';
+      },
+    });
+  }
+};
+
+const resetTurnstile = () => {
+  if (turnstileWidgetId && window.turnstile) {
+    window.turnstile.reset(turnstileWidgetId);
+    turnstileToken.value = '';
+  }
+};
+
+onMounted(() => {
+  // Wait for Turnstile script to load
+  if (window.turnstile) {
+    initTurnstile();
+  } else {
+    const checkTurnstile = setInterval(() => {
+      if (window.turnstile) {
+        initTurnstile();
+        clearInterval(checkTurnstile);
+      }
+    }, 100);
+    
+    // Cleanup if script doesn't load within 5 seconds
+    setTimeout(() => {
+      clearInterval(checkTurnstile);
+    }, 5000);
+  }
+});
+
+onUnmounted(() => {
+  if (turnstileWidgetId && window.turnstile) {
+    window.turnstile.remove(turnstileWidgetId);
+  }
+});
+
 const handleRegister = async () => {
+  if (!turnstileToken.value) {
+    error.value = 'Please complete the CAPTCHA verification';
+    return;
+  }
+  
   error.value = '';
   success.value = '';
   loading.value = true;
   
-  const result = await authStore.register(email.value, password.value);
+  const result = await authStore.register(email.value, password.value, turnstileToken.value);
   
   if (result.success) {
     // If email is auto-verified, redirect to login
     if (result.emailVerified) {
       success.value = 'Registration successful! Email auto-verified. You can now login.';
+      resetTurnstile();
       setTimeout(() => {
         router.push('/login');
       }, 2000);
@@ -250,14 +315,17 @@ const handleRegister = async () => {
       displayedOTP.value = result.otp;
       success.value = `Registration successful! Your verification code is below (Email service not configured):`;
       showVerification.value = true;
+      resetTurnstile();
     }
     // Normal flow - check email
     else {
       success.value = 'Registration successful! Please check your email for the verification code.';
       showVerification.value = true;
+      resetTurnstile();
     }
   } else {
     error.value = result.error;
+    resetTurnstile();
   }
   
   loading.value = false;
