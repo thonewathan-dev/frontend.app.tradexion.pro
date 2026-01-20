@@ -817,6 +817,10 @@ watch(() => route.query.symbol, (newSymbol) => {
       if (symbols.value.includes(symbol)) {
         selectedSymbol.value = symbol;
         loadMarketData();
+        // Ensure WebSocket is connected when symbol changes
+        if (!tickerWs || tickerWs.readyState !== WebSocket.OPEN) {
+          connectWebSocket();
+        }
       }
     } else {
       // Format like "BCHUSDT" - add slash before USDT
@@ -824,6 +828,10 @@ watch(() => route.query.symbol, (newSymbol) => {
       if (symbols.value.includes(symbol)) {
         selectedSymbol.value = symbol;
         loadMarketData();
+        // Ensure WebSocket is connected when symbol changes
+        if (!tickerWs || tickerWs.readyState !== WebSocket.OPEN) {
+          connectWebSocket();
+        }
       }
     }
   }
@@ -920,29 +928,39 @@ onMounted(async () => {
     const currentSymbol = selectedSymbol.value.replace('/', '');
     if (symbol !== currentSymbol) return;
     
-    // Initialize ticker if it doesn't exist
+    // Always update ticker with WebSocket data (real-time)
+    // Use Object.assign to ensure Vue reactivity detects changes
+    const newPrice = Number(tickerData.c) || 0;
+    const newChangePercent = Number(tickerData.P) || 0;
+    const newChange = Number(tickerData.p) || 0;
+    const newVolume = Number(tickerData.v) || 0;
+    const newHigh = Number(tickerData.h) || 0;
+    const newLow = Number(tickerData.l) || 0;
+    
     if (!ticker.value) {
       ticker.value = {
-        price: 0,
-        priceChangePercent: 0,
-        priceChange: 0,
-        volume: 0,
-        highPrice: 0,
-        lowPrice: 0,
+        price: newPrice,
+        priceChangePercent: newChangePercent,
+        priceChange: newChange,
+        volume: newVolume,
+        highPrice: newHigh,
+        lowPrice: newLow,
       };
+    } else {
+      // Update existing ticker - ensure Vue detects changes by assigning each property
+      ticker.value.price = newPrice;
+      ticker.value.priceChangePercent = newChangePercent;
+      ticker.value.priceChange = newChange;
+      ticker.value.volume = newVolume;
+      ticker.value.highPrice = newHigh;
+      ticker.value.lowPrice = newLow;
     }
-    
-    // Always update ticker with WebSocket data (real-time)
-    ticker.value.price = Number(tickerData.c) || 0;
-    ticker.value.priceChangePercent = Number(tickerData.P) || 0;
-    ticker.value.priceChange = Number(tickerData.p) || 0;
-    ticker.value.volume = Number(tickerData.v) || 0;
-    ticker.value.highPrice = Number(tickerData.h) || 0;
-    ticker.value.lowPrice = Number(tickerData.l) || 0;
   };
 
   const connectWebSocket = () => {
     if (tickerWs?.readyState === WebSocket.OPEN) return;
+    
+    console.log('[Kline WS] Connecting to Binance...');
     
     try {
       if (tickerWs) {
