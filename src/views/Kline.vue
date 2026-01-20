@@ -895,25 +895,6 @@ onMounted(async () => {
   setTimeout(handleResize, 250);
   
   // WebSocket for real-time ticker updates (header price/change/volume)
-  // Initialize chart first, then load data
-  await initChart();
-  // Load market data (ticker and trades), klines will be loaded by initChart
-  const symbol = selectedSymbol.value.replace('/', '');
-  isLoading.value = true;
-  try {
-    await Promise.all([
-      loadTicker(symbol),
-      loadRecentTrades(symbol),
-    ]);
-    // Ensure klines are loaded after chart is ready
-    if (chart && candlestickSeries) {
-      await loadKlines();
-    }
-  } finally {
-    isLoading.value = false;
-  }
-  
-  // Resize charts on window resize (also adjust height on mobile to avoid empty space)
   handleResize = () => {
     try {
       if (chart && chartContainer.value) {
