@@ -920,14 +920,25 @@ onMounted(async () => {
     const currentSymbol = selectedSymbol.value.replace('/', '');
     if (symbol !== currentSymbol) return;
     
-    if (ticker.value) {
-      ticker.value.price = Number(tickerData.c) || ticker.value.price;
-      ticker.value.priceChangePercent = Number(tickerData.P) || ticker.value.priceChangePercent;
-      ticker.value.priceChange = Number(tickerData.p) || ticker.value.priceChange;
-      ticker.value.volume = Number(tickerData.v) || ticker.value.volume;
-      ticker.value.highPrice = Number(tickerData.h) || ticker.value.highPrice;
-      ticker.value.lowPrice = Number(tickerData.l) || ticker.value.lowPrice;
+    // Initialize ticker if it doesn't exist
+    if (!ticker.value) {
+      ticker.value = {
+        price: 0,
+        priceChangePercent: 0,
+        priceChange: 0,
+        volume: 0,
+        highPrice: 0,
+        lowPrice: 0,
+      };
     }
+    
+    // Always update ticker with WebSocket data (real-time)
+    ticker.value.price = Number(tickerData.c) || 0;
+    ticker.value.priceChangePercent = Number(tickerData.P) || 0;
+    ticker.value.priceChange = Number(tickerData.p) || 0;
+    ticker.value.volume = Number(tickerData.v) || 0;
+    ticker.value.highPrice = Number(tickerData.h) || 0;
+    ticker.value.lowPrice = Number(tickerData.l) || 0;
   };
 
   const connectWebSocket = () => {
@@ -957,7 +968,11 @@ onMounted(async () => {
         try {
           const data = JSON.parse(event.data);
           if (Array.isArray(data)) {
+            // Process all ticker updates - this stream sends all symbols
             data.forEach(processTickerUpdate);
+          } else if (data.s) {
+            // Handle single ticker update (if stream format changes)
+            processTickerUpdate(data);
           }
         } catch (e) {
           console.error('[Kline WS] Parse error:', e);
