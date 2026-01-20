@@ -335,6 +335,12 @@ let tickerAbortController = null;
 let tradesAbortController = null;
 let klinesAbortController = null;
 
+// WebSocket state management (same as Home page)
+let tickerWs = null;
+let wsReconnectTimer = null;
+let wsBackoffMs = 1000;
+const MAX_BACKOFF_MS = 30000;
+
 const loadTicker = async (symbol) => {
   // Cancel previous request if still pending
   if (tickerAbortController) {
@@ -839,6 +845,107 @@ watch(() => route.query.symbol, (newSymbol) => {
 
 let dataInterval = null;
 
+// Process WebSocket updates - MUTATE existing ticker object (same as Home page)
+const processTickerUpdate = (tickerData) => {
+  if (!tickerData?.s) return;
+  
+  const symbol = tickerData.s;
+  const currentSymbol = selectedSymbol.value.replace('/', '');
+  if (symbol !== currentSymbol) return;
+  
+  if (!ticker.value) {
+    // Initialize ticker if it doesn't exist
+    ticker.value = {
+      price: 0,
+      priceChangePercent: 0,
+      priceChange: 0,
+      volume: 0,
+      highPrice: 0,
+      lowPrice: 0,
+    };
+  }
+  
+  const price = Number.parseFloat(tickerData.c);
+  const changePercent = Number.parseFloat(tickerData.P) || 0;
+  const change = Number.parseFloat(tickerData.p) || 0;
+  const volume = Number.parseFloat(tickerData.v) || 0;
+  const highPrice = Number.parseFloat(tickerData.h) || 0;
+  const lowPrice = Number.parseFloat(tickerData.l) || 0;
+  
+  if (!Number.isFinite(price)) return;
+  
+  // Directly mutate properties (same as Home page) - Vue reactivity will detect changes
+  ticker.value.price = price;
+  ticker.value.priceChangePercent = changePercent;
+  ticker.value.priceChange = change;
+  ticker.value.volume = volume;
+  ticker.value.highPrice = highPrice;
+  ticker.value.lowPrice = lowPrice;
+};
+
+// WebSocket connection management (same as Home page)
+const connectWebSocket = () => {
+  if (tickerWs?.readyState === WebSocket.OPEN) return;
+  
+  console.log('[Kline WS] Connecting to Binance...');
+  
+  try {
+    if (tickerWs) {
+      tickerWs.onopen = null;
+      tickerWs.onmessage = null;
+      tickerWs.onerror = null;
+      tickerWs.onclose = null;
+      tickerWs.close();
+    }
+  } catch (e) {
+    console.warn('[Kline WS] Cleanup error:', e);
+  }
+  
+  try {
+    tickerWs = new WebSocket(BINANCE_WS_URL);
+    
+    tickerWs.onopen = () => {
+      console.log('[Kline WS] Connected successfully');
+      wsBackoffMs = 1000;
+    };
+    
+    tickerWs.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (Array.isArray(data)) {
+          data.forEach(processTickerUpdate);
+        }
+      } catch (e) {
+        console.error('[Kline WS] Parse error:', e);
+      }
+    };
+    
+    tickerWs.onerror = (e) => {
+      console.error('[Kline WS] Error:', e);
+    };
+    
+    tickerWs.onclose = (e) => {
+      console.warn('[Kline WS] Closed:', e.code, e.reason);
+      tickerWs = null;
+      scheduleReconnect();
+    };
+  } catch (e) {
+    console.error('[Kline WS] Setup error:', e);
+    scheduleReconnect();
+  }
+};
+
+const scheduleReconnect = () => {
+  if (wsReconnectTimer) return;
+  
+  wsReconnectTimer = setTimeout(() => {
+    wsReconnectTimer = null;
+    connectWebSocket();
+  }, wsBackoffMs);
+  
+  wsBackoffMs = Math.min(wsBackoffMs * 2, MAX_BACKOFF_MS);
+};
+
 const refreshMarketData = async () => {
   const symbol = selectedSymbol.value.replace('/', '');
   
@@ -920,110 +1027,10 @@ onMounted(async () => {
   window.addEventListener('resize', handleResize);
   setTimeout(handleResize, 250);
   
-  // WebSocket for real-time ticker updates (header price/change/volume)
-
-  const processTickerUpdate = (tickerData) => {
-    if (!tickerData?.s) return;
-    const symbol = tickerData.s;
-    const currentSymbol = selectedSymbol.value.replace('/', '');
-    if (symbol !== currentSymbol) return;
-    
-    // Always update ticker with WebSocket data (real-time)
-    // Use Object.assign to ensure Vue reactivity detects changes
-    const newPrice = Number(tickerData.c) || 0;
-    const newChangePercent = Number(tickerData.P) || 0;
-    const newChange = Number(tickerData.p) || 0;
-    const newVolume = Number(tickerData.v) || 0;
-    const newHigh = Number(tickerData.h) || 0;
-    const newLow = Number(tickerData.l) || 0;
-    
-    if (!ticker.value) {
-      ticker.value = {
-        price: newPrice,
-        priceChangePercent: newChangePercent,
-        priceChange: newChange,
-        volume: newVolume,
-        highPrice: newHigh,
-        lowPrice: newLow,
-      };
-    } else {
-      // Update existing ticker - ensure Vue detects changes by assigning each property
-      ticker.value.price = newPrice;
-      ticker.value.priceChangePercent = newChangePercent;
-      ticker.value.priceChange = newChange;
-      ticker.value.volume = newVolume;
-      ticker.value.highPrice = newHigh;
-      ticker.value.lowPrice = newLow;
-    }
-  };
-
-  const connectWebSocket = () => {
-    if (tickerWs?.readyState === WebSocket.OPEN) return;
-    
-    console.log('[Kline WS] Connecting to Binance...');
-    
-    try {
-      if (tickerWs) {
-        tickerWs.onopen = null;
-        tickerWs.onmessage = null;
-        tickerWs.onerror = null;
-        tickerWs.onclose = null;
-        tickerWs.close();
-      }
-    } catch (e) {
-      console.warn('[Kline WS] Cleanup error:', e);
-    }
-    
-    try {
-      tickerWs = new WebSocket(BINANCE_WS_URL);
-      
-      tickerWs.onopen = () => {
-        console.log('[Kline WS] Connected');
-        wsBackoffMs = 1000;
-      };
-      
-      tickerWs.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          if (Array.isArray(data)) {
-            // Process all ticker updates - this stream sends all symbols
-            data.forEach(processTickerUpdate);
-          } else if (data.s) {
-            // Handle single ticker update (if stream format changes)
-            processTickerUpdate(data);
-          }
-        } catch (e) {
-          console.error('[Kline WS] Parse error:', e);
-        }
-      };
-      
-      tickerWs.onerror = (e) => {
-        console.error('[Kline WS] Error:', e);
-      };
-      
-      tickerWs.onclose = (e) => {
-        console.warn('[Kline WS] Closed:', e.code);
-        tickerWs = null;
-        scheduleReconnect();
-      };
-    } catch (e) {
-      console.error('[Kline WS] Setup error:', e);
-      scheduleReconnect();
-    }
-  };
-
-  const scheduleReconnect = () => {
-    if (wsReconnectTimer) return;
-    wsReconnectTimer = setTimeout(() => {
-      wsReconnectTimer = null;
-      connectWebSocket();
-    }, wsBackoffMs);
-    wsBackoffMs = Math.min(wsBackoffMs * 2, MAX_BACKOFF_MS);
-  };
-
+  // Connect WebSocket for real-time updates (same as Home page)
   connectWebSocket();
 
-  // Refresh klines and trades every 2 seconds (ticker updated via WebSocket)
+  // Refresh klines and trades every 1 second (ticker updated via WebSocket in real-time)
   let isRefreshing = false;
   dataInterval = setInterval(async () => {
     if (!isRefreshing) {
@@ -1040,7 +1047,7 @@ onMounted(async () => {
         isRefreshing = false;
       }
     }
-  }, 2000);
+  }, 1000);
 });
 
 onUnmounted(() => {
