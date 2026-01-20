@@ -22,7 +22,7 @@
             <div 
               :class="[
                 'text-xl font-bold mb-1',
-                ticker?.priceChangePercent >= 0 ? 'text-green-400' : 'text-red-400'
+                (Number(ticker?.priceChangePercent) || 0) >= 0 ? 'text-green-400' : 'text-red-400'
               ]"
             >
               {{ formatPrice(ticker?.price || 0) }}
@@ -30,18 +30,18 @@
             <div 
               :class="[
                 'inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium',
-                ticker?.priceChangePercent >= 0 
+                (Number(ticker?.priceChangePercent) || 0) >= 0 
                   ? 'bg-green-500/20 text-green-300' 
                   : 'bg-red-500/20 text-red-300'
               ]"
             >
-              <svg v-if="ticker?.priceChangePercent < 0" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg v-if="(Number(ticker?.priceChangePercent) || 0) < 0" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
               <svg v-else class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
               </svg>
-              {{ ticker?.priceChangePercent >= 0 ? '+' : '' }}{{ ticker?.priceChangePercent?.toFixed(2) || '0.00' }}%
+              {{ (Number(ticker?.priceChangePercent) || 0) >= 0 ? '+' : '' }}{{ (Number(ticker?.priceChangePercent) || 0).toFixed(2) }}%
             </div>
           </div>
           
@@ -343,7 +343,20 @@ const loadTicker = async (symbol) => {
     const response = await api.get(`/market/ticker/${symbol}/24h`, {
       signal: tickerAbortController.signal,
     });
-    ticker.value = response.data;
+    // Ensure numeric fields are properly parsed
+    if (response.data) {
+      ticker.value = {
+        ...response.data,
+        price: Number(response.data.price) || 0,
+        priceChangePercent: Number(response.data.priceChangePercent) || 0,
+        priceChange: Number(response.data.priceChange) || 0,
+        volume: Number(response.data.volume) || 0,
+        highPrice: Number(response.data.highPrice) || 0,
+        lowPrice: Number(response.data.lowPrice) || 0,
+      };
+    } else {
+      ticker.value = null;
+    }
   } catch (error) {
     // Ignore abort errors
     if (error.name === 'AbortError' || error.name === 'CanceledError') {
