@@ -168,7 +168,9 @@
                   @error="handleImageError"
                 />
                 <div class="text-xs md:text-sm font-semibold text-white mb-1">{{ ticker.symbol }}</div>
+                <!-- Top 3: percentage -->
                 <span
+                  v-if="!ticker.isPlaceholder"
                   :class="[
                     'text-xs px-2 py-0.5 rounded-full font-medium mb-1',
                     ticker.change >= 0 
@@ -178,8 +180,32 @@
                 >
                   {{ ticker.change >= 0 ? '+' : '' }}{{ ticker.change.toFixed(2) }}%
                 </span>
-                <div class="text-sm md:text-base font-bold text-white mb-0.5">${{ formatPrice(ticker.price) }}</div>
-                <div class="text-xs text-white/60">Vol {{ formatVolume(ticker.volume) }}</div>
+                <div
+                  v-else
+                  class="h-4 bg-white/10 rounded-full w-14 mb-1 animate-pulse"
+                ></div>
+                <!-- Top 3: last price -->
+                <div
+                  v-if="!ticker.isPlaceholder"
+                  class="text-sm md:text-base font-bold text-white mb-0.5"
+                >
+                  ${{ formatPrice(ticker.price) }}
+                </div>
+                <div
+                  v-else
+                  class="h-4 bg-white/10 rounded w-16 mb-0.5 animate-pulse"
+                ></div>
+                <!-- Top 3: volume -->
+                <div
+                  v-if="!ticker.isPlaceholder"
+                  class="text-xs text-white/60"
+                >
+                  Vol {{ formatVolume(ticker.volume) }}
+                </div>
+                <div
+                  v-else
+                  class="h-3 bg-white/10 rounded w-20 animate-pulse"
+                ></div>
               </div>
             </div>
           </div>
@@ -257,9 +283,19 @@
                 <!-- Right: Price and Change -->
                 <div class="flex items-center gap-3 flex-shrink-0">
                   <div class="text-right">
-                    <div class="text-base font-bold text-white leading-tight">${{ formatPrice(ticker.price) }}</div>
+                    <div
+                      v-if="!ticker.isPlaceholder"
+                      class="text-base font-bold text-white leading-tight"
+                    >
+                      ${{ formatPrice(ticker.price) }}
+                    </div>
+                    <div
+                      v-else
+                      class="h-4 bg-white/10 rounded w-16 animate-pulse"
+                    ></div>
                   </div>
                   <span
+                    v-if="!ticker.isPlaceholder"
                     :class="[
                       'text-xs px-2 py-1 rounded-full font-medium whitespace-nowrap flex items-center gap-1',
                       ticker.change >= 0 
@@ -275,6 +311,10 @@
                     </svg>
                     {{ ticker.change >= 0 ? '+' : '' }}{{ ticker.change.toFixed(2) }}%
                   </span>
+                    <div
+                      v-else
+                      class="h-4 bg-white/10 rounded-full w-14 animate-pulse"
+                    ></div>
                 </div>
               </div>
             </div>
@@ -299,6 +339,7 @@
                   <span class="text-sm font-semibold text-white">{{ ticker.symbol }}</span>
                 </div>
                 <span
+                  v-if="!ticker.isPlaceholder"
                   :class="[
                     'text-xs px-2 py-1 rounded-full font-medium',
                     ticker.change >= 0 
@@ -308,9 +349,31 @@
                 >
                   {{ ticker.change >= 0 ? '+' : '' }}{{ ticker.change.toFixed(2) }}%
                 </span>
+                <div
+                  v-else
+                  class="h-4 bg-white/10 rounded-full w-16 animate-pulse"
+                ></div>
               </div>
-              <div class="text-2xl font-bold text-white mb-1">${{ formatPrice(ticker.price) }}</div>
-              <div class="text-xs text-white/60">{{ $t('home.volume') }}: {{ formatVolume(ticker.volume) }}</div>
+              <div
+                v-if="!ticker.isPlaceholder"
+                class="text-2xl font-bold text-white mb-1"
+              >
+                ${{ formatPrice(ticker.price) }}
+              </div>
+              <div
+                v-else
+                class="h-5 bg-white/10 rounded w-24 mb-1 animate-pulse"
+              ></div>
+              <div
+                v-if="!ticker.isPlaceholder"
+                class="text-xs text-white/60"
+              >
+                {{ $t('home.volume') }}: {{ formatVolume(ticker.volume) }}
+              </div>
+              <div
+                v-else
+                class="h-3 bg-white/10 rounded w-24 animate-pulse"
+              ></div>
             </div>
           </div>
         </div>
@@ -328,6 +391,7 @@ import { useLanguage } from '../composables/useLanguage';
 import MobileNav from '../components/MobileNav.vue';
 import DesktopNav from '../components/DesktopNav.vue';
 import { getCoinLogoUrl } from '../utils/coinLogos';
+import api from '../utils/api';
 
 const router = useRouter();
 const { t } = useI18n();
@@ -348,6 +412,9 @@ const BINANCE_WS_URL = 'wss://stream.binance.com:9443/ws/!ticker@arr';
 
 // Reactive tickerMap - single source of truth, NEVER cleared
 const tickerMap = reactive({});
+
+// Track initial load state (used for skeletons; prices come from DB/backend)
+const isInitialLoading = ref(true);
 
 // Initialize ALL symbols as placeholders - cards NEVER disappear
 SYMBOLS.forEach((symbol) => {
@@ -564,6 +631,39 @@ const handleImageError = (event) => {
   event.target.src = `https://via.placeholder.com/32?text=${symbol}`;
 };
 
+// Load initial prices from backend (DB-backed snapshots) so we never show 0.00000
+const loadInitialTickers = async () => {
+  try {
+    const response = await api.get('/market/ticker/24h');
+    const data = Array.isArray(response.data) ? response.data : [];
+
+    data.forEach((t) => {
+      const symbol = t.symbol;
+      if (!SYMBOLS.includes(symbol)) return;
+
+      const ticker = tickerMap[symbol];
+      if (!ticker) return;
+
+      const price = Number.parseFloat(t.price ?? t.lastPrice);
+      const changePercent = Number.parseFloat(
+        t.priceChangePercent ?? t.price_change_percent ?? 0,
+      );
+      const volume = Number.parseFloat(t.volume ?? 0);
+
+      if (!Number.isFinite(price)) return;
+
+      ticker.price = price;
+      ticker.change = changePercent;
+      ticker.volume = volume;
+      ticker.isPlaceholder = false;
+    });
+  } catch (e) {
+    console.error('[Home] Failed to load initial tickers:', e);
+  } finally {
+    isInitialLoading.value = false;
+  }
+};
+
 // WebSocket state management
 let tickerWs = null;
 let wsReconnectTimer = null;
@@ -663,7 +763,7 @@ const scheduleReconnect = () => {
 
 let clickOutsideHandler = null;
 
-onMounted(() => {
+onMounted(async () => {
   console.log('[Home] Mounted. Initializing tickers...');
   // Double check initialization
   SYMBOLS.forEach((symbol) => {
@@ -678,7 +778,10 @@ onMounted(() => {
     }
   });
   console.log('[Home] tickerMap size:', Object.keys(tickerMap).length);
-  
+
+  // First load last-known prices from backend (DB snapshots / Binance)
+  await loadInitialTickers();
+
   connectWebSocket();
   startAutoSlide();
   
