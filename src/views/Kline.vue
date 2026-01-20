@@ -275,10 +275,11 @@ let userHasZoomed = false; // Track if user has manually zoomed
 let handleResize = null;
 
 const formatPrice = (price) => {
-  if (!price) return '0.00';
-  if (price >= 1) return price.toFixed(2);
-  if (price >= 0.01) return price.toFixed(4);
-  return price.toFixed(8);
+  const num = Number(price);
+  if (!Number.isFinite(num) || num === 0) return '0.00';
+  if (num >= 1) return num.toFixed(2);
+  if (num >= 0.01) return num.toFixed(4);
+  return num.toFixed(8);
 };
 
 const formatQuantity = (qty) => {
