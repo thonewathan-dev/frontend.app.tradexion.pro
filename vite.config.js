@@ -10,7 +10,15 @@ export default defineConfig({
     },
   },
   server: {
-    port: 5173,
+    port: process.env.PORT || 5173,
+    host: '0.0.0.0',
+    allowedHosts: [
+      'tradexion.up.railway.app',
+      '.railway.app',
+      '.up.railway.app',
+      'localhost',
+    ],
+    strictPort: false,
   },
   preview: {
     port: process.env.PORT || 5173,
