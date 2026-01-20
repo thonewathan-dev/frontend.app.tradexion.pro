@@ -187,8 +187,11 @@ import SkeletonLoader from '../components/SkeletonLoader.vue';
 import api from '../utils/api';
 import { createChart } from 'lightweight-charts';
 import { getCoinLogoUrl } from '../utils/coinLogos';
+import axios from 'axios';
 
 const { t } = useI18n();
+
+const BINANCE_HTTP_API = 'https://api.binance.com/api/v3';
 
 const route = useRoute();
 const router = useRouter();
@@ -374,11 +377,34 @@ const loadRecentTrades = async (symbol) => {
   tradesAbortController = new AbortController();
   
   try {
+    let trades = [];
+
+    // Try backend first
     const response = await api.get(`/market/trades/${symbol}`, { 
       params: { limit: 50 },
       signal: tradesAbortController.signal,
     });
-    recentTrades.value = response.data;
+    trades = Array.isArray(response.data) ? response.data : [];
+
+    // If backend returns no data (e.g. Binance 451), fall back to direct Binance HTTP
+    if (!trades.length) {
+      try {
+        const binanceRes = await axios.get(`${BINANCE_HTTP_API}/trades`, {
+          params: { symbol, limit: 50 },
+        });
+        trades = (binanceRes.data || []).map((trade) => ({
+          id: trade.id,
+          price: Number(trade.price),
+          quantity: Number(trade.qty),
+          time: trade.time,
+          isBuyerMaker: trade.isBuyerMaker,
+        }));
+      } catch (fallbackErr) {
+        console.warn('Binance trades fallback failed:', fallbackErr?.message || fallbackErr);
+      }
+    }
+
+    recentTrades.value = trades;
   } catch (error) {
     // Ignore abort errors
     if (error.name === 'AbortError' || error.name === 'CanceledError') {
@@ -437,7 +463,30 @@ const loadKlines = async () => {
       signal: klinesAbortController.signal,
     });
     
-    const klines = response.data;
+    let klines = Array.isArray(response.data) ? response.data : [];
+
+    // If backend returns no klines (e.g. Binance 451), fall back to direct Binance HTTP
+    if (!klines.length) {
+      try {
+        const binanceRes = await axios.get(`${BINANCE_HTTP_API}/klines`, {
+          params: {
+            symbol,
+            interval: binanceInterval,
+            limit: 200,
+          },
+        });
+        klines = (binanceRes.data || []).map((k) => ({
+          time: k[0],
+          open: k[1],
+          high: k[2],
+          low: k[3],
+          close: k[4],
+          volume: k[5],
+        }));
+      } catch (fallbackErr) {
+        console.warn('Binance klines fallback failed:', fallbackErr?.message || fallbackErr);
+      }
+    }
     
     if (!klines || klines.length === 0) {
       console.warn('No klines data received');
