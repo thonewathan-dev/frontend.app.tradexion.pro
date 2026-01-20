@@ -19,6 +19,9 @@ export default defineConfig({
       'localhost',
     ],
     strictPort: false,
+    hmr: {
+      clientPort: 443, // Use HTTPS port for HMR on Railway
+    },
   },
   preview: {
     port: process.env.PORT || 5173,
