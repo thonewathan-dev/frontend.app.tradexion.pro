@@ -1254,25 +1254,6 @@ onMounted(() => {
       }
     }
   }, 2000);
-});
-
-// Cleanup WebSocket on unmount
-onUnmounted(() => {
-  if (wsReconnectTimer) {
-    clearTimeout(wsReconnectTimer);
-  }
-  try {
-    if (tickerWs) {
-      tickerWs.onopen = null;
-      tickerWs.onmessage = null;
-      tickerWs.onerror = null;
-      tickerWs.onclose = null;
-      tickerWs.close();
-    }
-  } catch {
-    // Ignore cleanup errors
-  }
-});
   
   // Update countdowns every second
   setInterval(() => {
@@ -1293,5 +1274,23 @@ onUnmounted(() => {
       }
     }
   }, 3000);
+});
+
+// Cleanup WebSocket on unmount
+onUnmounted(() => {
+  if (wsReconnectTimer) {
+    clearTimeout(wsReconnectTimer);
+  }
+  try {
+    if (tickerWs) {
+      tickerWs.onopen = null;
+      tickerWs.onmessage = null;
+      tickerWs.onerror = null;
+      tickerWs.onclose = null;
+      tickerWs.close();
+    }
+  } catch {
+    // Ignore cleanup errors
+  }
 });
 </script>
