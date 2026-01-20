@@ -647,7 +647,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch, nextTick } from 'vue';
+import { ref, onMounted, onUnmounted, computed, watch, nextTick } from 'vue';
 import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import MobileNav from '../components/MobileNav.vue';
@@ -656,6 +656,10 @@ import SkeletonLoader from '../components/SkeletonLoader.vue';
 import api from '../utils/api';
 import { getCoinLogoUrl } from '../utils/coinLogos';
 import CustomSelect from '../components/CustomSelect.vue';
+import axios from 'axios';
+
+const BINANCE_HTTP_API = 'https://api.binance.com/api/v3';
+const BINANCE_WS_URL = 'wss://stream.binance.com:9443/ws/!ticker@arr';
 
 const { t } = useI18n();
 
@@ -763,18 +767,104 @@ const loadMarketData = async () => {
 const loadTicker = async (symbol) => {
   try {
     const response = await api.get(`/market/ticker/${symbol}/24h`);
-    ticker.value = response.data;
+    if (response.data && response.data.price) {
+      ticker.value = {
+        ...response.data,
+        price: Number(response.data.price) || 0,
+        priceChangePercent: Number(response.data.priceChangePercent) || 0,
+        priceChange: Number(response.data.priceChange) || 0,
+        volume: Number(response.data.volume) || 0,
+        highPrice: Number(response.data.highPrice) || 0,
+        lowPrice: Number(response.data.lowPrice) || 0,
+      };
+    } else {
+      // Fallback: fetch directly from Binance
+      try {
+        const binanceResponse = await axios.get(`${BINANCE_HTTP_API}/ticker/24hr`, {
+          params: { symbol: symbol.toUpperCase() }
+        });
+        const data = binanceResponse.data;
+        ticker.value = {
+          price: Number(data.lastPrice) || 0,
+          priceChangePercent: Number(data.priceChangePercent) || 0,
+          priceChange: Number(data.priceChange) || 0,
+          volume: Number(data.volume) || 0,
+          highPrice: Number(data.highPrice) || 0,
+          lowPrice: Number(data.lowPrice) || 0,
+        };
+      } catch (binanceError) {
+        console.error('Binance fallback failed:', binanceError);
+      }
+    }
   } catch (error) {
     console.error('Error loading ticker:', error);
+    // Try Binance fallback on error
+    try {
+      const binanceResponse = await axios.get(`${BINANCE_HTTP_API}/ticker/24hr`, {
+        params: { symbol: symbol.toUpperCase() }
+      });
+      const data = binanceResponse.data;
+      ticker.value = {
+        price: Number(data.lastPrice) || 0,
+        priceChangePercent: Number(data.priceChangePercent) || 0,
+        priceChange: Number(data.priceChange) || 0,
+        volume: Number(data.volume) || 0,
+        highPrice: Number(data.highPrice) || 0,
+        lowPrice: Number(data.lowPrice) || 0,
+      };
+    } catch (binanceError) {
+      console.error('Binance fallback failed:', binanceError);
+    }
   }
 };
 
 const loadOrderBook = async (symbol) => {
   try {
     const response = await api.get(`/market/orderbook/${symbol}`, { params: { limit: 20 } });
-    orderBook.value = response.data;
+    if (response.data && (response.data.bids?.length > 0 || response.data.asks?.length > 0)) {
+      orderBook.value = response.data;
+    } else {
+      // Fallback: fetch directly from Binance
+      try {
+        const binanceResponse = await axios.get(`${BINANCE_HTTP_API}/depth`, {
+          params: { symbol: symbol.toUpperCase(), limit: 20 }
+        });
+        orderBook.value = {
+          bids: (binanceResponse.data.bids || []).map(([price, quantity]) => ({
+            price: Number(price) || 0,
+            quantity: Number(quantity) || 0,
+          })),
+          asks: (binanceResponse.data.asks || []).map(([price, quantity]) => ({
+            price: Number(price) || 0,
+            quantity: Number(quantity) || 0,
+          })),
+          timestamp: Date.now(),
+        };
+      } catch (binanceError) {
+        console.error('Binance orderbook fallback failed:', binanceError);
+      }
+    }
   } catch (error) {
     console.error('Error loading order book:', error);
+    // Try Binance fallback on error
+    try {
+      const binanceResponse = await axios.get(`${BINANCE_HTTP_API}/depth`, {
+        params: { symbol: symbol.toUpperCase(), limit: 20 }
+      });
+      orderBook.value = {
+        bids: (binanceResponse.data.bids || []).map(([price, quantity]) => ({
+          price: Number(price) || 0,
+          quantity: Number(quantity) || 0,
+        })),
+        asks: (binanceResponse.data.asks || []).map(([price, quantity]) => ({
+          price: Number(price) || 0,
+          quantity: Number(quantity) || 0,
+        })),
+        timestamp: Date.now(),
+      };
+    } catch (binanceError) {
+      console.error('Binance orderbook fallback failed:', binanceError);
+    }
   }
 };
 
@@ -1056,9 +1146,90 @@ const refreshMarketData = async () => {
   ]);
 };
 
+// WebSocket for real-time ticker updates
+let tickerWs = null;
+let wsReconnectTimer = null;
+let wsBackoffMs = 1000;
+const MAX_BACKOFF_MS = 30000;
+
+const processTickerUpdate = (tickerData) => {
+  if (!tickerData?.s) return;
+  const symbol = tickerData.s;
+  const currentSymbol = selectedSymbol.value.replace('/', '');
+  if (symbol !== currentSymbol) return;
+  
+  if (ticker.value) {
+    ticker.value.price = Number(tickerData.c) || ticker.value.price;
+    ticker.value.priceChangePercent = Number(tickerData.P) || ticker.value.priceChangePercent;
+    ticker.value.priceChange = Number(tickerData.p) || ticker.value.priceChange;
+    ticker.value.volume = Number(tickerData.v) || ticker.value.volume;
+    ticker.value.highPrice = Number(tickerData.h) || ticker.value.highPrice;
+    ticker.value.lowPrice = Number(tickerData.l) || ticker.value.lowPrice;
+  }
+};
+
+const connectWebSocket = () => {
+  if (tickerWs?.readyState === WebSocket.OPEN) return;
+  
+  try {
+    if (tickerWs) {
+      tickerWs.onopen = null;
+      tickerWs.onmessage = null;
+      tickerWs.onerror = null;
+      tickerWs.onclose = null;
+      tickerWs.close();
+    }
+  } catch (e) {
+    console.warn('[Contracts WS] Cleanup error:', e);
+  }
+  
+  try {
+    tickerWs = new WebSocket(BINANCE_WS_URL);
+    
+    tickerWs.onopen = () => {
+      console.log('[Contracts WS] Connected');
+      wsBackoffMs = 1000;
+    };
+    
+    tickerWs.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (Array.isArray(data)) {
+          data.forEach(processTickerUpdate);
+        }
+      } catch (e) {
+        console.error('[Contracts WS] Parse error:', e);
+      }
+    };
+    
+    tickerWs.onerror = (e) => {
+      console.error('[Contracts WS] Error:', e);
+    };
+    
+    tickerWs.onclose = (e) => {
+      console.warn('[Contracts WS] Closed:', e.code);
+      tickerWs = null;
+      scheduleReconnect();
+    };
+  } catch (e) {
+    console.error('[Contracts WS] Setup error:', e);
+    scheduleReconnect();
+  }
+};
+
+const scheduleReconnect = () => {
+  if (wsReconnectTimer) return;
+  wsReconnectTimer = setTimeout(() => {
+    wsReconnectTimer = null;
+    connectWebSocket();
+  }, wsBackoffMs);
+  wsBackoffMs = Math.min(wsBackoffMs * 2, MAX_BACKOFF_MS);
+};
+
 onMounted(() => {
   loadMarketData();
   loadCoinList();
+  connectWebSocket();
   loadContractTrades();
   
   // Real-time updates every 2 seconds - throttled to prevent browser overload
@@ -1068,7 +1239,9 @@ onMounted(() => {
     if (!isRefreshing) {
       isRefreshing = true;
       try {
-        await refreshMarketData();
+        // Only refresh orderbook (ticker is updated via WebSocket)
+        const symbol = selectedSymbol.value.replace('/', '');
+        await loadOrderBook(symbol);
         // Wallet balance does NOT need 2s polling (causes 429). Refresh every ~10s.
         walletTick = (walletTick + 1) % 5;
         if (walletTick === 0) {
@@ -1081,6 +1254,25 @@ onMounted(() => {
       }
     }
   }, 2000);
+});
+
+// Cleanup WebSocket on unmount
+onUnmounted(() => {
+  if (wsReconnectTimer) {
+    clearTimeout(wsReconnectTimer);
+  }
+  try {
+    if (tickerWs) {
+      tickerWs.onopen = null;
+      tickerWs.onmessage = null;
+      tickerWs.onerror = null;
+      tickerWs.onclose = null;
+      tickerWs.close();
+    }
+  } catch {
+    // Ignore cleanup errors
+  }
+});
   
   // Update countdowns every second
   setInterval(() => {

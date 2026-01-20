@@ -894,14 +894,132 @@ onMounted(async () => {
   // One extra resize tick for mobile browsers after layout settles
   setTimeout(handleResize, 250);
   
-  // Refresh data every 2 seconds - throttled to prevent browser overload
-  // Only refresh if not already loading
+  // WebSocket for real-time ticker updates (header price/change/volume)
+  // Initialize chart first, then load data
+  await initChart();
+  // Load market data (ticker and trades), klines will be loaded by initChart
+  const symbol = selectedSymbol.value.replace('/', '');
+  isLoading.value = true;
+  try {
+    await Promise.all([
+      loadTicker(symbol),
+      loadRecentTrades(symbol),
+    ]);
+    // Ensure klines are loaded after chart is ready
+    if (chart && candlestickSeries) {
+      await loadKlines();
+    }
+  } finally {
+    isLoading.value = false;
+  }
+  
+  // Resize charts on window resize (also adjust height on mobile to avoid empty space)
+  handleResize = () => {
+    try {
+      if (chart && chartContainer.value) {
+        const w = chartContainer.value.clientWidth;
+        if (w > 0) chart.applyOptions({ width: w, height: chartHeight.value });
+      }
+      if (volumeChart && volumeChartContainer.value) {
+        const w = volumeChartContainer.value.clientWidth;
+        if (w > 0) volumeChart.applyOptions({ width: w, height: volumeHeight.value });
+      }
+    } catch (error) {
+      console.warn('Error resizing charts:', error);
+    }
+  };
+  window.addEventListener('resize', handleResize);
+  setTimeout(handleResize, 250);
+  
+  // WebSocket for real-time ticker updates (header price/change/volume)
+
+  const processTickerUpdate = (tickerData) => {
+    if (!tickerData?.s) return;
+    const symbol = tickerData.s;
+    const currentSymbol = selectedSymbol.value.replace('/', '');
+    if (symbol !== currentSymbol) return;
+    
+    if (ticker.value) {
+      ticker.value.price = Number(tickerData.c) || ticker.value.price;
+      ticker.value.priceChangePercent = Number(tickerData.P) || ticker.value.priceChangePercent;
+      ticker.value.priceChange = Number(tickerData.p) || ticker.value.priceChange;
+      ticker.value.volume = Number(tickerData.v) || ticker.value.volume;
+      ticker.value.highPrice = Number(tickerData.h) || ticker.value.highPrice;
+      ticker.value.lowPrice = Number(tickerData.l) || ticker.value.lowPrice;
+    }
+  };
+
+  const connectWebSocket = () => {
+    if (tickerWs?.readyState === WebSocket.OPEN) return;
+    
+    try {
+      if (tickerWs) {
+        tickerWs.onopen = null;
+        tickerWs.onmessage = null;
+        tickerWs.onerror = null;
+        tickerWs.onclose = null;
+        tickerWs.close();
+      }
+    } catch (e) {
+      console.warn('[Kline WS] Cleanup error:', e);
+    }
+    
+    try {
+      tickerWs = new WebSocket(BINANCE_WS_URL);
+      
+      tickerWs.onopen = () => {
+        console.log('[Kline WS] Connected');
+        wsBackoffMs = 1000;
+      };
+      
+      tickerWs.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (Array.isArray(data)) {
+            data.forEach(processTickerUpdate);
+          }
+        } catch (e) {
+          console.error('[Kline WS] Parse error:', e);
+        }
+      };
+      
+      tickerWs.onerror = (e) => {
+        console.error('[Kline WS] Error:', e);
+      };
+      
+      tickerWs.onclose = (e) => {
+        console.warn('[Kline WS] Closed:', e.code);
+        tickerWs = null;
+        scheduleReconnect();
+      };
+    } catch (e) {
+      console.error('[Kline WS] Setup error:', e);
+      scheduleReconnect();
+    }
+  };
+
+  const scheduleReconnect = () => {
+    if (wsReconnectTimer) return;
+    wsReconnectTimer = setTimeout(() => {
+      wsReconnectTimer = null;
+      connectWebSocket();
+    }, wsBackoffMs);
+    wsBackoffMs = Math.min(wsBackoffMs * 2, MAX_BACKOFF_MS);
+  };
+
+  connectWebSocket();
+
+  // Refresh klines and trades every 2 seconds (ticker updated via WebSocket)
   let isRefreshing = false;
   dataInterval = setInterval(async () => {
     if (!isRefreshing) {
       isRefreshing = true;
       try {
-        await refreshMarketData();
+        const symbol = selectedSymbol.value.replace('/', '');
+        await Promise.all([
+          loadRecentTrades(symbol),
+          loadKlines(),
+        ]);
       } catch (error) {
         console.error('Error refreshing market data:', error);
       } finally {
@@ -921,6 +1039,24 @@ onUnmounted(() => {
   }
   if (klinesAbortController) {
     klinesAbortController.abort();
+  }
+  
+  // Cleanup WebSocket
+  if (wsReconnectTimer) {
+    clearTimeout(wsReconnectTimer);
+    wsReconnectTimer = null;
+  }
+  try {
+    if (tickerWs) {
+      tickerWs.onopen = null;
+      tickerWs.onmessage = null;
+      tickerWs.onerror = null;
+      tickerWs.onclose = null;
+      tickerWs.close();
+      tickerWs = null;
+    }
+  } catch {
+    // Ignore cleanup errors
   }
   
   if (watermarkObserver) {
