@@ -408,6 +408,21 @@ onMounted(() => {
   setTimeout(() => {
     clearInterval(checkTurnstile);
   }, 8000);
+
+  // Load Tawk.to chat widget
+  if (!window.Tawk_API) {
+    window.Tawk_API = window.Tawk_API || {};
+    window.Tawk_LoadStart = new Date();
+    (function() {
+      const s1 = document.createElement('script');
+      const s0 = document.getElementsByTagName('script')[0];
+      s1.async = true;
+      s1.src = 'https://embed.tawk.to/697117b14a0f82197e61fb90/1jfgs93mg';
+      s1.charset = 'UTF-8';
+      s1.setAttribute('crossorigin', '*');
+      s0.parentNode.insertBefore(s1, s0);
+    })();
+  }
 });
 
 onUnmounted(() => {
