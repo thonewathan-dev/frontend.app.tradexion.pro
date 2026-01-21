@@ -17,6 +17,8 @@ export default defineConfig({
       '.railway.app',
       '.up.railway.app',
       'localhost',
+      'tradexion.pro',
+      'www.tradexion.pro',
     ],
     strictPort: false,
     hmr: {
@@ -30,6 +32,8 @@ export default defineConfig({
       'tradexion.up.railway.app',
       '.railway.app',
       '.up.railway.app',
+      'tradexion.pro',
+      'www.tradexion.pro',
     ],
     // Disable local network access to prevent permission prompt
     strictPort: false,
