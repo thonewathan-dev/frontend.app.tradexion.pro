@@ -40,7 +40,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 1010 10A10.011 10.011 0 0012 2z" />
                 </svg>
               </button>
-            </div>
+                  </div>
             <div class="text-white text-3xl font-bold mb-3">
               <span v-if="!hasLoadedWallets" class="inline-block h-7 w-28 rounded bg-white/10 animate-pulse" />
               <span v-else>≈{{ formatBalance(totalBalance) }}</span>
@@ -61,9 +61,9 @@
                   <span v-else>{{ formatBalance(spotBalance) }}</span>
                 </div>
               </div>
+              </div>
             </div>
-          </div>
-
+            
           <!-- Actions -->
           <div class="glass-card rounded-lg p-4">
             <div class="flex gap-2">
@@ -132,10 +132,10 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                   <span class="text-white text-sm font-medium">Contract account</span>
-                </div>
-                <svg class="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                </svg>
+              </div>
+              <svg class="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
               </button>
             </div>
 
@@ -150,7 +150,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                   </svg>
                   <span class="text-white text-sm font-medium">Invite friends</span>
-                </div>
+          </div>
                 <svg class="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
@@ -177,12 +177,12 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
                   <span class="text-white text-sm font-medium">Complaint suggestion</span>
-                </div>
-                <svg class="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                </svg>
+              </div>
+              <svg class="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
               </button>
-            </div>
+          </div>
 
             <!-- Card 3: Settings -->
             <div class="glass-card-no-hover rounded-lg overflow-hidden">
@@ -209,12 +209,12 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                   </svg>
                   <span class="text-white text-sm font-medium">Modify the password</span>
-                </div>
-                <svg class="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-              <button
+              </div>
+              <svg class="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+          <button
                 class="w-full flex items-center justify-between px-3 py-3 transition-colors hover:bg-white/5"
               >
                 <div class="flex items-center gap-3">
@@ -222,15 +222,15 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10a6 6 0 00-12 0v3H5a2 2 0 00-2 2v1a2 2 0 002 2h3v-4H8v-4a4 4 0 118 0v4h-1v4h3a2 2 0 002-2v-1a2 2 0 00-2-2h-1v-3z" />
                   </svg>
                   <span class="text-white text-sm font-medium">Customer Services</span>
-                </div>
+        </div>
                 <svg class="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
+            </svg>
+          </button>
             </div>
 
             <!-- Logout Button (separate, not in card) -->
-            <button
+                <button
               class="w-full flex items-center justify-between px-3 py-3 rounded-xl bg-red-500/10 transition-colors hover:bg-red-500/20 active:bg-red-500/30"
               @click="handleLogout"
             >
@@ -288,7 +288,7 @@ const priceInUSDT = (symbol) => {
   if (s === 'USDT') return 1;
   if (s === 'BTC') return prices.value.BTCUSDT || 0;
   if (s === 'ETH') return prices.value.ETHUSDT || 0;
-  return 0;
+    return 0;
 };
 
 const accountTotalUSDT = (accountType) => {
@@ -331,8 +331,8 @@ const loadPrices = async () => {
 };
 
 const handleLogout = () => {
-  authStore.logout();
-  router.push('/login');
+    authStore.logout();
+    router.push('/login');
 };
 
 const handleInviteFriends = () => {
@@ -397,7 +397,7 @@ onMounted(async () => {
   }
   await loadPrices();
   await loadWallets();
-
+  
   balanceInterval = setInterval(() => {
     loadWalletsSilently();
     loadPrices();
