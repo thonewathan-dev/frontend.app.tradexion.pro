@@ -318,12 +318,16 @@ import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '../stores/auth';
 import { getApiUrl } from '../utils/config.js';
+import { useTawk } from '../composables/useTawk.js';
 
 const { t } = useI18n();
 
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
+
+// Load Tawk.to chat widget
+useTawk();
 
 const TURNSTILE_SITE_KEY = '0x4AAAAAACNscU1_JGFhgUPj';
 const turnstileWidget = ref(null);
@@ -397,7 +401,13 @@ onMounted(() => {
   }
 
   // Wait for Turnstile script to load
-  if (window.turnstile) return;
+  if (window.turnstile) {
+    if (step.value === 'password') {
+      nextTick().then(() => initTurnstile());
+    }
+    return;
+  }
+  
   const checkTurnstile = setInterval(() => {
     if (window.turnstile) {
       clearInterval(checkTurnstile);
@@ -408,21 +418,6 @@ onMounted(() => {
   setTimeout(() => {
     clearInterval(checkTurnstile);
   }, 8000);
-
-  // Load Tawk.to chat widget
-  if (!window.Tawk_API) {
-    window.Tawk_API = window.Tawk_API || {};
-    window.Tawk_LoadStart = new Date();
-    (function() {
-      const s1 = document.createElement('script');
-      const s0 = document.getElementsByTagName('script')[0];
-      s1.async = true;
-      s1.src = 'https://embed.tawk.to/697117b14a0f82197e61fb90/1jfgs93mg';
-      s1.charset = 'UTF-8';
-      s1.setAttribute('crossorigin', '*');
-      s0.parentNode.insertBefore(s1, s0);
-    })();
-  }
 });
 
 onUnmounted(() => {
