@@ -249,3 +249,10 @@ svg[data-name="watermark"],
 .chart-no-watermark svg:has(text[data-name="watermark"]) {
   display: none !important;
 }
+
+/* Safe area padding for mobile browsers (footer spacing) */
+@supports (padding: max(0px)) {
+  .pb-safe {
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+  }
+}
