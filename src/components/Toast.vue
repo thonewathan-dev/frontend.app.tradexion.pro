@@ -1,10 +1,14 @@
 <template>
   <Teleport to="body">
-    <transition-group name="toast" tag="div" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-[10000] space-y-2 pointer-events-none">
+    <transition-group
+      name="toast"
+      tag="div"
+      class="fixed top-4 left-0 right-0 z-[10000] space-y-2 pointer-events-none px-3 md:px-4"
+    >
       <div
         v-for="toast in toasts"
         :key="toast.id"
-        class="glass-card rounded-lg shadow-2xl border border-white/10 min-w-[300px] max-w-[90vw] pointer-events-auto animate-slide-down"
+        class="glass-card rounded-lg shadow-2xl border border-white/10 w-full max-w-[600px] mx-auto pointer-events-auto animate-slide-down"
         :class="{
           'bg-green-500/10 border-green-500/30': toast.type === 'success',
           'bg-red-500/10 border-red-500/30': toast.type === 'error',
@@ -151,12 +155,12 @@ defineExpose({
 
 .toast-enter-from {
   opacity: 0;
-  transform: translateY(-20px) translateX(-50%);
+  transform: translateY(-20px);
 }
 
 .toast-leave-to {
   opacity: 0;
-  transform: translateY(-20px) translateX(-50%) scale(0.95);
+  transform: translateY(-20px) scale(0.95);
 }
 
 .toast-move {

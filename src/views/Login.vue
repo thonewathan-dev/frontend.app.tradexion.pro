@@ -382,10 +382,9 @@ const handleLogin = async () => {
     if (typeof window !== 'undefined' && window.__toast?.error) {
       window.__toast.error(result.error || 'Login failed');
     }
-    // Gate-like behavior: offer signup when account doesn't exist
-    if ((result.error || '').toLowerCase().includes('invalid') || (result.error || '').toLowerCase().includes('not found')) {
-      showInvalidUserModal.value = true;
-    }
+    // Only show signup modal for specific "account not found" errors, not for wrong password
+    // Since backend returns "Invalid credentials" for both cases, we don't show the modal
+    // to avoid confusing users who just entered the wrong password
     resetTurnstile();
   }
 

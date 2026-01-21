@@ -1,5 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { ref } from 'vue';
 import { useAuthStore } from '../stores/auth';
+
+// Global route loading state so we can show a loader while pages change
+export const isRouteLoading = ref(false);
 
 const routes = [
   {
@@ -57,6 +61,18 @@ const routes = [
     meta: { requiresAuth: true, title: 'Assets' },
   },
   {
+    path: '/spot-account',
+    name: 'SpotAccount',
+    component: () => import('../views/SpotAccount.vue'),
+    meta: { requiresAuth: true, title: 'Spot Account' },
+  },
+  {
+    path: '/contract-account',
+    name: 'ContractAccount',
+    component: () => import('../views/ContractAccount.vue'),
+    meta: { requiresAuth: true, title: 'Contract Account' },
+  },
+  {
     path: '/deposit',
     name: 'Deposit',
     component: () => import('../views/Deposit.vue'),
@@ -69,10 +85,28 @@ const routes = [
     meta: { requiresAuth: true, title: 'Withdraw' },
   },
   {
+    path: '/transfer',
+    name: 'Transfer',
+    component: () => import('../views/Transfer.vue'),
+    meta: { requiresAuth: true, title: 'Transfer' },
+  },
+  {
     path: '/flash-exchange',
     name: 'FlashExchange',
     component: () => import('../views/FlashExchange.vue'),
     meta: { requiresAuth: true, title: 'Flash Exchange' },
+  },
+  {
+    path: '/change-password',
+    name: 'ChangePassword',
+    component: () => import('../views/ChangePassword.vue'),
+    meta: { requiresAuth: true, title: 'Modify Password' },
+  },
+  {
+    path: '/about-tradexion',
+    name: 'AboutTradeXion',
+    component: () => import('../views/AboutTradeXion.vue'),
+    meta: { requiresAuth: true, title: 'About TradeXion' },
   },
   {
     path: '/privacy-policy',
@@ -95,6 +129,7 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
+  isRouteLoading.value = true;
   
   // If route requires auth and we have a token but no user, try to fetch user
   if (to.meta.requiresAuth && authStore.accessToken && !authStore.user) {
@@ -109,9 +144,16 @@ router.beforeEach(async (to, from, next) => {
 });
 
 router.afterEach((to) => {
+  isRouteLoading.value = false;
   const base = 'TradeXion';
   const title = typeof to.meta?.title === 'function' ? to.meta.title(to) : to.meta?.title;
   document.title = title ? `${base} | ${title}` : base;
+});
+
+// Ensure loader is cleared even if navigation errors
+router.onError((err) => {
+  console.error('Router error:', err);
+  isRouteLoading.value = false;
 });
 
 export default router;

@@ -21,7 +21,7 @@
           </div>
         </div>
 
-        <div class="p-4">
+        <div class="p-3 pb-4">
           <!-- Currency Selection -->
           <div class="mb-4">
             <div class="flex items-center justify-between mb-2">
@@ -58,50 +58,65 @@
           </div>
 
           <!-- QR Code and Address -->
-          <div v-if="depositAddress" class="glass-card rounded-xl p-6 mb-4 text-center">
-            <div class="mb-4">
-              <div class="inline-block p-4 bg-white rounded-lg relative">
-                <img :src="qrCodeUrl" alt="QR Code" class="w-48 h-48" />
-                <!-- Coin Logo Overlay -->
-                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div class="w-12 h-12 bg-white rounded-full p-2 flex items-center justify-center shadow-lg">
-                    <img :src="coinLogo" :alt="selectedCurrency" class="w-full h-full object-contain" />
+          <div class="rounded-xl p-4 mb-3 text-center bg-white/5 border border-white/10 min-h-[230px] flex flex-col items-center justify-center">
+            <!-- Loading state -->
+            <div v-if="depositAddressLoading" class="flex flex-col items-center gap-3 w-full">
+              <div class="w-32 h-32 rounded-lg bg-white/10 animate-pulse" />
+              <div class="h-3 w-40 bg-white/10 rounded-full animate-pulse" />
+              <div class="h-3 w-56 bg-white/10 rounded-full animate-pulse" />
+            </div>
+
+            <!-- Loaded state -->
+            <template v-else-if="depositAddress">
+              <div class="mb-4">
+                <div class="inline-block p-3 bg-white rounded-lg relative">
+                  <img :src="qrCodeUrl" alt="QR Code" class="w-40 h-40" />
+                  <!-- Coin Logo Overlay -->
+                  <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div class="w-10 h-10 bg-white rounded-full p-1.5 flex items-center justify-center shadow-lg">
+                      <img :src="coinLogo" :alt="selectedCurrency" class="w-full h-full object-contain" />
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <div class="mb-2">
-              <p class="text-white/70 text-sm mb-2">{{ t('deposit.depositAddress') }}</p>
-              <div class="flex items-center gap-2 justify-center">
-                <p class="text-white font-mono text-sm break-all">{{ depositAddress }}</p>
-                <button
-                  @click="copyAddress"
-                  class="px-3 py-1 bg-blue-500/30 text-blue-200 rounded-lg text-sm hover:bg-blue-500/40 transition-colors"
-                >
-                  {{ t('deposit.copy') }}
-                </button>
+              <div class="mb-2">
+                <p class="text-white/70 text-xs mb-1.5">{{ t('deposit.depositAddress') }}</p>
+                <div class="flex items-center gap-2 justify-center">
+                  <p class="text-white font-mono text-xs break-all">{{ depositAddress }}</p>
+                  <button
+                    @click="copyAddress"
+                    class="px-3 py-1 bg-blue-500/30 text-blue-200 rounded-lg text-xs transition-colors"
+                  >
+                    {{ t('deposit.copy') }}
+                  </button>
+                </div>
               </div>
-            </div>
+            </template>
+
+            <!-- No address state -->
+            <p v-else class="text-xs text-white/60">
+              {{ t('deposit.noAddressAvailable') || 'Deposit address not available for this currency/network.' }}
+            </p>
           </div>
 
           <!-- Deposit Form -->
-          <div class="glass-card rounded-xl p-4 space-y-4">
+          <div class="rounded-xl p-3 space-y-3 bg-white/5 border border-white/10">
             <div>
-              <label class="block text-sm text-white/70 mb-2">{{ t('deposit.rechargeQuantity') }}</label>
+              <label class="block text-xs text-white/70 mb-1.5">{{ t('deposit.rechargeQuantity') }}</label>
               <div class="flex items-center gap-2">
                 <input
                   v-model="depositAmount"
                   type="number"
                   step="0.00000001"
-                  class="flex-1 px-4 py-2 glass-input rounded-lg focus:outline-none"
+                  class="flex-1 px-3 py-2 glass-input rounded-lg focus:outline-none text-sm"
                   placeholder="0.00"
                 />
-                <span class="text-white/70 text-sm">{{ selectedCurrency }}</span>
+                <span class="text-white/70 text-xs">{{ selectedCurrency }}</span>
               </div>
             </div>
 
             <div>
-              <label class="block text-sm text-white/70 mb-2">{{ t('deposit.transferScreenshot') }}</label>
+              <label class="block text-xs text-white/70 mb-1.5">{{ t('deposit.transferScreenshot') }}</label>
               <input
                 type="file"
                 accept="image/*"
@@ -114,23 +129,23 @@
                 :value="screenshotFile ? screenshotFile.name : 'Select Picture'"
                 readonly
                 @click="$refs.fileInput.click()"
-                class="w-full px-4 py-2 glass-input rounded-lg focus:outline-none cursor-pointer hover:bg-white/10 transition-colors"
+                class="w-full px-3 py-2 glass-input rounded-lg focus:outline-none cursor-pointer text-sm"
                 placeholder="Select Picture"
               />
               <div v-if="screenshotPreview" class="mt-2">
-                <img :src="screenshotPreview" alt="Preview" class="w-full h-32 object-cover rounded-lg" />
+                <img :src="screenshotPreview" alt="Preview" class="w-full h-24 object-cover rounded-lg" />
               </div>
             </div>
 
             <button
               @click="handleSubmit"
               :disabled="loading || !depositAmount || (selectedCurrency !== 'BANK' && !screenshotFile)"
-              class="w-full py-3 bg-blue-500/30 hover:bg-blue-500/40 border border-blue-500/50 rounded-lg font-medium text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              class="w-full py-2.5 bg-blue-500/40 border border-blue-500/60 rounded-lg font-medium text-sm text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {{ loading ? t('common.processing') : t('deposit.submitButton') }}
             </button>
 
-            <p class="text-xs text-white/60 text-center">
+            <p class="text-[11px] text-white/60 text-center leading-snug">
               {{ t('deposit.waitForReview') }}
             </p>
           </div>
@@ -242,6 +257,7 @@ const screenshotFile = ref(null);
 const screenshotPreview = ref(null);
 const depositAddress = ref('');
 const qrCodeUrl = ref('');
+const depositAddressLoading = ref(false);
 const loading = ref(false);
 const showCurrencySelector = ref(false);
 const showHistory = ref(false);
@@ -308,6 +324,10 @@ const loadDepositAddress = async () => {
     return;
   }
 
+  depositAddressLoading.value = true;
+  depositAddress.value = '';
+  qrCodeUrl.value = '';
+
   try {
     console.log('Loading deposit address for:', selectedCurrency.value, selectedNetwork.value);
     
@@ -348,6 +368,8 @@ const loadDepositAddress = async () => {
     
     depositAddress.value = '';
     qrCodeUrl.value = '';
+  } finally {
+    depositAddressLoading.value = false;
   }
 };
 

@@ -2,6 +2,7 @@ import axios from 'axios';
 import { useAuthStore } from '../stores/auth';
 import { getCache, setCache } from './cache.js';
 import { getApiUrl } from './config.js';
+import { useAlert } from '../composables/useAlert';
 
 // Create axios instance - baseURL will be set dynamically in interceptor
 const api = axios.create({
@@ -101,28 +102,46 @@ api.interceptors.response.use(
     return response;
   },
   async (error) => {
-    const originalRequest = error.config;
+    const originalRequest = error.config || {};
     
     // Handle 401 Unauthorized - token expired or invalid
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-      
+    if (error.response?.status === 401) {
       const authStore = useAuthStore();
-      
-      // Try to refresh the token
-      if (authStore.refreshToken) {
+      const { showError } = useAlert();
+      const isRefreshRequest = originalRequest.url?.includes('/auth/refresh');
+
+      // Try a single silent refresh for non-refresh requests
+      if (!isRefreshRequest && !originalRequest._retry && authStore.refreshToken) {
+        originalRequest._retry = true;
         const refreshed = await authStore.refreshAccessToken();
         
         if (refreshed && authStore.accessToken) {
           // Retry the original request with new token
           originalRequest.baseURL = getApiUrl(); // Ensure baseURL is correct
+          originalRequest.headers = originalRequest.headers || {};
           originalRequest.headers.Authorization = `Bearer ${authStore.accessToken}`;
           return api(originalRequest);
         }
       }
-      
-      // If refresh failed, logout user
+
+      // If we reach here, either:
+      // - refresh endpoint itself failed, or
+      // - refresh token is missing/invalid, or
+      // - refresh attempt already failed
       authStore.logout();
+
+      // Show session expired message via top popup toast and redirect to login
+      const backendMsg = error.response?.data?.error;
+      const msg =
+        backendMsg === 'Token has been invalidated. Please login again.'
+          ? 'Your session has been ended by admin. Please login again.'
+          : 'Your session has expired or is invalid. Please login again.';
+      try {
+        showError(msg, 4000);
+      } catch (_) {
+        // Fallback: silent if toast not ready
+      }
+
       if (window.location.pathname !== '/login') {
         window.location.href = '/login';
       }

@@ -61,6 +61,14 @@ const isActive = (path) => {
   if (path === '/') {
     return route.path === '/';
   }
+  // Treat sub-pages like /spot-account and /contract-account as part of Assets tab only
+  if (['/spot-account', '/contract-account'].includes(route.path)) {
+    return path === '/assets';
+  }
+  // For other paths, use exact match or starts with, but exclude /spot-account matching /spot
+  if (path === '/spot' && route.path.startsWith('/spot-account')) {
+    return false;
+  }
   return route.path.startsWith(path);
 };
 
