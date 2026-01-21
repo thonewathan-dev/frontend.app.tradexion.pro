@@ -50,11 +50,17 @@ export default defineConfig({
           'vendor': ['vue', 'vue-router', 'pinia'],
           'charts': ['lightweight-charts'],
         },
+        // Add hash to filenames for cache-busting
+        entryFileNames: 'assets/[name].[hash].js',
+        chunkFileNames: 'assets/[name].[hash].js',
+        assetFileNames: 'assets/[name].[hash].[ext]',
       },
     },
     // Enable asset caching
     assetsInlineLimit: 4096, // Inline small assets
     chunkSizeWarningLimit: 1000,
+    // Generate manifest for cache-busting
+    manifest: true,
   },
   // Optimize dependencies
   optimizeDeps: {
