@@ -1052,7 +1052,7 @@ onMounted(async () => {
   // Connect WebSocket for real-time updates (same as Home page)
   connectWebSocket();
 
-  // Refresh klines and trades every 1 second (ticker updated via WebSocket in real-time)
+  // Refresh klines and trades every 3 seconds - reduced from 1s to prevent browser overload (ticker updated via WebSocket in real-time)
   let isRefreshing = false;
   dataInterval = setInterval(async () => {
     if (!isRefreshing) {
@@ -1069,7 +1069,7 @@ onMounted(async () => {
         isRefreshing = false;
       }
     }
-  }, 1000);
+  }, 3000);
 });
 
 onUnmounted(() => {

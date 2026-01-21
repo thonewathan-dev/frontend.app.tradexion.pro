@@ -1226,24 +1226,29 @@ const scheduleReconnect = () => {
   wsBackoffMs = Math.min(wsBackoffMs * 2, MAX_BACKOFF_MS);
 };
 
+// Store interval IDs for cleanup
+let marketDataInterval = null;
+let countdownInterval = null;
+let tradesInterval = null;
+
 onMounted(() => {
   loadMarketData();
   loadCoinList();
   connectWebSocket();
   loadContractTrades();
   
-  // Real-time updates every 2 seconds - throttled to prevent browser overload
+  // Real-time updates every 5 seconds - reduced from 2s to prevent browser overload
   let isRefreshing = false;
   let walletTick = 0;
-  setInterval(async () => {
+  marketDataInterval = setInterval(async () => {
     if (!isRefreshing) {
       isRefreshing = true;
       try {
         // Only refresh orderbook (ticker is updated via WebSocket)
         const symbol = selectedSymbol.value.replace('/', '');
         await loadOrderBook(symbol);
-        // Wallet balance does NOT need 2s polling (causes 429). Refresh every ~10s.
-        walletTick = (walletTick + 1) % 5;
+        // Wallet balance does NOT need frequent polling (causes 429). Refresh every ~15s.
+        walletTick = (walletTick + 1) % 3;
         if (walletTick === 0) {
           await loadWalletBalance();
         }
@@ -1253,16 +1258,16 @@ onMounted(() => {
         isRefreshing = false;
       }
     }
-  }, 2000);
+  }, 5000);
   
   // Update countdowns every second
-  setInterval(() => {
+  countdownInterval = setInterval(() => {
     updateCountdowns();
   }, 1000);
   
-  // Reload contract trades every 3 seconds - throttled to prevent browser overload
+  // Reload contract trades every 5 seconds - reduced from 3s to prevent browser overload
   let isLoadingTrades = false;
-  setInterval(async () => {
+  tradesInterval = setInterval(async () => {
     if (!isLoadingTrades) {
       isLoadingTrades = true;
       try {
@@ -1273,14 +1278,31 @@ onMounted(() => {
         isLoadingTrades = false;
       }
     }
-  }, 3000);
+  }, 5000);
 });
 
-// Cleanup WebSocket on unmount
+// Cleanup WebSocket and intervals on unmount
 onUnmounted(() => {
   if (wsReconnectTimer) {
     clearTimeout(wsReconnectTimer);
+    wsReconnectTimer = null;
   }
+  
+  if (marketDataInterval) {
+    clearInterval(marketDataInterval);
+    marketDataInterval = null;
+  }
+  
+  if (countdownInterval) {
+    clearInterval(countdownInterval);
+    countdownInterval = null;
+  }
+  
+  if (tradesInterval) {
+    clearInterval(tradesInterval);
+    tradesInterval = null;
+  }
+  
   try {
     if (tickerWs) {
       tickerWs.onopen = null;
@@ -1288,6 +1310,7 @@ onUnmounted(() => {
       tickerWs.onerror = null;
       tickerWs.onclose = null;
       tickerWs.close();
+      tickerWs = null;
     }
   } catch {
     // Ignore cleanup errors

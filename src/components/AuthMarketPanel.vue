@@ -366,10 +366,22 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
-  if (wsReconnectTimer) clearTimeout(wsReconnectTimer);
-  wsReconnectTimer = null;
-  if (tickerWs) tickerWs.close();
-  tickerWs = null;
+  if (wsReconnectTimer) {
+    clearTimeout(wsReconnectTimer);
+    wsReconnectTimer = null;
+  }
+  try {
+    if (tickerWs) {
+      tickerWs.onopen = null;
+      tickerWs.onmessage = null;
+      tickerWs.onerror = null;
+      tickerWs.onclose = null;
+      tickerWs.close();
+      tickerWs = null;
+    }
+  } catch {
+    // Ignore cleanup errors
+  }
 });
 </script>
 

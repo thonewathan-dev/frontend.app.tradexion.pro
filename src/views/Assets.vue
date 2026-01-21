@@ -981,12 +981,12 @@ onMounted(async () => {
     loadWallets();
   }, 30000);
   
-  // Refresh user every 3 seconds to get latest credited_score
+  // Refresh user every 10 seconds - reduced from 3s to prevent browser overload
   userRefreshInterval = setInterval(() => {
     if (route.path === '/assets') {
       refreshUser();
     }
-  }, 3000);
+  }, 10000);
 });
 
 onActivated(async () => {

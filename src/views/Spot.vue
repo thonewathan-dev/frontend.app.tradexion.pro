@@ -893,22 +893,25 @@ const scheduleReconnect = () => {
   wsBackoffMs = Math.min(wsBackoffMs * 2, MAX_BACKOFF_MS);
 };
 
+// Store interval ID for cleanup
+let marketDataInterval = null;
+
 onMounted(() => {
   loadMarketData();
   loadCoinList();
   connectWebSocket();
   
-  // Refresh orderbook every 2 seconds (throttled)
+  // Refresh orderbook every 5 seconds - reduced from 2s to prevent browser overload
   let isRefreshing = false;
   let walletTick = 0;
-  setInterval(async () => {
+  marketDataInterval = setInterval(async () => {
     if (!isRefreshing) {
       isRefreshing = true;
       try {
         const symbol = selectedSymbol.value.replace('/', '');
         await loadOrderBook(symbol);
-        // Wallets do NOT need 2s polling (causes 429). Refresh every ~10s.
-        walletTick = (walletTick + 1) % 5;
+        // Wallets do NOT need frequent polling (causes 429). Refresh every ~15s.
+        walletTick = (walletTick + 1) % 3;
         if (walletTick === 0) {
           await loadWallets();
         }
@@ -918,14 +921,21 @@ onMounted(() => {
         isRefreshing = false;
       }
     }
-  }, 2000);
+  }, 5000);
 });
 
-// Cleanup WebSocket on unmount
+// Cleanup WebSocket and intervals on unmount
 onUnmounted(() => {
   if (wsReconnectTimer) {
     clearTimeout(wsReconnectTimer);
+    wsReconnectTimer = null;
   }
+  
+  if (marketDataInterval) {
+    clearInterval(marketDataInterval);
+    marketDataInterval = null;
+  }
+  
   try {
     if (tickerWs) {
       tickerWs.onopen = null;
@@ -933,6 +943,7 @@ onUnmounted(() => {
       tickerWs.onerror = null;
       tickerWs.onclose = null;
       tickerWs.close();
+      tickerWs = null;
     }
   } catch {
     // Ignore cleanup errors
