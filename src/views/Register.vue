@@ -118,25 +118,9 @@
                 </div>
               </div>
 
-              <!-- Terms and Privacy Checkbox -->
-              <div class="flex items-start gap-2 pt-1">
-                <input
-                  v-model="acceptTerms"
-                  type="checkbox"
-                  id="accept-terms"
-                  class="mt-0.5 w-4 h-4 rounded border-white/30 bg-white/5 text-white focus:ring-2 focus:ring-white/20 cursor-pointer"
-                />
-                <label for="accept-terms" class="text-xs text-white/70 leading-relaxed cursor-pointer">
-                  I agree to the 
-                  <router-link to="/terms-of-service" class="text-white font-semibold underline hover:text-white/80">Terms of Service</router-link>
-                  and 
-                  <router-link to="/privacy-policy" class="text-white font-semibold underline hover:text-white/80">Privacy Policy</router-link>
-                </label>
-              </div>
-
               <button
                 type="submit"
-                :disabled="loading || !canGoNext || !acceptTerms"
+                :disabled="loading || !canGoNext"
                 class="w-full py-2.5 text-sm rounded-full font-semibold glass-button-no-hover text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-white/20"
               >
                 Next
@@ -233,25 +217,9 @@
               </div>
             </div>
 
-            <!-- Terms and Privacy Checkbox -->
-            <div class="flex items-start gap-2 pt-1">
-              <input
-                v-model="acceptTerms"
-                type="checkbox"
-                id="accept-terms-phone"
-                class="mt-0.5 w-4 h-4 rounded border-white/30 bg-white/5 text-white focus:ring-2 focus:ring-white/20 cursor-pointer"
-              />
-              <label for="accept-terms-phone" class="text-xs text-white/70 leading-relaxed cursor-pointer">
-                I agree to the 
-                <router-link to="/terms-of-service" class="text-white font-semibold underline hover:text-white/80">Terms of Service</router-link>
-                and 
-                <router-link to="/privacy-policy" class="text-white font-semibold underline hover:text-white/80">Privacy Policy</router-link>
-              </label>
-            </div>
-
             <button
               type="submit"
-              :disabled="loading || !phone || !acceptTerms"
+              :disabled="loading || !phone"
               class="w-full py-2.5 text-sm rounded-full font-semibold glass-button-no-hover text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-white/20"
             >
               Next
@@ -268,14 +236,37 @@
       </div>
 
       <!-- Terms and Privacy Checkbox (before Google login) -->
-      <div class="flex items-start gap-2 mb-3">
-        <input
-          v-model="acceptTerms"
-          type="checkbox"
-          id="accept-terms-google"
-          class="mt-0.5 w-4 h-4 rounded border-white/30 bg-white/5 text-white focus:ring-2 focus:ring-white/20 cursor-pointer"
-        />
-        <label for="accept-terms-google" class="text-xs text-white/70 leading-relaxed cursor-pointer">
+      <div class="flex items-start gap-2.5 mb-3">
+        <button
+          type="button"
+          @click="acceptTerms = !acceptTerms"
+          class="relative flex-shrink-0 w-5 h-5 rounded border-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/20"
+          :class="acceptTerms ? 'bg-white border-white' : 'bg-transparent border-white/30 hover:border-white/50'"
+        >
+          <transition
+            enter-active-class="transition-all duration-200"
+            enter-from-class="opacity-0 scale-75"
+            enter-to-class="opacity-100 scale-100"
+            leave-active-class="transition-all duration-150"
+            leave-from-class="opacity-100 scale-100"
+            leave-to-class="opacity-0 scale-75"
+          >
+            <svg
+              v-if="acceptTerms"
+              class="absolute inset-0 w-full h-full text-slate-950"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="3"
+              viewBox="0 0 24 24"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </transition>
+        </button>
+        <label
+          @click="acceptTerms = !acceptTerms"
+          class="text-xs text-white/70 leading-relaxed cursor-pointer flex-1"
+        >
           I agree to the 
           <router-link to="/terms-of-service" class="text-white font-semibold underline hover:text-white/80">Terms of Service</router-link>
           and 

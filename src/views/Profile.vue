@@ -52,22 +52,87 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { computed, onMounted, onActivated, onUnmounted, watch, ref } from 'vue';
+import { useRoute } from 'vue-router';
 import MobileNav from '../components/MobileNav.vue';
 import DesktopNav from '../components/DesktopNav.vue';
 import { useAuthStore } from '../stores/auth';
 
 const isMobile = computed(() => window.innerWidth < 768);
 const authStore = useAuthStore();
-const user = ref(null);
+const route = useRoute();
+
+// Local ref to force reactivity updates
+const localUser = ref(null);
+
+// Make user reactive to authStore changes
+const user = computed(() => {
+  // Sync with authStore.user and localUser
+  const storeUser = authStore.user;
+  if (storeUser) {
+    localUser.value = { ...storeUser };
+    return localUser.value;
+  }
+  return storeUser;
+});
 
 const formatDate = (dateString) => {
   if (!dateString) return 'N/A';
   return new Date(dateString).toLocaleDateString();
 };
 
+// Periodic refresh interval (declare before use)
+let refreshInterval = null;
+
+const refreshUser = async () => {
+  try {
+    await authStore.fetchCurrentUser();
+    // Force update localUser to trigger reactivity
+    if (authStore.user) {
+      localUser.value = { ...authStore.user };
+    }
+  } catch (error) {
+    console.error('Error refreshing user:', error);
+  }
+};
+
+// Refresh on mount
 onMounted(async () => {
-  await authStore.fetchCurrentUser();
-  user.value = authStore.user;
+  await refreshUser();
+  
+  // Start periodic refresh every 3 seconds to catch admin updates
+  refreshInterval = setInterval(async () => {
+    if (route.path === '/profile') {
+      await refreshUser();
+    }
+  }, 3000);
+});
+
+// Refresh when page is activated (using keep-alive)
+onActivated(async () => {
+  await refreshUser();
+});
+
+// Refresh when navigating to profile page
+watch(() => route.path, async (newPath) => {
+  if (newPath === '/profile') {
+    await refreshUser();
+  }
+});
+
+// Watch authStore.user deeply for credited_score changes
+watch(() => authStore.user?.credited_score, (newScore, oldScore) => {
+  if (newScore !== oldScore && newScore !== undefined && localUser.value) {
+    localUser.value.credited_score = newScore;
+    console.log('[Profile] Credited score updated:', oldScore, '->', newScore);
+  }
+}, { deep: true, immediate: true });
+
+// Cleanup interval on unmount
+onUnmounted(() => {
+  if (refreshInterval) {
+    clearInterval(refreshInterval);
+    refreshInterval = null;
+  }
 });
 </script>

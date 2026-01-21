@@ -78,8 +78,12 @@ export const useAuthStore = defineStore('auth', () => {
 
   const fetchCurrentUser = async () => {
     try {
-      const response = await api.get('/auth/me');
-      user.value = response.data.user;
+      // Add timestamp to prevent caching
+      const response = await api.get('/auth/me', {
+        params: { _t: Date.now() }
+      });
+      // Force update by creating a new object reference
+      user.value = { ...response.data.user };
       return { success: true };
     } catch (error) {
       // Only logout if it's a 401 (unauthorized) - token is invalid

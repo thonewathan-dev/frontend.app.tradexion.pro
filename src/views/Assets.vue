@@ -18,8 +18,8 @@
                 <div class="text-xs text-white/60">ID: {{ user?.id || 'N/A' }}</div>
               </div>
             </div>
-            <button class="px-4 py-1.5 glass-button rounded-full text-xs font-medium text-white">
-              {{ t('assets.creditScore') }}: 100
+            <button class="px-2 py-0.5 glass-button-no-hover rounded-full text-[10px] font-medium text-white">
+              {{ t('assets.creditScore') }}: {{ parseFloat(user?.credited_score || 100).toFixed(0) }}
             </button>
           </div>
         </div>
@@ -339,7 +339,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed, watch, h } from 'vue';
+import { ref, onMounted, onUnmounted, onActivated, computed, watch, h } from 'vue';
+import { useRoute } from 'vue-router';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
 import { useI18n } from 'vue-i18n';
@@ -358,9 +359,22 @@ const { t } = useI18n();
 const { showSuccess, showError, showWarning, showInfo } = useAlert();
 
 const router = useRouter();
+const route = useRoute();
 const authStore = useAuthStore();
 const isMobile = computed(() => window.innerWidth < 768);
 const user = computed(() => authStore.user);
+
+// Refresh user data to get latest credited_score
+const refreshUser = async () => {
+  try {
+    await authStore.fetchCurrentUser();
+  } catch (error) {
+    console.error('Error refreshing user:', error);
+  }
+};
+
+// Periodic refresh for credited_score (every 3 seconds while on Assets page)
+let userRefreshInterval = null;
 
 const wallets = ref([]);
 const isLoading = ref(true);
@@ -957,6 +971,9 @@ onMounted(async () => {
   // Fetch user first if not available
   if (!authStore.user) {
     await authStore.fetchCurrentUser();
+  } else {
+    // Refresh user to get latest credited_score
+    await refreshUser();
   }
   // Then load wallets
   await loadWallets();
@@ -965,11 +982,34 @@ onMounted(async () => {
   balanceInterval = setInterval(() => {
     loadWallets();
   }, 30000);
+  
+  // Refresh user every 3 seconds to get latest credited_score
+  userRefreshInterval = setInterval(() => {
+    if (route.path === '/assets') {
+      refreshUser();
+    }
+  }, 3000);
 });
+
+onActivated(async () => {
+  // Refresh user when page is activated
+  await refreshUser();
+});
+
+// Watch for changes in credited_score
+watch(() => authStore.user?.credited_score, (newScore, oldScore) => {
+  if (newScore !== oldScore && newScore !== undefined) {
+    console.log('[Assets] Credited score updated:', oldScore, '->', newScore);
+  }
+}, { deep: true, immediate: true });
 
 onUnmounted(() => {
   if (balanceInterval) {
     clearInterval(balanceInterval);
+  }
+  if (userRefreshInterval) {
+    clearInterval(userRefreshInterval);
+    userRefreshInterval = null;
   }
 });
 </script>

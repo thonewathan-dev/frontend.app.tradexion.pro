@@ -15,8 +15,12 @@
       </div>
     </div>
 
-    <div class="max-w-3xl mx-auto px-4 py-6 pb-8 pb-safe">
-      <div class="glass-card-no-hover rounded-xl border border-white/12 p-6 space-y-6">
+    <!-- Banner Image -->
+    <div class="w-full">
+      <img :src="bannerUrl" alt="Banner" class="w-full h-auto object-cover" />
+    </div>
+
+    <div class="max-w-3xl mx-auto px-4 py-6 pb-8 pb-safe space-y-6">
         <div>
           <p class="text-sm text-white/80 mb-4">
             Last updated: {{ new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) }}
@@ -110,7 +114,6 @@
             We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last updated" date.
           </p>
         </section>
-      </div>
     </div>
   </div>
 </template>
@@ -119,4 +122,5 @@
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
+const bannerUrl = new URL('../assets/banners/bitcoin-banner.png', import.meta.url).href;
 </script>
