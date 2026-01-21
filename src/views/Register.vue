@@ -118,9 +118,25 @@
                 </div>
               </div>
 
+              <!-- Terms and Privacy Checkbox -->
+              <div class="flex items-start gap-2 pt-1">
+                <input
+                  v-model="acceptTerms"
+                  type="checkbox"
+                  id="accept-terms"
+                  class="mt-0.5 w-4 h-4 rounded border-white/30 bg-white/5 text-white focus:ring-2 focus:ring-white/20 cursor-pointer"
+                />
+                <label for="accept-terms" class="text-xs text-white/70 leading-relaxed cursor-pointer">
+                  I agree to the 
+                  <router-link to="/terms-of-service" class="text-white font-semibold underline hover:text-white/80">Terms of Service</router-link>
+                  and 
+                  <router-link to="/privacy-policy" class="text-white font-semibold underline hover:text-white/80">Privacy Policy</router-link>
+                </label>
+              </div>
+
               <button
                 type="submit"
-                :disabled="loading || !canGoNext"
+                :disabled="loading || !canGoNext || !acceptTerms"
                 class="w-full py-2.5 text-sm rounded-full font-semibold glass-button-no-hover text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-white/20"
               >
                 Next
@@ -172,7 +188,7 @@
 
               <button
                 type="submit"
-                :disabled="loading || !turnstileToken || !password"
+                :disabled="loading || !turnstileToken || !password || !acceptTerms"
                 class="w-full py-2.5 text-sm rounded-full font-semibold glass-button-no-hover text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-white/20"
               >
                 {{ loading ? t('auth.registering') : 'Create Account' }}
@@ -217,9 +233,25 @@
               </div>
             </div>
 
+            <!-- Terms and Privacy Checkbox -->
+            <div class="flex items-start gap-2 pt-1">
+              <input
+                v-model="acceptTerms"
+                type="checkbox"
+                id="accept-terms-phone"
+                class="mt-0.5 w-4 h-4 rounded border-white/30 bg-white/5 text-white focus:ring-2 focus:ring-white/20 cursor-pointer"
+              />
+              <label for="accept-terms-phone" class="text-xs text-white/70 leading-relaxed cursor-pointer">
+                I agree to the 
+                <router-link to="/terms-of-service" class="text-white font-semibold underline hover:text-white/80">Terms of Service</router-link>
+                and 
+                <router-link to="/privacy-policy" class="text-white font-semibold underline hover:text-white/80">Privacy Policy</router-link>
+              </label>
+            </div>
+
             <button
               type="submit"
-              :disabled="loading || !phone"
+              :disabled="loading || !phone || !acceptTerms"
               class="w-full py-2.5 text-sm rounded-full font-semibold glass-button-no-hover text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-white/20"
             >
               Next
@@ -235,11 +267,28 @@
         <div class="h-px flex-1 bg-white/15"></div>
       </div>
 
+      <!-- Terms and Privacy Checkbox (before Google login) -->
+      <div class="flex items-start gap-2 mb-3">
+        <input
+          v-model="acceptTerms"
+          type="checkbox"
+          id="accept-terms-google"
+          class="mt-0.5 w-4 h-4 rounded border-white/30 bg-white/5 text-white focus:ring-2 focus:ring-white/20 cursor-pointer"
+        />
+        <label for="accept-terms-google" class="text-xs text-white/70 leading-relaxed cursor-pointer">
+          I agree to the 
+          <router-link to="/terms-of-service" class="text-white font-semibold underline hover:text-white/80">Terms of Service</router-link>
+          and 
+          <router-link to="/privacy-policy" class="text-white font-semibold underline hover:text-white/80">Privacy Policy</router-link>
+        </label>
+      </div>
+
       <!-- Google button -->
       <button
         type="button"
         @click="loginWithGoogle"
-        class="w-full py-2.5 text-sm rounded-lg glass-card-no-hover border border-white/12 hover:border-white/20 transition-colors flex items-center justify-center gap-2 font-semibold text-white"
+        :disabled="!acceptTerms"
+        class="w-full py-2.5 text-sm rounded-lg glass-card-no-hover border border-white/12 hover:border-white/20 transition-colors flex items-center justify-center gap-2 font-semibold text-white disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <svg class="w-4 h-4" viewBox="0 0 24 24">
           <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -291,6 +340,7 @@ const showVerification = ref(false);
 const displayedOTP = ref('');
 const registerMode = ref('email'); // 'email' | 'phone'
 const step = ref('identifier'); // 'identifier' | 'password'
+const acceptTerms = ref(false);
 
 const canGoNext = computed(() => {
   const v = email.value.trim();
@@ -380,6 +430,7 @@ const setMode = (mode) => {
   password.value = '';
   phone.value = '';
   step.value = 'identifier';
+  // Don't reset acceptTerms - user should only accept once per session
   removeTurnstile();
 };
 
@@ -484,6 +535,13 @@ const handlePhoneRegister = async () => {
 };
 
 const loginWithGoogle = () => {
+  if (!acceptTerms.value) {
+    if (typeof window !== 'undefined' && window.__toast?.error) {
+      window.__toast.error('Please accept the Terms of Service and Privacy Policy to continue');
+    }
+    return;
+  }
+  
   // Get API URL from config utility
   const apiUrl = getApiUrl();
   

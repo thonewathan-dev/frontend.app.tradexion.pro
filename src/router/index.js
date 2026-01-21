@@ -80,6 +80,18 @@ const routes = [
     component: () => import('../views/Profile.vue'),
     meta: { requiresAuth: true, title: 'Profile' },
   },
+  {
+    path: '/privacy-policy',
+    name: 'PrivacyPolicy',
+    component: () => import('../views/PrivacyPolicy.vue'),
+    meta: { requiresAuth: false, title: 'Privacy Policy' },
+  },
+  {
+    path: '/terms-of-service',
+    name: 'TermsOfService',
+    component: () => import('../views/TermsOfService.vue'),
+    meta: { requiresAuth: false, title: 'Terms of Service' },
+  },
 ];
 
 const router = createRouter({
