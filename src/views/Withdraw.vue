@@ -226,7 +226,7 @@ import api from '../utils/api';
 const { t } = useI18n();
 const router = useRouter();
 const authStore = useAuthStore();
-const { showAlert } = useAlert();
+const { showSuccess, showError, showWarning } = useAlert();
 
 const isMobile = computed(() => window.innerWidth < 768);
 
@@ -321,18 +321,18 @@ const loadWithdrawHistory = async () => {
 
 const handleWithdraw = async () => {
   if (!canWithdraw.value) {
-    showAlert('error', t('withdraw.invalidInput'));
+    showError(t('withdraw.invalidInput'));
     return;
   }
 
   const amount = parseFloat(withdrawAmount.value);
   if (amount > extractableQuantity.value) {
-    showAlert('error', t('withdraw.insufficientBalance'));
+    showError(t('withdraw.insufficientBalance'));
     return;
   }
 
   if (withdrawAddress.value.trim().indexOf(' ') !== -1) {
-    showAlert('error', t('withdraw.addressWarning'));
+    showWarning(t('withdraw.addressWarning'));
     return;
   }
 
@@ -345,13 +345,14 @@ const handleWithdraw = async () => {
       network: selectedNetwork.value,
     });
     
-    showAlert('success', t('withdraw.success'));
+    showSuccess(t('withdraw.success'));
     withdrawAddress.value = '';
     withdrawAmount.value = '';
     await loadExtractableQuantity();
+    await loadWithdrawHistory();
   } catch (error) {
     console.error('Withdraw error:', error);
-    showAlert('error', error.response?.data?.error || t('withdraw.error'));
+    showError(error.response?.data?.error || t('withdraw.error'));
   } finally {
     loading.value = false;
   }

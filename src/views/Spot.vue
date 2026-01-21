@@ -638,8 +638,8 @@ const loadTicker = async (symbol) => {
           highPrice: Number(data.highPrice) || 0,
           lowPrice: Number(data.lowPrice) || 0,
         };
-        if (transactionMode.value === 'market' && !orderPrice.value) {
-          orderPrice.value = formatPrice(ticker.value.price);
+    if (transactionMode.value === 'market' && !orderPrice.value) {
+      orderPrice.value = formatPrice(ticker.value.price);
         }
       } catch (binanceError) {
         console.error('Binance fallback failed:', binanceError);
@@ -674,7 +674,7 @@ const loadOrderBook = async (symbol) => {
   try {
     const response = await api.get(`/market/orderbook/${symbol}`, { params: { limit: 12 } });
     if (response.data && (response.data.bids?.length > 0 || response.data.asks?.length > 0)) {
-      orderBook.value = response.data;
+    orderBook.value = response.data;
     } else {
       // Fallback: fetch directly from Binance
       try {

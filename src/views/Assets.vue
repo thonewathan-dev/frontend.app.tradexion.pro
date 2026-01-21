@@ -103,9 +103,9 @@
                 <div class="text-white/60 text-xs mb-1">{{ t('assets.spotAccount') }}</div>
                 <div class="text-white text-base font-semibold">{{ formatSpotBalance(spotBalance) }}</div>
               </div>
+              </div>
             </div>
-          </div>
-          
+            
           <!-- Action Buttons Card - Separate Glass Card -->
           <div class="glass-card rounded-lg p-4 mb-3">
             <div class="flex gap-2">
@@ -686,8 +686,6 @@ const handleProfileItemClick = (action) => {
   if (action === 'logout') {
     authStore.logout();
     router.push('/login');
-  } else if (action === 'change-password') {
-    router.push('/profile');
   } else {
     console.log('Profile item clicked:', action);
   }

@@ -822,7 +822,7 @@ const loadOrderBook = async (symbol) => {
   try {
     const response = await api.get(`/market/orderbook/${symbol}`, { params: { limit: 20 } });
     if (response.data && (response.data.bids?.length > 0 || response.data.asks?.length > 0)) {
-      orderBook.value = response.data;
+    orderBook.value = response.data;
     } else {
       // Fallback: fetch directly from Binance
       try {

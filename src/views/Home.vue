@@ -201,7 +201,7 @@
                   class="text-xs text-white/60"
                 >
                   Vol {{ formatVolume(ticker.volume) }}
-                </div>
+              </div>
                 <div
                   v-else
                   class="h-3 bg-white/10 rounded w-20 animate-pulse"
@@ -257,32 +257,32 @@
         
         <div class="p-3 md:p-8">
           <!-- Market Tickers - Always visible, only price/volume/% update -->
-          <!-- Mobile: Compact horizontal cards -->
-          <div class="flex flex-col gap-2 md:hidden mb-6">
-            <div
-              v-for="ticker in tickers"
-              :key="ticker.symbol"
-              class="glass-card rounded-lg p-3 cursor-pointer active:scale-[0.98] transition-transform"
-              @click="selectSymbol(ticker.symbol)"
-            >
-              <div class="flex items-center justify-between">
-                <!-- Left: Logo and Name -->
-                <div class="flex items-center gap-2.5 flex-1 min-w-0">
-                  <img
-                    :src="getCoinLogo(ticker.symbol)"
-                    :alt="ticker.symbol"
-                    class="w-9 h-9 md:w-10 md:h-10 rounded-full flex-shrink-0"
-                    @error="handleImageError"
-                  />
-                  <div class="flex flex-col min-w-0">
-                    <span class="text-sm font-semibold text-white truncate">{{ ticker.symbol.split('/')[0] }}</span>
-                    <span class="text-xs text-white/60">{{ $t('home.volume') }} {{ formatVolume(ticker.volume) }}</span>
+            <!-- Mobile: Compact horizontal cards -->
+            <div class="flex flex-col gap-2 md:hidden mb-6">
+              <div
+                v-for="ticker in tickers"
+                :key="ticker.symbol"
+                class="glass-card rounded-lg p-3 cursor-pointer active:scale-[0.98] transition-transform"
+                @click="selectSymbol(ticker.symbol)"
+              >
+                <div class="flex items-center justify-between">
+                  <!-- Left: Logo and Name -->
+                  <div class="flex items-center gap-2.5 flex-1 min-w-0">
+                    <img
+                      :src="getCoinLogo(ticker.symbol)"
+                      :alt="ticker.symbol"
+                      class="w-9 h-9 md:w-10 md:h-10 rounded-full flex-shrink-0"
+                      @error="handleImageError"
+                    />
+                    <div class="flex flex-col min-w-0">
+                      <span class="text-sm font-semibold text-white truncate">{{ ticker.symbol.split('/')[0] }}</span>
+                      <span class="text-xs text-white/60">{{ $t('home.volume') }} {{ formatVolume(ticker.volume) }}</span>
+                    </div>
                   </div>
-                </div>
-                
-                <!-- Right: Price and Change -->
-                <div class="flex items-center gap-3 flex-shrink-0">
-                  <div class="text-right">
+                  
+                  <!-- Right: Price and Change -->
+                  <div class="flex items-center gap-3 flex-shrink-0">
+                    <div class="text-right">
                     <div
                       v-if="!ticker.isPlaceholder"
                       class="text-base font-bold text-white leading-tight"
@@ -293,35 +293,35 @@
                       v-else
                       class="h-4 bg-white/10 rounded w-16 animate-pulse"
                     ></div>
-                  </div>
-                  <span
+                    </div>
+                    <span
                     v-if="!ticker.isPlaceholder"
-                    :class="[
-                      'text-xs px-2 py-1 rounded-full font-medium whitespace-nowrap flex items-center gap-1',
-                      ticker.change >= 0 
-                        ? 'bg-green-500/20 text-green-300' 
-                        : 'bg-red-500/20 text-red-300'
-                    ]"
-                  >
-                    <svg v-if="ticker.change < 0" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                    <svg v-else class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-                    </svg>
-                    {{ ticker.change >= 0 ? '+' : '' }}{{ ticker.change.toFixed(2) }}%
-                  </span>
+                      :class="[
+                        'text-xs px-2 py-1 rounded-full font-medium whitespace-nowrap flex items-center gap-1',
+                        ticker.change >= 0 
+                          ? 'bg-green-500/20 text-green-300' 
+                          : 'bg-red-500/20 text-red-300'
+                      ]"
+                    >
+                      <svg v-if="ticker.change < 0" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                      <svg v-else class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                      </svg>
+                      {{ ticker.change >= 0 ? '+' : '' }}{{ ticker.change.toFixed(2) }}%
+                    </span>
                     <div
                       v-else
                       class="h-4 bg-white/10 rounded-full w-14 animate-pulse"
                     ></div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          
-          <!-- Desktop: Grid layout -->
-          <div class="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            
+            <!-- Desktop: Grid layout -->
+            <div class="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <div
               v-for="ticker in tickers"
               :key="ticker.symbol"
@@ -781,7 +781,7 @@ onMounted(async () => {
 
   // First load last-known prices from backend (DB snapshots / Binance)
   await loadInitialTickers();
-
+  
   connectWebSocket();
   startAutoSlide();
   

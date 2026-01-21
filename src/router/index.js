@@ -75,12 +75,6 @@ const routes = [
     meta: { requiresAuth: true, title: 'Flash Exchange' },
   },
   {
-    path: '/profile',
-    name: 'Profile',
-    component: () => import('../views/Profile.vue'),
-    meta: { requiresAuth: true, title: 'Profile' },
-  },
-  {
     path: '/privacy-policy',
     name: 'PrivacyPolicy',
     component: () => import('../views/PrivacyPolicy.vue'),

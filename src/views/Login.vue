@@ -1,8 +1,8 @@
 <template>
-  <div class="min-h-[100dvh] overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-white">
+  <div class="min-h-[100dvh] overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-white flex flex-col">
     <!-- Top bar -->
     <div class="sticky top-0 z-10 glass-card-no-hover border-b border-white/10">
-      <div class="max-w-md mx-auto px-4 h-14 flex items-center justify-between">
+      <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
         <div class="flex items-center gap-2">
           <img :src="logoMarkUrl" alt="TradeXion" class="w-7 h-7 object-contain" />
           <span class="font-semibold tracking-tight text-white">TradeXion</span>
@@ -16,8 +16,16 @@
       </div>
     </div>
 
-    <div class="max-w-md mx-auto px-4 py-4 pb-8 pb-safe">
-      <h1 class="text-2xl font-bold tracking-tight mb-3 text-white">Log In</h1>
+    <div class="flex-1 max-w-5xl mx-auto w-full px-4 pt-6 pb-8 md:pt-10 md:pb-10 md:flex md:items-center">
+      <div class="grid md:grid-cols-2 gap-6 md:gap-10 items-start w-full">
+        <!-- Desktop left panel (market preview like the reference) -->
+        <div class="hidden md:block">
+          <AuthMarketPanel />
+        </div>
+
+        <!-- Right: login form -->
+        <div class="min-w-0">
+          <h1 class="text-2xl md:text-3xl font-bold tracking-tight mb-3 text-white">Log In</h1>
 
       <!-- Tabs -->
       <div class="flex gap-6 text-sm font-semibold mb-3">
@@ -174,7 +182,11 @@
       <div class="mt-3 mb-4 mb-safe text-center text-xs text-white/70">
         <router-link to="/register" class="font-semibold text-white hover:text-white/80">Create a TradeXion Account</router-link>
       </div>
+        </div>
+      </div>
     </div>
+
+    <SiteFooter />
 
     <!-- "Invalid user" modal -->
     <div v-if="showInvalidUserModal" class="fixed inset-0 z-50 flex items-center justify-center px-4">
@@ -205,6 +217,8 @@
 </template>
 
 <script setup>
+import AuthMarketPanel from '../components/AuthMarketPanel.vue';
+import SiteFooter from '../components/SiteFooter.vue';
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
