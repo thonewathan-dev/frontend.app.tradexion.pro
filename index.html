@@ -14,33 +14,98 @@
   <body>
     <div id="app"></div>
     <script>
-      // Cache-busting: Clear old cached code if version mismatch
-      const CURRENT_VERSION = '2.0.0';
-      const storedVersion = localStorage.getItem('app_version');
+      // Global error handler to catch ref errors BEFORE Vue loads
+      window.addEventListener('error', function(event) {
+        if (event.message && (event.message.includes('refs') || event.message.includes('Cannot read properties'))) {
+          console.error('Critical error detected, clearing cache...');
+          event.preventDefault();
+          
+          // Clear everything
+          if ('caches' in window) {
+            caches.keys().then(names => {
+              names.forEach(name => caches.delete(name).catch(() => {}));
+            });
+          }
+          
+          if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+              registrations.forEach(reg => reg.unregister());
+            });
+          }
+          
+          // Preserve auth
+          const authTokens = {
+            accessToken: localStorage.getItem('accessToken'),
+            refreshToken: localStorage.getItem('refreshToken'),
+          };
+          
+          localStorage.clear();
+          sessionStorage.clear();
+          
+          Object.entries(authTokens).forEach(([key, value]) => {
+            if (value) localStorage.setItem(key, value);
+          });
+          
+          // Force reload with cache bypass
+          setTimeout(() => {
+            window.location.href = window.location.origin + window.location.pathname + '?v=' + Date.now() + '&_clear=1';
+          }, 100);
+          
+          return false;
+        }
+      }, true); // Use capture phase
       
-      if (storedVersion && storedVersion !== CURRENT_VERSION) {
-        console.log('App version changed, clearing cache...');
+      // Aggressive cache-busting: Always clear on load to prevent stale code
+      (function() {
+        const CURRENT_VERSION = '2.2.0';
+        const storedVersion = localStorage.getItem('app_version');
+        const urlParams = new URLSearchParams(window.location.search);
+        const forceClear = urlParams.get('_clear') === '1' || urlParams.get('_nocache') === '1';
+        
+        // Clear service workers first
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(registrations => {
+            registrations.forEach(reg => reg.unregister());
+          });
+        }
+        
         // Clear all caches
         if ('caches' in window) {
           caches.keys().then(names => {
-            names.forEach(name => caches.delete(name));
+            names.forEach(name => caches.delete(name).catch(() => {}));
           });
         }
-        // Clear localStorage except auth tokens
-        const authTokens = {
-          accessToken: localStorage.getItem('accessToken'),
-          refreshToken: localStorage.getItem('refreshToken'),
-        };
-        localStorage.clear();
-        Object.entries(authTokens).forEach(([key, value]) => {
-          if (value) localStorage.setItem(key, value);
-        });
-        localStorage.setItem('app_version', CURRENT_VERSION);
-        // Force reload
-        window.location.reload(true);
-      } else if (!storedVersion) {
-        localStorage.setItem('app_version', CURRENT_VERSION);
-      }
+        
+        if (forceClear || (storedVersion && storedVersion !== CURRENT_VERSION) || !storedVersion) {
+          console.log('Clearing cache for version update...');
+          
+          // Preserve auth tokens
+          const authTokens = {
+            accessToken: localStorage.getItem('accessToken'),
+            refreshToken: localStorage.getItem('refreshToken'),
+          };
+          
+          // Clear everything
+          localStorage.clear();
+          sessionStorage.clear();
+          
+          // Restore auth
+          Object.entries(authTokens).forEach(([key, value]) => {
+            if (value) localStorage.setItem(key, value);
+          });
+          localStorage.setItem('app_version', CURRENT_VERSION);
+          
+          // Remove params and reload if needed
+          if (forceClear) {
+            const cleanUrl = window.location.href.split('?')[0];
+            if (window.location.href !== cleanUrl) {
+              window.history.replaceState({}, '', cleanUrl);
+            }
+          } else if (storedVersion && storedVersion !== CURRENT_VERSION) {
+            window.location.reload(true);
+          }
+        }
+      })();
     </script>
     <script type="module" src="/src/main.js"></script>
   </body>

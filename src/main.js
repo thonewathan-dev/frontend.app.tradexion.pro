@@ -8,11 +8,45 @@ import './style.css';
 // Global error handler to catch Vue errors and prevent blank pages
 const handleError = (err, instance, info) => {
   console.error('Vue Error:', err, info);
-  // If it's a ref error from old cached code, try to recover
-  if (err?.message?.includes('refs') || err?.message?.includes('null')) {
-    console.warn('Detected ref error - likely from cached JavaScript. Clearing cache may help.');
-    // Don't crash the app, just log it
-    return;
+  // If it's a ref error from old cached code, force cache clear and reload
+  if (err?.message?.includes('refs') || err?.message?.includes('null') || err?.message?.includes('Cannot read properties')) {
+    console.error('Critical: Ref error detected - clearing all caches and reloading...');
+    
+    // Clear all possible caches
+    if ('caches' in window) {
+      caches.keys().then(names => {
+        names.forEach(name => {
+          caches.delete(name).catch(() => {});
+        });
+      });
+    }
+    
+    // Clear service workers
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(registrations => {
+        registrations.forEach(registration => registration.unregister());
+      });
+    }
+    
+    // Clear localStorage (except auth)
+    const authTokens = {
+      accessToken: localStorage.getItem('accessToken'),
+      refreshToken: localStorage.getItem('refreshToken'),
+    };
+    localStorage.clear();
+    Object.entries(authTokens).forEach(([key, value]) => {
+      if (value) localStorage.setItem(key, value);
+    });
+    
+    // Clear sessionStorage
+    sessionStorage.clear();
+    
+    // Force hard reload with cache bypass
+    setTimeout(() => {
+      window.location.href = window.location.href.split('?')[0] + '?v=' + Date.now() + '&_nocache=1';
+    }, 100);
+    
+    return false; // Prevent Vue from logging again
   }
   // For other errors, let Vue handle them normally
 };
