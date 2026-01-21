@@ -1,140 +1,203 @@
 <template>
-  <div class="min-h-[100dvh] min-h-[100svh] overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950">
-    <!-- Center on desktop + mobile, no page scroll -->
-    <div class="min-h-[100dvh] min-h-[100svh] flex items-center justify-center px-4 py-4">
-      <div class="w-full max-w-5xl">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
-          <!-- Left (Brand / Info) -->
-          <div class="hidden lg:flex glass-card-no-hover rounded-xl p-10 flex-col justify-between relative overflow-hidden">
-            <!-- Background icons -->
-            <div class="absolute inset-0 pointer-events-none">
-              <img
-                v-for="(bg, idx) in bgIcons"
-                :key="idx"
-                :src="bg.src"
-                alt=""
-                class="absolute object-contain opacity-[0.10] blur-[0.2px]"
-                :style="bg.style"
-              />
-            </div>
+  <div class="min-h-[100dvh] overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-white">
+    <!-- Top bar -->
+    <div class="sticky top-0 z-10 glass-card-no-hover border-b border-white/10">
+      <div class="max-w-md mx-auto px-4 h-14 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <img :src="logoMarkUrl" alt="TradeXion" class="w-7 h-7 object-contain" />
+          <span class="font-semibold tracking-tight text-white">TradeXion</span>
+        </div>
+        <router-link
+          to="/register"
+          class="px-4 py-1.5 rounded-full text-sm font-semibold glass-button-no-hover text-white border border-white/20 hover:border-white/30 transition-colors"
+        >
+          {{ t('auth.register') }}
+        </router-link>
+      </div>
+    </div>
 
-            <div class="relative z-10">
-              <div class="flex items-center gap-3 mb-6">
-                <!-- Bigger logo (desktop) -->
-                <img
-                  :src="logoUrl"
-                  alt="TradeXion"
-                  class="w-auto object-contain h-[clamp(140px,18vw,320px)]"
-                />
-              </div>
-              <h2 class="text-3xl font-bold text-white mb-3">{{ t('auth.welcomeBack') }}</h2>
-              <p class="text-white/70">{{ t('auth.signIn') }}</p>
-            </div>
+    <div class="max-w-md mx-auto px-4 py-6">
+      <h1 class="text-3xl font-bold tracking-tight mb-5 text-white">Log In</h1>
 
-            <div class="relative z-10 flex items-end justify-between">
-              <div class="text-xs text-white/50">© {{ year }} TradeXion</div>
-            </div>
+      <!-- Tabs -->
+      <div class="flex gap-6 text-sm font-semibold mb-4">
+        <button
+          type="button"
+          class="pb-2 border-b-2 transition-colors"
+          :class="loginMode === 'email' ? 'border-white text-white' : 'border-transparent text-white/50 hover:text-white/80'"
+          @click="setMode('email')"
+        >
+          Email
+        </button>
+        <button
+          type="button"
+          class="pb-2 border-b-2 transition-colors"
+          :class="loginMode === 'phone' ? 'border-white text-white' : 'border-transparent text-white/50 hover:text-white/80'"
+          @click="setMode('phone')"
+        >
+          Phone
+        </button>
+      </div>
+
+      <!-- Alerts shown via top Toast -->
+
+      <!-- Card -->
+      <div class="glass-card-no-hover rounded-xl border border-white/12 p-4">
+        <!-- EMAIL MODE -->
+        <form v-if="loginMode === 'email'" @submit.prevent="onPrimaryAction" class="space-y-3">
+          <!-- Step 1: identifier -->
+          <div v-if="step === 'identifier'" class="space-y-3">
+            <label class="block text-sm text-white/80 font-medium">Email</label>
+            <input
+              v-model.trim="email"
+              type="email"
+              autocomplete="email"
+              class="w-full px-4 py-3 glass-input rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+              placeholder="Email"
+              required
+            />
+
+            <button
+              type="submit"
+              :disabled="loading || !canGoNext"
+              class="w-full py-3 rounded-full font-semibold glass-button-no-hover text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-white/20"
+            >
+              Next
+            </button>
           </div>
 
-          <!-- Right (Form) -->
-          <!-- Mobile: fit inside viewport, no scroll, no empty bottom gap -->
-          <div class="glass-card-no-hover rounded-xl p-4 sm:p-6 lg:p-10 relative overflow-hidden flex flex-col justify-center max-h-[calc(100dvh-32px)] max-h-[calc(100svh-32px)]">
-            <!-- subtle background icons -->
-            <div class="absolute inset-0 pointer-events-none">
-              <img
-                v-for="(bg, idx) in bgIconsRight"
-                :key="idx"
-                :src="bg.src"
-                alt=""
-                class="absolute object-contain opacity-[0.08] blur-[0.3px]"
-                :style="bg.style"
-              />
-            </div>
-            <div class="flex flex-col items-center text-center mb-4 lg:hidden">
-              <div class="flex items-center gap-2 mb-4">
-                <!-- Bigger logo (mobile/tablet) but clamped to avoid scroll -->
-                <img
-                  :src="logoUrl"
-                  alt="TradeXion"
-                  class="w-auto object-contain h-[clamp(110px,18vh,180px)]"
-                />
-              </div>
-              <h1 class="text-2xl font-bold text-white">{{ t('auth.welcomeBack') }}</h1>
-              <p class="text-white/70 mt-1">{{ t('auth.signIn') }}</p>
-            </div>
-
-            <div v-if="error" class="mb-4 p-4 bg-red-500/20 border border-red-500/50 rounded-xl text-red-300 text-sm backdrop-blur-sm">
-              {{ error }}
-            </div>
-
-            <form @submit.prevent="handleLogin" class="space-y-4">
-              <div>
-                <label class="block text-sm text-white/80 mb-2 font-medium">{{ t('auth.email') }}</label>
-                <input
-                  v-model="email"
-                  type="email"
-                  required
-                  autocomplete="email"
-                  class="w-full px-4 py-3 glass-input rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/30 transition-all"
-                  placeholder="your@email.com"
-                />
-              </div>
-
-              <div>
-                <label class="block text-sm text-white/80 mb-2 font-medium">{{ t('auth.password') }}</label>
-                <input
-                  v-model="password"
-                  type="password"
-                  required
-                  autocomplete="current-password"
-                  class="w-full px-4 py-3 glass-input rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/30 transition-all"
-                  placeholder="••••••••"
-                />
-              </div>
-
-              <!-- Cloudflare Turnstile CAPTCHA -->
-              <div class="flex justify-center">
-                <div ref="turnstileWidget" id="turnstile-widget-login"></div>
-              </div>
-
+          <!-- Step 2: password -->
+          <div v-else class="space-y-3">
+            <div class="flex items-center gap-2 mb-2">
               <button
-                type="submit"
-                :disabled="loading || !turnstileToken"
-                class="w-full py-3 glass-button-no-hover rounded-lg font-semibold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                type="button"
+                class="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
+                @click="backToIdentifier"
+                aria-label="Back"
               >
-                {{ loading ? t('auth.loggingIn') : t('auth.signInButton') }}
-              </button>
-            </form>
-
-            <div class="mt-5">
-              <div class="relative mb-4">
-                <div class="absolute inset-0 flex items-center">
-                  <div class="w-full border-t border-white/15"></div>
-                </div>
-                <div class="relative flex justify-center text-sm">
-                  <span class="px-4 bg-transparent text-white/60">{{ t('auth.orContinueWith') }}</span>
-                </div>
-              </div>
-
-              <button
-                @click="loginWithGoogle"
-                class="w-full py-3 glass-button-no-hover rounded-lg font-medium text-white transition-all flex items-center justify-center gap-2"
-              >
-                <svg class="w-5 h-5" viewBox="0 0 24 24">
-                  <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                  <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                  <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                  <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                 </svg>
-                {{ t('auth.continueWithGoogle') }}
+              </button>
+              <div class="flex-1 text-center text-sm font-semibold text-white truncate px-2">Log In</div>
+              <div class="w-8"></div>
+            </div>
+
+            <label class="block text-sm text-white/80 font-medium">Email</label>
+            <input
+              :value="email"
+              type="email"
+              autocomplete="email"
+              readonly
+              class="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white/80 placeholder-white/40 focus:outline-none"
+            />
+
+            <label class="block text-sm text-white/80 font-medium">Password</label>
+            <input
+              v-model="password"
+              type="password"
+              autocomplete="current-password"
+              class="w-full px-4 py-3 glass-input rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+              placeholder="Password"
+              required
+            />
+
+            <div class="flex justify-end">
+              <button type="button" class="text-sm font-semibold text-white/80 hover:text-white" @click="onForgotPassword">
+                Forgot password
               </button>
             </div>
 
-            <div class="mt-5 text-center text-sm text-white/70">
-              {{ t('auth.dontHaveAccount') }}
-              <router-link to="/register" class="text-white font-semibold transition-colors ml-1">{{ t('auth.register') }}</router-link>
+            <!-- Turnstile only when we actually submit credentials -->
+            <div class="flex justify-center pt-1">
+              <div v-show="step === 'password'" ref="turnstileWidget" id="turnstile-widget-login"></div>
             </div>
+
+            <button
+              type="submit"
+              :disabled="loading || !turnstileToken || !password"
+              class="w-full py-3 rounded-full font-semibold glass-button-no-hover text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-white/20"
+            >
+              {{ loading ? t('auth.loggingIn') : 'Log In' }}
+            </button>
           </div>
+        </form>
+
+        <!-- PHONE MODE -->
+        <form v-else @submit.prevent="handlePhoneLogin" class="space-y-3">
+          <label class="block text-sm text-white/80 font-medium">Phone</label>
+          <div class="flex items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-3 py-2.5 focus-within:ring-2 focus-within:ring-white/20 focus-within:border-white/25">
+            <div class="text-white/70 text-sm font-semibold">+</div>
+            <input
+              v-model.trim="phone"
+              type="tel"
+              inputmode="tel"
+              autocomplete="tel"
+              class="flex-1 bg-transparent outline-none text-white placeholder-white/40"
+              placeholder="Enter phone number"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            :disabled="loading || !phone"
+            class="w-full py-3 rounded-full font-semibold glass-button-no-hover text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-white/20"
+          >
+            Next
+          </button>
+        </form>
+      </div>
+
+      <!-- Divider -->
+      <div class="my-5 flex items-center gap-3">
+        <div class="h-px flex-1 bg-white/15"></div>
+        <div class="text-xs text-white/60">Or</div>
+        <div class="h-px flex-1 bg-white/15"></div>
+      </div>
+
+      <!-- Google button -->
+      <button
+        type="button"
+        @click="loginWithGoogle"
+        class="w-full py-3 rounded-lg glass-card-no-hover border border-white/12 hover:border-white/20 transition-colors flex items-center justify-center gap-2 font-semibold text-white"
+      >
+        <svg class="w-5 h-5" viewBox="0 0 24 24">
+          <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+          <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>
+        Continue with Google
+      </button>
+
+      <div class="mt-4 text-center text-sm text-white/70">
+        <router-link to="/register" class="font-semibold text-white hover:text-white/80">Create a TradeXion Account</router-link>
+      </div>
+    </div>
+
+    <!-- "Invalid user" modal -->
+    <div v-if="showInvalidUserModal" class="fixed inset-0 z-50 flex items-center justify-center px-4">
+      <div class="absolute inset-0 bg-black/40" @click="showInvalidUserModal = false"></div>
+      <div class="relative w-full max-w-sm glass-card-no-hover rounded-xl border border-white/12 p-4">
+        <div class="text-sm text-white/80 leading-relaxed">
+          We can't find this account. Please click "Confirm" to sign up and log in now.
+        </div>
+        <div class="mt-4 flex gap-3">
+          <button
+            type="button"
+            class="flex-1 py-2.5 rounded-full border border-white/15 text-white/80 font-semibold hover:bg-white/10"
+            @click="showInvalidUserModal = false"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="flex-1 py-2.5 rounded-full glass-button-no-hover text-white font-semibold border border-white/20"
+            @click="goRegisterFromModal"
+          >
+            Confirm
+          </button>
         </div>
       </div>
     </div>
@@ -142,7 +205,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '../stores/auth';
@@ -158,102 +221,196 @@ const turnstileWidget = ref(null);
 const turnstileToken = ref('');
 let turnstileWidgetId = null;
 
-const logoUrl = new URL('../assets/logo/Logo+SideText.png', import.meta.url).href;
+const logoMarkUrl = new URL('../assets/logo/Logo-Only.png', import.meta.url).href;
 const year = new Date().getFullYear();
-
-// Background icons (NO banners, NO ERC/TRC)
-const bgIcons = [
-  { src: new URL('../assets/coins/BTC.png', import.meta.url).href, style: 'top: -18px; left: -10px; width: 120px; transform: rotate(-12deg);' },
-  { src: new URL('../assets/coins/ETH.png', import.meta.url).href, style: 'top: 20%; right: -26px; width: 140px; transform: rotate(18deg);' },
-  { src: new URL('../assets/coins/BNB.png', import.meta.url).href, style: 'bottom: -30px; left: 16%; width: 150px; transform: rotate(-8deg);' },
-  { src: new URL('../assets/coins/XRP.png', import.meta.url).href, style: 'bottom: 14%; right: 10%; width: 110px; transform: rotate(10deg);' },
-  { src: new URL('../assets/coins/DOGE.png', import.meta.url).href, style: 'top: 52%; left: -24px; width: 110px; transform: rotate(22deg);' },
-  { src: new URL('../assets/coins/DOT.png', import.meta.url).href, style: 'top: 8%; left: 55%; width: 90px; transform: rotate(-20deg);' },
-  { src: new URL('../assets/coins/ADA.png', import.meta.url).href, style: 'bottom: 8%; left: 60%; width: 95px; transform: rotate(14deg);' },
-  { src: new URL('../assets/coins/LTC.png', import.meta.url).href, style: 'top: 32%; left: 30%; width: 80px; transform: rotate(-6deg);' },
-];
-
-const bgIconsRight = [
-  { src: new URL('../assets/coins/ETH.png', import.meta.url).href, style: 'top: -20px; right: -24px; width: 130px; transform: rotate(20deg);' },
-  { src: new URL('../assets/coins/BTC.png', import.meta.url).href, style: 'bottom: -26px; left: -24px; width: 140px; transform: rotate(-18deg);' },
-  { src: new URL('../assets/coins/XRP.png', import.meta.url).href, style: 'bottom: 18%; right: -22px; width: 110px; transform: rotate(14deg);' },
-  { src: new URL('../assets/coins/BNB.png', import.meta.url).href, style: 'top: 46%; left: -28px; width: 120px; transform: rotate(-10deg);' },
-];
 
 const email = ref('');
 const password = ref('');
 const error = ref('');
 const loading = ref(false);
+const phone = ref('');
+
+const loginMode = ref('email'); // 'email' | 'phone'
+const step = ref('identifier'); // 'identifier' | 'password'
+const showInvalidUserModal = ref(false);
+
+const canGoNext = computed(() => {
+  const v = email.value.trim();
+  // simple, strict-enough email check for UI gating; backend is final authority
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+});
+
+const displayIdentifier = computed(() => {
+  const v = email.value.trim();
+  if (!v) return '';
+  // show a short identifier (like Gate)
+  if (v.length <= 22) return v;
+  return `${v.slice(0, 10)}…${v.slice(-8)}`;
+});
 
 const initTurnstile = () => {
-  if (window.turnstile && turnstileWidget.value) {
-    turnstileWidgetId = window.turnstile.render('#turnstile-widget-login', {
-      sitekey: TURNSTILE_SITE_KEY,
-      callback: (token) => {
-        turnstileToken.value = token;
-      },
-      'error-callback': () => {
-        turnstileToken.value = '';
-      },
-      'expired-callback': () => {
-        turnstileToken.value = '';
-      },
-    });
-  }
+  if (!window.turnstile) return;
+  if (turnstileWidgetId) return; // already rendered
+  if (step.value !== 'password') return;
+  if (!turnstileWidget.value) return;
+
+  turnstileWidgetId = window.turnstile.render('#turnstile-widget-login', {
+    sitekey: TURNSTILE_SITE_KEY,
+    callback: (token) => {
+      turnstileToken.value = token;
+    },
+    'error-callback': () => {
+      turnstileToken.value = '';
+    },
+    'expired-callback': () => {
+      turnstileToken.value = '';
+    },
+  });
 };
 
 const resetTurnstile = () => {
-  if (turnstileWidgetId && window.turnstile) {
-    window.turnstile.reset(turnstileWidgetId);
+  if (!turnstileWidgetId || !window.turnstile) {
     turnstileToken.value = '';
+    return;
   }
+  window.turnstile.reset(turnstileWidgetId);
+  turnstileToken.value = '';
 };
 
-onMounted(() => {
-  // Wait for Turnstile script to load
-  if (window.turnstile) {
-    initTurnstile();
-  } else {
-    const checkTurnstile = setInterval(() => {
-      if (window.turnstile) {
-        initTurnstile();
-        clearInterval(checkTurnstile);
-      }
-    }, 100);
-    
-    // Cleanup if script doesn't load within 5 seconds
-    setTimeout(() => {
-      clearInterval(checkTurnstile);
-    }, 5000);
-  }
-});
-
-onUnmounted(() => {
+const removeTurnstile = () => {
   if (turnstileWidgetId && window.turnstile) {
     window.turnstile.remove(turnstileWidgetId);
   }
+  turnstileWidgetId = null;
+  turnstileToken.value = '';
+};
+
+onMounted(() => {
+  // Turnstile is only needed on password step; we still watch for script load
+  if (window.turnstile) return;
+  const checkTurnstile = setInterval(() => {
+    if (window.turnstile) {
+      clearInterval(checkTurnstile);
+      // if user is already on password step, render now
+      nextTick().then(() => initTurnstile());
+    }
+  }, 100);
+
+  setTimeout(() => {
+    clearInterval(checkTurnstile);
+  }, 8000);
 });
+
+onUnmounted(() => {
+  removeTurnstile();
+});
+
+watch(
+  () => step.value,
+  async (v) => {
+    if (v !== 'password') {
+      removeTurnstile();
+      return;
+    }
+    await nextTick();
+    initTurnstile();
+  }
+);
+
+const setMode = (mode) => {
+  loginMode.value = mode;
+  error.value = '';
+  loading.value = false;
+  password.value = '';
+  phone.value = '';
+  step.value = 'identifier';
+  removeTurnstile();
+};
+
+const backToIdentifier = () => {
+  step.value = 'identifier';
+  password.value = '';
+  error.value = '';
+  removeTurnstile();
+};
+
+const onPrimaryAction = async () => {
+  if (step.value === 'identifier') {
+    error.value = '';
+    if (!canGoNext.value) return;
+    step.value = 'password';
+    await nextTick();
+    initTurnstile();
+    return;
+  }
+
+  await handleLogin();
+};
 
 const handleLogin = async () => {
   if (!turnstileToken.value) {
-    error.value = 'Please complete the CAPTCHA verification';
+    if (typeof window !== 'undefined' && window.__toast?.error) {
+      window.__toast.error('Please complete the CAPTCHA verification');
+    }
     return;
   }
-  
+
   error.value = '';
   loading.value = true;
-  
-  const result = await authStore.login(email.value, password.value, turnstileToken.value);
-  
+
+  const result = await authStore.login(email.value.trim(), password.value, turnstileToken.value);
+
   if (result.success) {
     resetTurnstile();
     router.push('/');
   } else {
     error.value = result.error;
+    if (typeof window !== 'undefined' && window.__toast?.error) {
+      window.__toast.error(result.error || 'Login failed');
+    }
+    // Gate-like behavior: offer signup when account doesn't exist
+    if ((result.error || '').toLowerCase().includes('invalid') || (result.error || '').toLowerCase().includes('not found')) {
+      showInvalidUserModal.value = true;
+    }
     resetTurnstile();
   }
-  
+
   loading.value = false;
+};
+
+const handlePhoneLogin = async () => {
+  error.value = '';
+  loading.value = true;
+  try {
+    const result = await authStore.loginWithPhone(phone.value.trim());
+    if (result.success) {
+      router.push('/');
+    } else {
+      error.value = result.error || 'Login failed';
+      if (typeof window !== 'undefined' && window.__toast?.error) {
+        window.__toast.error(error.value);
+      }
+    }
+  } catch (e) {
+    error.value = 'Login failed';
+    if (typeof window !== 'undefined' && window.__toast?.error) {
+      window.__toast.error(error.value);
+    }
+  } finally {
+    loading.value = false;
+  }
+};
+
+const goRegisterFromModal = () => {
+  showInvalidUserModal.value = false;
+  router.push({ path: '/register', query: { email: email.value.trim() } });
+};
+
+const onForgotPassword = () => {
+  // Placeholder UX; wire to a real page when available
+  if (typeof window !== 'undefined' && window.__toast?.info) {
+    window.__toast.info('Forgot password is not available yet.');
+  }
 };
 
 const loginWithGoogle = () => {
