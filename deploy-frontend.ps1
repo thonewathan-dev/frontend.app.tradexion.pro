@@ -36,11 +36,11 @@ Write-Host ""
 # Set environment variables
 Write-Host "Setting environment variables..." -ForegroundColor Yellow
 Write-Host "  - VITE_API_URL" -ForegroundColor Gray
-railway variables set VITE_API_URL=https://backend-tradexion.up.railway.app/api
+railway variables set VITE_API_URL=https://backend.tradexion.pro/api
 
 Write-Host ""
 Write-Host "Environment variables set:" -ForegroundColor Green
-Write-Host "  VITE_API_URL=https://backend-tradexion.up.railway.app/api" -ForegroundColor White
+    Write-Host "  VITE_API_URL=https://backend.tradexion.pro/api" -ForegroundColor White
 Write-Host ""
 
 # Deploy
@@ -62,11 +62,11 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "========================================" -ForegroundColor Green
     Write-Host ""
     Write-Host "Next steps:" -ForegroundColor Yellow
-    Write-Host "  1. Set custom domain: railway domain tradexion.up.railway.app" -ForegroundColor White
+    Write-Host "  1. Set custom domain: railway domain www.tradexion.pro" -ForegroundColor White
     Write-Host "  2. View logs: railway logs" -ForegroundColor White
     Write-Host "  3. Open service: railway open" -ForegroundColor White
     Write-Host ""
-    Write-Host "Frontend URL: https://tradexion.up.railway.app" -ForegroundColor Cyan
+    Write-Host "Frontend URL: https://www.tradexion.pro" -ForegroundColor Cyan
     Write-Host ""
 } else {
     Write-Host ""
