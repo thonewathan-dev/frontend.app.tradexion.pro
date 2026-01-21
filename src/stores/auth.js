@@ -15,6 +15,10 @@ export const useAuthStore = defineStore('auth', () => {
 
   const login = async (email, password, turnstileToken) => {
     try {
+      if (!turnstileToken) {
+        return { success: false, error: 'CAPTCHA verification required. Please complete the CAPTCHA.' };
+      }
+      
       const response = await api.post('/auth/login', { email, password, turnstileToken });
       accessToken.value = response.data.accessToken;
       refreshToken.value = response.data.refreshToken;
@@ -25,7 +29,30 @@ export const useAuthStore = defineStore('auth', () => {
       
       return { success: true };
     } catch (error) {
-      return { success: false, error: error.response?.data?.error || 'Login failed' };
+      console.error('Login error:', error);
+      const errorMessage = error.response?.data?.error || error.message || 'Login failed';
+      
+      // Provide more specific error messages
+      if (error.response?.status === 401) {
+        if (errorMessage.includes('CAPTCHA') || errorMessage.includes('captcha')) {
+          return { success: false, error: 'CAPTCHA verification failed. Please try again.' };
+        }
+        if (errorMessage.includes('verified')) {
+          return { success: false, error: 'Please verify your email before logging in.' };
+        }
+        return { success: false, error: 'Invalid email or password. Please check your credentials.' };
+      }
+      if (error.response?.status === 403) {
+        if (errorMessage.includes('banned') || errorMessage.includes('suspended')) {
+          return { success: false, error: 'Your account has been suspended. Please contact support.' };
+        }
+        return { success: false, error: errorMessage };
+      }
+      if (error.response?.status === 400) {
+        return { success: false, error: errorMessage };
+      }
+      
+      return { success: false, error: errorMessage };
     }
   };
 
