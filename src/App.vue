@@ -1,9 +1,17 @@
 <template>
   <div class="relative min-h-screen">
-    <router-view v-slot="{ Component, route }">
-      <transition :name="route.meta?.transition || 'route-fade'" mode="out-in">
-        <component :is="Component" />
-      </transition>
+    <router-view v-slot="slotProps">
+      <template v-if="slotProps && slotProps.Component">
+        <transition 
+          :name="(slotProps.route && slotProps.route.meta && slotProps.route.meta.transition) || 'route-fade'" 
+          mode="out-in"
+        >
+          <component :is="slotProps.Component" :key="slotProps.route?.path" />
+        </transition>
+      </template>
+      <div v-else class="flex items-center justify-center min-h-screen">
+        <span class="loader"></span>
+      </div>
     </router-view>
 
     <!-- Global route-change loader -->
