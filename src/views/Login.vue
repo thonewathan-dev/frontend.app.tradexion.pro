@@ -16,7 +16,7 @@
       </div>
     </div>
 
-    <div class="max-w-md mx-auto px-4 py-4 pb-6 pb-safe">
+    <div class="max-w-md mx-auto px-4 py-4 pb-8 pb-safe">
       <h1 class="text-2xl font-bold tracking-tight mb-3 text-white">Log In</h1>
 
       <!-- Tabs -->
@@ -171,7 +171,7 @@
         Continue with Google
       </button>
 
-      <div class="mt-3 mb-2 text-center text-xs text-white/70">
+      <div class="mt-3 mb-4 mb-safe text-center text-xs text-white/70">
         <router-link to="/register" class="font-semibold text-white hover:text-white/80">Create a TradeXion Account</router-link>
       </div>
     </div>

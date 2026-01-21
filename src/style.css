@@ -251,8 +251,29 @@ svg[data-name="watermark"],
 }
 
 /* Safe area padding for mobile browsers (footer spacing) */
+.pb-safe {
+  padding-bottom: 2rem; /* Fallback for browsers without safe-area support */
+}
+
 @supports (padding: max(0px)) {
   .pb-safe {
-    padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+    padding-bottom: max(2rem, env(safe-area-inset-bottom) + 0.5rem);
+  }
+}
+
+.mb-safe {
+  margin-bottom: 1rem; /* Fallback */
+}
+
+@supports (margin: max(0px)) {
+  .mb-safe {
+    margin-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
+
+/* Ensure viewport height accounts for mobile browser UI */
+@supports (height: 100dvh) {
+  .min-h-screen-mobile {
+    min-height: 100dvh;
   }
 }
