@@ -224,15 +224,11 @@ import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '../stores/auth';
 import { getApiUrl } from '../utils/config.js';
-import { useTawk } from '../composables/useTawk.js';
 
 const { t } = useI18n();
 
 const router = useRouter();
 const authStore = useAuthStore();
-
-// Load Tawk.to chat widget
-useTawk();
 
 const TURNSTILE_SITE_KEY = '0x4AAAAAACNscU1_JGFhgUPj';
 const turnstileWidget = ref(null);
@@ -305,13 +301,7 @@ const removeTurnstile = () => {
 
 onMounted(() => {
   // Turnstile is only needed on password step; we still watch for script load
-  if (window.turnstile) {
-    if (step.value === 'password') {
-      nextTick().then(() => initTurnstile());
-    }
-    return;
-  }
-  
+  if (window.turnstile) return;
   const checkTurnstile = setInterval(() => {
     if (window.turnstile) {
       clearInterval(checkTurnstile);
