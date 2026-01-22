@@ -14,11 +14,39 @@
   <body>
     <div id="app"></div>
     <script>
+      // Prevent infinite reload loops
+      const RELOAD_ATTEMPT_KEY = 'app_reload_attempt';
+      const MAX_RELOAD_ATTEMPTS = 1;
+      
+      // Check if we've already tried reloading
+      const reloadAttempts = parseInt(sessionStorage.getItem(RELOAD_ATTEMPT_KEY) || '0');
+      const urlParams = new URLSearchParams(window.location.search);
+      const isReloadAttempt = urlParams.get('_clear') === '1' || urlParams.get('_nocache') === '1';
+      
+      // If this is a reload attempt and we've already tried, show error page
+      if (isReloadAttempt && reloadAttempts >= MAX_RELOAD_ATTEMPTS) {
+        document.body.innerHTML = `
+          <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; flex-direction: column; padding: 20px; text-align: center; font-family: system-ui, sans-serif; background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 100%);">
+            <h1 style="color: #f97316; margin-bottom: 16px; font-size: 32px; font-weight: bold;">Application Error</h1>
+            <p style="color: #e5e7eb; margin-bottom: 24px; font-size: 18px;">Please clear your browser cache manually and reload the page.</p>
+            <p style="color: #9ca3af; margin-bottom: 32px; font-size: 14px;">Press Ctrl+Shift+Delete (Windows) or Cmd+Shift+Delete (Mac) to clear cache.</p>
+            <button onclick="sessionStorage.removeItem('app_reload_attempt'); location.href = location.pathname;" style="padding: 12px 24px; background: #3b82f6; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 500;">
+              Try Again
+            </button>
+          </div>
+        `;
+        throw new Error('Stopped infinite reload loop');
+      }
+      
       // Global error handler to catch ref errors BEFORE Vue loads
       window.addEventListener('error', function(event) {
         if (event.message && (event.message.includes('refs') || event.message.includes('Cannot read properties'))) {
           console.error('Critical error detected, clearing cache...');
           event.preventDefault();
+          
+          // Increment reload counter
+          const currentAttempts = parseInt(sessionStorage.getItem(RELOAD_ATTEMPT_KEY) || '0');
+          sessionStorage.setItem(RELOAD_ATTEMPT_KEY, (currentAttempts + 1).toString());
           
           // Clear everything
           if ('caches' in window) {
@@ -40,16 +68,30 @@
           };
           
           localStorage.clear();
-          sessionStorage.clear();
+          sessionStorage.setItem(RELOAD_ATTEMPT_KEY, currentAttempts + 1);
           
           Object.entries(authTokens).forEach(([key, value]) => {
             if (value) localStorage.setItem(key, value);
           });
           
-          // Force reload with cache bypass
-          setTimeout(() => {
-            window.location.href = window.location.origin + window.location.pathname + '?v=' + Date.now() + '&_clear=1';
-          }, 100);
+          // Force reload with cache bypass (only if we haven't exceeded max attempts)
+          if (currentAttempts < MAX_RELOAD_ATTEMPTS) {
+            setTimeout(() => {
+              window.location.href = window.location.origin + window.location.pathname + '?v=' + Date.now() + '&_clear=1';
+            }, 100);
+          } else {
+            // Show error page instead of reloading
+            document.body.innerHTML = `
+              <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; flex-direction: column; padding: 20px; text-align: center; font-family: system-ui, sans-serif; background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 100%);">
+                <h1 style="color: #f97316; margin-bottom: 16px; font-size: 32px; font-weight: bold;">Application Error</h1>
+                <p style="color: #e5e7eb; margin-bottom: 24px; font-size: 18px;">Please clear your browser cache manually and reload the page.</p>
+                <p style="color: #9ca3af; margin-bottom: 32px; font-size: 14px;">Press Ctrl+Shift+Delete (Windows) or Cmd+Shift+Delete (Mac) to clear cache.</p>
+                <button onclick="sessionStorage.removeItem('app_reload_attempt'); location.href = location.pathname;" style="padding: 12px 24px; background: #3b82f6; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 500;">
+                  Try Again
+                </button>
+              </div>
+            `;
+          }
           
           return false;
         }
@@ -57,10 +99,15 @@
       
       // Aggressive cache-busting: Always clear on load to prevent stale code
       (function() {
-        const CURRENT_VERSION = '2.2.0';
+        const CURRENT_VERSION = '2.3.0';
         const storedVersion = localStorage.getItem('app_version');
         const urlParams = new URLSearchParams(window.location.search);
         const forceClear = urlParams.get('_clear') === '1' || urlParams.get('_nocache') === '1';
+        
+        // Don't clear if we're in a reload loop
+        if (reloadAttempts >= MAX_RELOAD_ATTEMPTS && isReloadAttempt) {
+          return; // Already showing error page
+        }
         
         // Clear service workers first
         if ('serviceWorker' in navigator) {
@@ -85,9 +132,11 @@
             refreshToken: localStorage.getItem('refreshToken'),
           };
           
-          // Clear everything
+          // Clear everything but keep reload counter
+          const reloadCounter = sessionStorage.getItem(RELOAD_ATTEMPT_KEY);
           localStorage.clear();
           sessionStorage.clear();
+          if (reloadCounter) sessionStorage.setItem(RELOAD_ATTEMPT_KEY, reloadCounter);
           
           // Restore auth
           Object.entries(authTokens).forEach(([key, value]) => {
@@ -95,14 +144,21 @@
           });
           localStorage.setItem('app_version', CURRENT_VERSION);
           
-          // Remove params and reload if needed
-          if (forceClear) {
+          // Remove params and reload if needed (but not if we've exceeded attempts)
+          if (forceClear && reloadAttempts < MAX_RELOAD_ATTEMPTS) {
             const cleanUrl = window.location.href.split('?')[0];
             if (window.location.href !== cleanUrl) {
               window.history.replaceState({}, '', cleanUrl);
             }
-          } else if (storedVersion && storedVersion !== CURRENT_VERSION) {
+          } else if (storedVersion && storedVersion !== CURRENT_VERSION && reloadAttempts < MAX_RELOAD_ATTEMPTS) {
             window.location.reload(true);
+          }
+        } else if (isReloadAttempt) {
+          // Reset reload counter on successful load
+          sessionStorage.removeItem(RELOAD_ATTEMPT_KEY);
+          const cleanUrl = window.location.href.split('?')[0];
+          if (window.location.href !== cleanUrl) {
+            window.history.replaceState({}, '', cleanUrl);
           }
         }
       })();

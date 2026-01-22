@@ -10,7 +10,30 @@ const handleError = (err, instance, info) => {
   console.error('Vue Error:', err, info);
   // If it's a ref error from old cached code, force cache clear and reload
   if (err?.message?.includes('refs') || err?.message?.includes('null') || err?.message?.includes('Cannot read properties')) {
+    const RELOAD_ATTEMPT_KEY = 'app_reload_attempt';
+    const MAX_RELOAD_ATTEMPTS = 1;
+    const reloadAttempts = parseInt(sessionStorage.getItem(RELOAD_ATTEMPT_KEY) || '0');
+    
+    // Don't reload if we've already tried
+    if (reloadAttempts >= MAX_RELOAD_ATTEMPTS) {
+      console.error('Max reload attempts reached, showing error page');
+      document.body.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; flex-direction: column; padding: 20px; text-align: center; font-family: system-ui, sans-serif; background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 100%);">
+          <h1 style="color: #f97316; margin-bottom: 16px; font-size: 32px; font-weight: bold;">Application Error</h1>
+          <p style="color: #e5e7eb; margin-bottom: 24px; font-size: 18px;">Please clear your browser cache manually and reload the page.</p>
+          <p style="color: #9ca3af; margin-bottom: 32px; font-size: 14px;">Press Ctrl+Shift+Delete (Windows) or Cmd+Shift+Delete (Mac) to clear cache.</p>
+          <button onclick="sessionStorage.removeItem('app_reload_attempt'); location.href = location.pathname;" style="padding: 12px 24px; background: #3b82f6; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 500;">
+            Try Again
+          </button>
+        </div>
+      `;
+      return false;
+    }
+    
     console.error('Critical: Ref error detected - clearing all caches and reloading...');
+    
+    // Increment reload counter
+    sessionStorage.setItem(RELOAD_ATTEMPT_KEY, (reloadAttempts + 1).toString());
     
     // Clear all possible caches
     if ('caches' in window) {
@@ -37,9 +60,6 @@ const handleError = (err, instance, info) => {
     Object.entries(authTokens).forEach(([key, value]) => {
       if (value) localStorage.setItem(key, value);
     });
-    
-    // Clear sessionStorage
-    sessionStorage.clear();
     
     // Force hard reload with cache bypass
     setTimeout(() => {
