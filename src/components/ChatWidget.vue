@@ -85,7 +85,7 @@
           />
           <button
             type="submit"
-            :disabled="!messageInput.trim() || !conversation || loading"
+            :disabled="!messageInput.trim() || loading"
             class="px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-white font-medium text-sm transition-colors"
           >
             {{ loading ? 'Sending...' : 'Send' }}
@@ -117,22 +117,26 @@ const {
   initializeChat,
   sendMessage,
   joinConversation,
+  loadMessages,
 } = useChat();
 
 const openChat = async () => {
   isOpen.value = true;
   hasUnread.value = false;
   
+  // Always try to initialize/load conversation when opening chat
   if (!conversation.value) {
     loading.value = true;
     try {
       await initializeChat();
+      console.log('Chat initialized, conversation:', conversation.value);
       // Ensure we're connected and joined to the conversation
       if (conversation.value && isConnected.value) {
         joinConversation(conversation.value.id);
       }
     } catch (error) {
       console.error('Failed to initialize chat:', error);
+      // Don't block the UI, user can still try to send (which will retry initialization)
     } finally {
       loading.value = false;
     }
@@ -140,6 +144,14 @@ const openChat = async () => {
     // If conversation exists, make sure we're joined
     if (isConnected.value && conversation.value) {
       joinConversation(conversation.value.id);
+    }
+    // Reload messages to get latest
+    if (conversation.value) {
+      try {
+        await loadMessages(conversation.value.id);
+      } catch (error) {
+        console.error('Failed to reload messages:', error);
+      }
     }
   }
   
@@ -152,13 +164,27 @@ const closeChat = () => {
 };
 
 const handleSend = async () => {
-  if (!messageInput.value.trim() || !conversation.value) {
-    console.log('Cannot send: missing message or conversation', {
-      hasMessage: !!messageInput.value.trim(),
-      hasConversation: !!conversation.value,
-      isConnected: isConnected.value
-    });
+  if (!messageInput.value.trim()) {
     return;
+  }
+
+  // If no conversation exists, create one first
+  if (!conversation.value) {
+    loading.value = true;
+    try {
+      await initializeChat();
+      // Wait a bit for conversation to be set
+      await new Promise(resolve => setTimeout(resolve, 100));
+      if (!conversation.value) {
+        throw new Error('Failed to create conversation');
+      }
+    } catch (error) {
+      console.error('Failed to initialize conversation:', error);
+      loading.value = false;
+      alert('Failed to start conversation. Please try again.');
+      return;
+    }
+    loading.value = false;
   }
 
   const message = messageInput.value.trim();
