@@ -55,6 +55,19 @@ export function useChat() {
 
     socket.on('new_message', (message) => {
       console.log('Received new_message event:', message);
+      
+      // Remove any optimistic message with the same content from the same sender
+      const optimisticIndex = messages.value.findIndex(
+        m => m.isOptimistic && 
+        m.sender_id === message.sender_id && 
+        m.message === message.message &&
+        m.image_url === message.image_url
+      );
+      if (optimisticIndex !== -1) {
+        messages.value.splice(optimisticIndex, 1);
+        console.log('Removed optimistic message, replacing with real one');
+      }
+      
       // Only add if not already in messages
       const existingIndex = messages.value.findIndex(m => m.id === message.id);
       if (existingIndex === -1) {

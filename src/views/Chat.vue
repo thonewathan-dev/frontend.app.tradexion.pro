@@ -1,7 +1,7 @@
 <template>
-  <div class="h-screen bg-gradient-to-br from-[#0b1020] via-[#101c3a] to-[#2b1554] flex flex-col overflow-hidden">
+  <div class="fixed inset-0 bg-gradient-to-br from-[#0b1020] via-[#101c3a] to-[#2b1554] flex flex-col overflow-hidden">
     <!-- Header - Fixed at top -->
-    <div class="glass-card-no-hover border-b border-white/10 px-4 py-3 flex-shrink-0">
+    <div class="glass-card-no-hover border-b border-white/10 px-4 py-3 flex-shrink-0 z-10">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
           <button
@@ -35,7 +35,7 @@
     </div>
 
     <!-- Messages Area - Scrollable middle section -->
-    <div ref="messagesContainer" class="flex-1 overflow-y-auto p-4 space-y-3" style="min-height: 0;">
+    <div ref="messagesContainer" class="flex-1 overflow-y-auto p-4 space-y-3" style="min-height: 0; overflow-x: hidden;">
       <!-- Auto Bot Welcome Message with Menu Buttons -->
       <div v-if="messages.length === 0 && !loading && !chatEnded" class="flex flex-col items-center justify-center h-full py-8 px-4">
         <div class="w-20 h-20 bg-blue-500/20 rounded-full flex items-center justify-center mb-4">
@@ -153,7 +153,7 @@
     </div>
 
     <!-- Input Area - Fixed at bottom (when chat is active) -->
-    <div v-if="!chatEnded" class="border-t border-white/10 bg-gradient-to-t from-[#0b1020] to-transparent backdrop-blur-sm flex-shrink-0">
+    <div v-if="!chatEnded" class="border-t border-white/10 bg-gradient-to-t from-[#0b1020] to-transparent backdrop-blur-sm flex-shrink-0 z-10">
       <div class="px-4 py-3">
         <form @submit.prevent="() => handleSend()" class="flex items-end gap-3">
           <div class="flex-1 relative">
@@ -214,7 +214,7 @@
     </div>
 
     <!-- Chat Ended Area - Fixed at bottom (replaces input when chat is ended) -->
-    <div v-else class="border-t border-white/10 bg-gradient-to-t from-[#0b1020] to-transparent backdrop-blur-sm flex-shrink-0">
+    <div v-else class="border-t border-white/10 bg-gradient-to-t from-[#0b1020] to-transparent backdrop-blur-sm flex-shrink-0 z-10">
       <div class="px-4 py-4">
         <div class="flex flex-col items-center gap-3">
           <div class="flex items-center gap-2">
@@ -563,16 +563,55 @@ const handleSend = async (imageUrl = null) => {
   messageInput.value = '';
   loading.value = true;
 
+  // Optimistically add message immediately for better UX
+  const tempMessage = {
+    id: `temp-${Date.now()}-${Math.random()}`,
+    conversation_id: conversation.value.id,
+    sender_id: authStore.user?.id,
+    sender_role: 'user',
+    message: message || '',
+    image_url: imageUrl || null,
+    created_at: new Date().toISOString(),
+    sender_email: authStore.user?.email || '',
+    isOptimistic: true, // Mark as optimistic
+  };
+  
+  // Add optimistic message immediately
+  messages.value.push(tempMessage);
+  await nextTick();
+  scrollToBottom();
+
   try {
     // Try to send even if not connected (will use REST API fallback)
     const result = await sendMessage(conversation.value.id, message, imageUrl);
     console.log('Message sent successfully:', result);
-    // Message will be added via socket 'new_message' event automatically
-    // For REST API fallback, it's already added in useChat
+    
+    // Remove optimistic message and replace with real one when received
+    // The 'new_message' event will add the real message, and we'll remove the optimistic one
+    const optimisticIndex = messages.value.findIndex(m => m.id === tempMessage.id);
+    if (optimisticIndex !== -1) {
+      // Wait a bit for the real message to arrive via socket
+      setTimeout(() => {
+        const optimisticMsg = messages.value.find(m => m.id === tempMessage.id);
+        if (optimisticMsg && optimisticMsg.isOptimistic) {
+          // Real message didn't arrive, remove optimistic one
+          const index = messages.value.findIndex(m => m.id === tempMessage.id);
+          if (index !== -1) {
+            messages.value.splice(index, 1);
+          }
+        }
+      }, 2000);
+    }
+    
     await nextTick();
     scrollToBottom();
   } catch (error) {
     console.error('Send message error:', error);
+    // Remove optimistic message on error
+    const optimisticIndex = messages.value.findIndex(m => m.id === tempMessage.id);
+    if (optimisticIndex !== -1) {
+      messages.value.splice(optimisticIndex, 1);
+    }
     messageInput.value = message; // Restore message on error
     // Show error to user
     alert('Failed to send message: ' + (error.message || 'Unknown error'));
