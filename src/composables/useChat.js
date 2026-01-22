@@ -45,10 +45,24 @@ export function useChat() {
 
     socket.on('error', (error) => {
       console.error('Chat error:', error);
+      isConnected.value = false;
+    });
+
+    socket.on('connect_error', (error) => {
+      console.error('Chat connection error:', error);
+      isConnected.value = false;
     });
 
     socket.on('new_message', (message) => {
-      messages.value.push(message);
+      console.log('Received new_message event:', message);
+      // Only add if not already in messages
+      const existingIndex = messages.value.findIndex(m => m.id === message.id);
+      if (existingIndex === -1) {
+        messages.value.push(message);
+        console.log('Added new message to list');
+      } else {
+        console.log('Message already exists, skipping');
+      }
     });
 
     socket.on('joined_conversation', (data) => {
@@ -92,12 +106,33 @@ export function useChat() {
     }
   };
 
-  const sendMessage = (conversationId, message) => {
+  const sendMessage = async (conversationId, message) => {
     if (socket && socket.connected) {
-      socket.emit('send_message', { conversationId, message });
+      console.log('Sending message via Socket.io:', { conversationId, message });
+      try {
+        socket.emit('send_message', { conversationId, message });
+        // Message will be added via 'new_message' event, so we return immediately
+        // Return a simple success object
+        return { success: true, conversationId, message };
+      } catch (error) {
+        console.error('Socket emit error:', error);
+        throw error;
+      }
     } else {
+      console.log('Socket not connected, using REST API fallback');
       // Fallback to REST API if Socket.io is not connected
-      return api.post('/chat/message', { conversationId, message });
+      try {
+        const response = await api.post('/chat/message', { conversationId, message });
+        console.log('Message sent via REST API:', response.data);
+        // Add message to local state if not already added
+        if (response.data.message && !messages.value.find(m => m.id === response.data.message.id)) {
+          messages.value.push(response.data.message);
+        }
+        return response.data.message;
+      } catch (error) {
+        console.error('REST API send error:', error);
+        throw error;
+      }
     }
   };
 

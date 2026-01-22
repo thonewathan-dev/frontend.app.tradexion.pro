@@ -57,11 +57,11 @@
           v-for="message in messages"
           :key="message.id"
           class="flex"
-          :class="message.sender_role === 'user' ? 'justify-end' : 'justify-start'"
+          :class="(message.sender_role === 'user' || message.sender_id === authStore.user?.id) ? 'justify-end' : 'justify-start'"
         >
           <div
             class="max-w-[75%] rounded-lg px-4 py-2"
-            :class="message.sender_role === 'user' 
+            :class="(message.sender_role === 'user' || message.sender_id === authStore.user?.id)
               ? 'bg-blue-500 text-white' 
               : 'bg-white/10 text-white'"
           >
@@ -85,10 +85,10 @@
           />
           <button
             type="submit"
-            :disabled="!messageInput.trim() || !isConnected || loading"
+            :disabled="!messageInput.trim() || !conversation || loading"
             class="px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-white font-medium text-sm transition-colors"
           >
-            Send
+            {{ loading ? 'Sending...' : 'Send' }}
           </button>
         </form>
       </div>
@@ -99,7 +99,9 @@
 <script setup>
 import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue';
 import { useChat } from '../composables/useChat.js';
+import { useAuthStore } from '../stores/auth.js';
 
+const authStore = useAuthStore();
 const isOpen = ref(false);
 const messageInput = ref('');
 const loading = ref(false);
@@ -114,6 +116,7 @@ const {
   disconnect,
   initializeChat,
   sendMessage,
+  joinConversation,
 } = useChat();
 
 const openChat = async () => {
@@ -124,10 +127,19 @@ const openChat = async () => {
     loading.value = true;
     try {
       await initializeChat();
+      // Ensure we're connected and joined to the conversation
+      if (conversation.value && isConnected.value) {
+        joinConversation(conversation.value.id);
+      }
     } catch (error) {
       console.error('Failed to initialize chat:', error);
     } finally {
       loading.value = false;
+    }
+  } else {
+    // If conversation exists, make sure we're joined
+    if (isConnected.value && conversation.value) {
+      joinConversation(conversation.value.id);
     }
   }
   
@@ -140,7 +152,12 @@ const closeChat = () => {
 };
 
 const handleSend = async () => {
-  if (!messageInput.value.trim() || !conversation.value || !isConnected.value) {
+  if (!messageInput.value.trim() || !conversation.value) {
+    console.log('Cannot send: missing message or conversation', {
+      hasMessage: !!messageInput.value.trim(),
+      hasConversation: !!conversation.value,
+      isConnected: isConnected.value
+    });
     return;
   }
 
@@ -149,12 +166,18 @@ const handleSend = async () => {
   loading.value = true;
 
   try {
-    await sendMessage(conversation.value.id, message);
+    // Try to send even if not connected (will use REST API fallback)
+    const result = await sendMessage(conversation.value.id, message);
+    console.log('Message sent successfully:', result);
+    // Message will be added via socket 'new_message' event automatically
+    // For REST API fallback, it's already added in useChat
     await nextTick();
     scrollToBottom();
   } catch (error) {
     console.error('Send message error:', error);
     messageInput.value = message; // Restore message on error
+    // Show error to user
+    alert('Failed to send message: ' + (error.message || 'Unknown error'));
   } finally {
     loading.value = false;
   }
