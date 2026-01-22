@@ -14,6 +14,7 @@
     </div>
 
     <Toast ref="toastRef" />
+    <ChatWidget />
   </div>
 </template>
 
@@ -21,6 +22,7 @@
 import { ref, onMounted } from 'vue';
 import { setToastComponent } from './composables/useAlert';
 import Toast from './components/Toast.vue';
+import ChatWidget from './components/ChatWidget.vue';
 import { isRouteLoading } from './router';
 
 const toastRef = ref(null);
