@@ -20,10 +20,39 @@ const handleError = (err, instance, info) => {
       document.body.innerHTML = `
         <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; flex-direction: column; padding: 20px; text-align: center; font-family: system-ui, sans-serif; background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 100%);">
           <h1 style="color: #f97316; margin-bottom: 16px; font-size: 32px; font-weight: bold;">Application Error</h1>
-          <p style="color: #e5e7eb; margin-bottom: 24px; font-size: 18px;">Please clear your browser cache manually and reload the page.</p>
-          <p style="color: #9ca3af; margin-bottom: 32px; font-size: 14px;">Press Ctrl+Shift+Delete (Windows) or Cmd+Shift+Delete (Mac) to clear cache.</p>
-          <button onclick="sessionStorage.removeItem('app_reload_attempt'); location.href = location.pathname;" style="padding: 12px 24px; background: #3b82f6; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 500;">
-            Try Again
+          <p style="color: #e5e7eb; margin-bottom: 24px; font-size: 18px;">Please clear your browser cache and reload the page.</p>
+          <button id="hardRefreshBtn" onclick="
+            (function() {
+              // Clear all caches
+              if ('caches' in window) {
+                caches.keys().then(names => {
+                  names.forEach(name => caches.delete(name).catch(() => {}));
+                });
+              }
+              // Clear service workers
+              if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(registrations => {
+                  registrations.forEach(reg => reg.unregister());
+                });
+              }
+              // Clear storage
+              sessionStorage.clear();
+              const authTokens = {
+                accessToken: localStorage.getItem('accessToken'),
+                refreshToken: localStorage.getItem('refreshToken'),
+              };
+              localStorage.clear();
+              Object.entries(authTokens).forEach(([key, value]) => {
+                if (value) localStorage.setItem(key, value);
+              });
+              // Hard reload with cache bypass
+              window.location.href = window.location.origin + window.location.pathname + '?v=' + Date.now() + '&_hard=1';
+            })();
+          " style="padding: 12px 24px; background: #3b82f6; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 500; margin-bottom: 12px;">
+            Clear Cache & Reload
+          </button>
+          <button onclick="sessionStorage.removeItem('app_reload_attempt'); location.href = location.pathname;" style="padding: 12px 24px; background: #6b7280; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px;">
+            Try Again (Simple Reload)
           </button>
         </div>
       `;
@@ -61,9 +90,10 @@ const handleError = (err, instance, info) => {
       if (value) localStorage.setItem(key, value);
     });
     
-    // Force hard reload with cache bypass
+    // Force hard reload with cache bypass - use replace for more aggressive cache clearing
     setTimeout(() => {
-      window.location.href = window.location.href.split('?')[0] + '?v=' + Date.now() + '&_nocache=1';
+      const url = window.location.href.split('?')[0] + '?v=' + Date.now() + '&_nocache=1&_t=' + performance.now();
+      window.location.replace(url); // Use replace to prevent back button issues
     }, 100);
     
     return false; // Prevent Vue from logging again
