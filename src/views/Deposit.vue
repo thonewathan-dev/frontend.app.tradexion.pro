@@ -128,7 +128,7 @@
                 type="text"
                 :value="screenshotFile ? screenshotFile.name : 'Select Picture'"
                 readonly
-                @click="$refs.fileInput.click()"
+                @click="fileInput?.click()"
                 class="w-full px-3 py-2 glass-input rounded-lg focus:outline-none cursor-pointer text-sm"
                 placeholder="Select Picture"
               />
