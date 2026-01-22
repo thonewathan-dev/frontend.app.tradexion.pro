@@ -46,6 +46,9 @@ export const useAuthStore = defineStore('auth', () => {
         if (errorMessage.includes('banned') || errorMessage.includes('suspended')) {
           return { success: false, error: 'Your account has been suspended. Please contact support.' };
         }
+        if (errorMessage.includes('verified') || errorMessage.includes('Email not verified')) {
+          return { success: false, error: 'Please verify your email before logging in. Check your inbox for the verification code.' };
+        }
         return { success: false, error: errorMessage };
       }
       if (error.response?.status === 400) {
@@ -56,9 +59,9 @@ export const useAuthStore = defineStore('auth', () => {
     }
   };
 
-  const register = async (email, password, turnstileToken) => {
+  const register = async (email, password, turnstileToken, inviteCode) => {
     try {
-      const response = await api.post('/auth/register', { email, password, turnstileToken });
+      const response = await api.post('/auth/register', { email, password, turnstileToken, inviteCode });
       return { 
         success: true, 
         data: response.data,
@@ -76,6 +79,44 @@ export const useAuthStore = defineStore('auth', () => {
       return { success: true };
     } catch (error) {
       return { success: false, error: error.response?.data?.error || 'Verification failed' };
+    }
+  };
+
+  const resendVerificationCode = async (email) => {
+    try {
+      await api.post('/auth/resend-verification', { email });
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.response?.data?.error || 'Failed to resend verification code' };
+    }
+  };
+
+  const requestPasswordReset = async (email) => {
+    try {
+      await api.post('/auth/password/reset-request', { email });
+      return { success: true };
+    } catch (error) {
+      const errorCode = error.response?.data?.error;
+      const errorMessage = error.response?.data?.message || error.response?.data?.error || 'Failed to request password reset';
+      return { success: false, error: errorCode || errorMessage, message: errorMessage };
+    }
+  };
+
+  const verifyPasswordResetCode = async (email, code) => {
+    try {
+      await api.post('/auth/password/verify-code', { email, code });
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.response?.data?.error || 'Invalid or expired code' };
+    }
+  };
+
+  const resetPassword = async (email, code, newPassword) => {
+    try {
+      await api.post('/auth/password/reset', { email, code, newPassword });
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.response?.data?.error || 'Failed to reset password' };
     }
   };
 
@@ -157,6 +198,10 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     register,
     verifyEmail,
+    resendVerificationCode,
+    requestPasswordReset,
+    verifyPasswordResetCode,
+    resetPassword,
     loginWithPhone,
     logout,
     fetchCurrentUser,

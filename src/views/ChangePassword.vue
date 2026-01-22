@@ -72,15 +72,14 @@
 
           <!-- Forgot password -->
           <div class="pt-2 border-t border-white/10 mt-2">
-            <button
-              type="button"
-              class="text-xs text-teal-300 hover:text-teal-200 underline underline-offset-2"
-              @click="handleForgotPassword"
+            <router-link
+              to="/forgot-password"
+              class="text-xs text-teal-300 hover:text-teal-200 underline underline-offset-2 inline-block"
             >
               Forgot password?
-            </button>
+            </router-link>
             <p class="mt-1 text-[11px] text-white/50">
-              This will be improved later. For now, if you still remember your current password, please change it above.
+              If you've forgotten your password, click above to reset it via email.
             </p>
           </div>
         </div>
@@ -91,12 +90,14 @@
 
 <script setup>
 import { ref, computed } from 'vue';
+import { useRouter } from 'vue-router';
 import DesktopNav from '../components/DesktopNav.vue';
 import MobileNav from '../components/MobileNav.vue';
 import api from '../utils/api';
 import { useAuthStore } from '../stores/auth';
 import { useAlert } from '../composables/useAlert';
 
+const router = useRouter();
 const authStore = useAuthStore();
 const isMobile = computed(() => window.innerWidth < 768);
 const { showSuccess, showError, showWarning, showInfo } = useAlert();
@@ -145,8 +146,5 @@ const handleSubmit = async () => {
   }
 };
 
-const handleForgotPassword = () => {
-  showInfo('Forgot password flow will be added soon. For now, please change your password if you still remember it.');
-};
 </script>
 

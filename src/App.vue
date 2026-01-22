@@ -18,16 +18,21 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, nextTick } from 'vue';
 import { setToastComponent } from './composables/useAlert';
 import Toast from './components/Toast.vue';
 import { isRouteLoading } from './router';
 
 const toastRef = ref(null);
 
-onMounted(() => {
+onMounted(async () => {
+  await nextTick();
   if (toastRef.value) {
-    setToastComponent(toastRef.value);
+    try {
+      setToastComponent(toastRef.value);
+    } catch (error) {
+      console.error('Failed to set toast component:', error);
+    }
   }
 });
 </script>

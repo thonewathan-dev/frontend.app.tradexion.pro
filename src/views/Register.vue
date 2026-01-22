@@ -82,6 +82,15 @@
 
           <button
             type="button"
+            @click="handleResendCode"
+            :disabled="loading || resendingCode"
+            class="w-full py-2.5 text-sm rounded-full font-semibold border border-white/15 text-white/90 hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {{ resendingCode ? 'Sending...' : 'Resend Code' }}
+          </button>
+
+          <button
+            type="button"
             @click="showVerification = false"
             class="w-full py-2.5 text-sm rounded-full font-semibold border border-white/15 text-white/90 hover:bg-white/10 transition-colors"
           >
@@ -93,7 +102,7 @@
         <div v-else>
           <!-- EMAIL MODE -->
           <form v-if="registerMode === 'email'" @submit.prevent="onPrimaryAction" class="space-y-2.5">
-            <!-- Step 1: email + invite -->
+            <!-- Step 1: email only -->
             <div v-if="step === 'identifier'" class="space-y-2.5">
               <label class="block text-xs text-white/80 font-medium">Email</label>
               <input
@@ -105,27 +114,6 @@
                 placeholder="Enter email address"
               />
 
-              <div>
-                <button
-                  type="button"
-                  class="w-full flex items-center justify-between text-xs text-white/80 font-semibold py-1.5"
-                  @click="inviteOpen = !inviteOpen"
-                >
-                  <span>Invite code</span>
-                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="inviteOpen ? 'M6 15l6-6 6 6' : 'M6 9l6 6 6-6'"/>
-                  </svg>
-                </button>
-                <div v-if="inviteOpen" class="mt-1.5">
-                  <input
-                    v-model.trim="inviteCode"
-                    type="text"
-                    class="w-full px-3 py-2.5 text-sm glass-input rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
-                    placeholder="Invite code"
-                  />
-                </div>
-              </div>
-
               <button
                 type="submit"
                 :disabled="loading || !canGoNext"
@@ -135,7 +123,7 @@
               </button>
             </div>
 
-            <!-- Step 2: password + captcha -->
+            <!-- Step 2: invite code + password + captcha -->
             <div v-else class="space-y-2.5">
               <div class="flex items-center gap-2 mb-1.5">
                 <button
@@ -161,6 +149,16 @@
                 class="w-full px-3 py-2.5 text-sm rounded-lg border border-white/10 bg-white/5 text-white/80 placeholder-white/40 focus:outline-none"
               />
 
+              <label class="block text-xs text-white/80 font-medium">Invite Code <span class="text-red-400">*</span></label>
+              <input
+                v-model.trim="inviteCode"
+                type="text"
+                required
+                class="w-full px-3 py-2.5 text-sm glass-input rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+                placeholder="Enter invite code"
+              />
+              <p class="text-xs text-white/50">Invite code is required to register</p>
+
               <label class="block text-xs text-white/80 font-medium">Password</label>
               <input
                 v-model="password"
@@ -180,7 +178,7 @@
 
               <button
                 type="submit"
-                :disabled="loading || !turnstileToken || !password || !acceptTerms"
+                :disabled="loading || !turnstileToken || !password || !inviteCode.trim() || !acceptTerms"
                 class="w-full py-2.5 text-sm rounded-full font-semibold glass-button-no-hover text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-white/20"
               >
                 {{ loading ? t('auth.registering') : 'Create Account' }}
@@ -204,30 +202,19 @@
               />
             </div>
 
-            <div>
-              <button
-                type="button"
-                class="w-full flex items-center justify-between text-xs text-white/80 font-semibold py-1.5"
-                @click="inviteOpen = !inviteOpen"
-              >
-                <span>Invite code</span>
-                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="inviteOpen ? 'M6 15l6-6 6 6' : 'M6 9l6 6 6-6'"/>
-                </svg>
-              </button>
-              <div v-if="inviteOpen" class="mt-1.5">
-                <input
-                  v-model.trim="inviteCode"
-                  type="text"
-                  class="w-full px-3 py-2.5 text-sm glass-input rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
-                  placeholder="Invite code"
-                />
-              </div>
-            </div>
+              <label class="block text-xs text-white/80 font-medium">Invite Code <span class="text-red-400">*</span></label>
+              <input
+                v-model.trim="inviteCode"
+                type="text"
+                required
+                class="w-full px-3 py-2.5 text-sm glass-input rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+                placeholder="Enter invite code"
+              />
+              <p class="text-xs text-white/50">Invite code is required to register</p>
 
             <button
               type="submit"
-              :disabled="loading || !phone"
+              :disabled="loading || !phone || !inviteCode.trim()"
               class="w-full py-2.5 text-sm rounded-full font-semibold glass-button-no-hover text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-white/20"
             >
               Next
@@ -346,8 +333,14 @@ const displayedOTP = ref('');
 const registerMode = ref('email'); // 'email' | 'phone'
 const step = ref('identifier'); // 'identifier' | 'password'
 const acceptTerms = ref(false);
+const resendingCode = ref(false);
 
 const canGoNext = computed(() => {
+  if (registerMode.value === 'email') {
+    // Step 1: only check email
+    const v = email.value.trim();
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+  }
   const v = email.value.trim();
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 });
@@ -471,7 +464,7 @@ const handleRegister = async () => {
   success.value = '';
   loading.value = true;
   
-  const result = await authStore.register(email.value.trim(), password.value, turnstileToken.value);
+  const result = await authStore.register(email.value.trim(), password.value, turnstileToken.value, inviteCode.value.trim());
   
   if (result.success) {
     // If email is auto-verified, redirect to login
@@ -533,6 +526,27 @@ const handleVerify = async () => {
   loading.value = false;
 };
 
+const handleResendCode = async () => {
+  resendingCode.value = true;
+  error.value = '';
+  
+  const result = await authStore.resendVerificationCode(email.value.trim());
+  
+  if (result.success) {
+    if (typeof window !== 'undefined' && window.__toast?.success) {
+      window.__toast.success('Verification code sent! Please check your email.');
+    }
+    code.value = ''; // Clear the code input
+  } else {
+    error.value = result.error;
+    if (typeof window !== 'undefined' && window.__toast?.error) {
+      window.__toast.error(result.error || 'Failed to resend code');
+    }
+  }
+  
+  resendingCode.value = false;
+};
+
 const handlePhoneRegister = async () => {
   if (typeof window !== 'undefined' && window.__toast?.info) {
     window.__toast.info('Phone registration is not available yet. Please use Email.');
@@ -547,6 +561,7 @@ const loginWithGoogle = () => {
     return;
   }
   
+  // For registration, invite code will be collected after OAuth
   // Get API URL from config utility
   const apiUrl = getApiUrl();
   

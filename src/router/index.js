@@ -25,10 +25,28 @@ const routes = [
     meta: { requiresAuth: false, title: 'Register', transition: 'auth' },
   },
   {
+    path: '/forgot-password',
+    name: 'ForgotPassword',
+    component: () => import('../views/ForgotPassword.vue'),
+    meta: { requiresAuth: false, title: 'Forgot Password', transition: 'auth' },
+  },
+  {
+    path: '/reset-password',
+    name: 'ResetPassword',
+    component: () => import('../views/ResetPassword.vue'),
+    meta: { requiresAuth: false, title: 'Reset Password', transition: 'auth' },
+  },
+  {
     path: '/auth/callback',
     name: 'AuthCallback',
     component: () => import('../views/AuthCallback.vue'),
     meta: { requiresAuth: false, title: 'Auth' },
+  },
+  {
+    path: '/google-invite-code',
+    name: 'GoogleInviteCode',
+    component: () => import('../views/GoogleInviteCode.vue'),
+    meta: { requiresAuth: false, title: 'Complete Registration' },
   },
   {
     path: '/spot',

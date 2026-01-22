@@ -111,9 +111,9 @@
             />
 
             <div class="flex justify-end">
-              <button type="button" class="text-xs font-semibold text-white/80 hover:text-white" @click="onForgotPassword">
+              <router-link to="/forgot-password" class="text-xs font-semibold text-white/80 hover:text-white">
                 Forgot password
-              </button>
+              </router-link>
             </div>
 
             <!-- Turnstile only when we actually submit credentials -->
@@ -220,7 +220,7 @@
 import AuthMarketPanel from '../components/AuthMarketPanel.vue';
 import SiteFooter from '../components/SiteFooter.vue';
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '../stores/auth';
 import { getApiUrl } from '../utils/config.js';
@@ -228,6 +228,7 @@ import { getApiUrl } from '../utils/config.js';
 const { t } = useI18n();
 
 const router = useRouter();
+const route = useRoute();
 const authStore = useAuthStore();
 
 const TURNSTILE_SITE_KEY = '0x4AAAAAACNscU1_JGFhgUPj';
@@ -253,6 +254,7 @@ const canGoNext = computed(() => {
   // simple, strict-enough email check for UI gating; backend is final authority
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 });
+
 
 const displayIdentifier = computed(() => {
   const v = email.value.trim();
@@ -300,6 +302,12 @@ const removeTurnstile = () => {
 };
 
 onMounted(() => {
+  // Prefill email from query params (e.g., from password reset)
+  const emailParam = route.query.email;
+  if (emailParam && typeof emailParam === 'string') {
+    email.value = emailParam;
+  }
+
   // Turnstile is only needed on password step; we still watch for script load
   if (window.turnstile) return;
   const checkTurnstile = setInterval(() => {
@@ -403,12 +411,6 @@ const goRegisterFromModal = () => {
   router.push({ path: '/register', query: { email: email.value.trim() } });
 };
 
-const onForgotPassword = () => {
-  // Placeholder UX; wire to a real page when available
-  if (typeof window !== 'undefined' && window.__toast?.info) {
-    window.__toast.info('Forgot password is not available yet.');
-  }
-};
 
 const loginWithGoogle = () => {
   // Get API URL from config utility

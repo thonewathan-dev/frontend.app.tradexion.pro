@@ -1,5 +1,5 @@
 <template>
-  <Teleport to="body">
+  <Teleport v-if="isMounted" to="body">
     <transition-group
       name="toast"
       tag="div"
@@ -89,10 +89,14 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
-import { Teleport } from 'vue';
 
 const toasts = ref([]);
+const isMounted = ref(false);
 let toastIdCounter = 0;
+
+onMounted(() => {
+  isMounted.value = true;
+});
 
 const addToast = (message, type = 'info', duration = 3000) => {
   const id = ++toastIdCounter;
