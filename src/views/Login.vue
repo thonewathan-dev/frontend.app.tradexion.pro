@@ -392,25 +392,9 @@ const handleLogin = async () => {
 };
 
 const handlePhoneLogin = async () => {
-  error.value = '';
-  loading.value = true;
-  try {
-    const result = await authStore.loginWithPhone(phone.value.trim());
-    if (result.success) {
-      router.push('/');
-    } else {
-      error.value = result.error || 'Login failed';
-      if (typeof window !== 'undefined' && window.__toast?.error) {
-        window.__toast.error(error.value);
-      }
-    }
-  } catch (e) {
-    error.value = 'Login failed';
-    if (typeof window !== 'undefined' && window.__toast?.error) {
-      window.__toast.error(error.value);
-    }
-  } finally {
-    loading.value = false;
+  // Phone login is disabled - show message like register page
+  if (typeof window !== 'undefined' && window.__toast?.info) {
+    window.__toast.info('Phone login is not available yet. Please use Email.');
   }
 };
 

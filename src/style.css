@@ -279,6 +279,53 @@ svg[data-name="watermark"],
 }
 
 /* Custom loader animation */
+/* Chat message animations */
+@keyframes messageSent {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes messageReceived {
+  0% {
+    opacity: 0;
+    transform: translateX(-10px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+.animate-message-sent {
+  animation: messageSent 0.3s ease-out;
+}
+
+.animate-message-received {
+  animation: messageReceived 0.3s ease-out;
+}
+
+/* Modal animation */
+@keyframes scaleIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.2s ease-out;
+}
+
 .loader {
   width: 32px;
   height: 32px;

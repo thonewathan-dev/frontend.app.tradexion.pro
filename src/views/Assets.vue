@@ -216,6 +216,7 @@
           </button>
           <button
                 class="w-full flex items-center justify-between px-3 py-3 transition-colors hover:bg-white/5"
+                @click="router.push('/chat')"
               >
                 <div class="flex items-center gap-3">
                   <svg class="w-5 h-5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">

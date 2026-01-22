@@ -60,8 +60,19 @@ export function useChat() {
       if (existingIndex === -1) {
         messages.value.push(message);
         console.log('Added new message to list');
+        
+        // If user sent message and conversation was closed, reopen it
+        if (message.sender_role === 'user' && conversation.value && conversation.value.status === 'closed') {
+          conversation.value.status = 'open';
+        }
       } else {
         console.log('Message already exists, skipping');
+      }
+    });
+    
+    socket.on('chat_ended', () => {
+      if (conversation.value) {
+        conversation.value.status = 'closed';
       }
     });
 
@@ -106,14 +117,14 @@ export function useChat() {
     }
   };
 
-  const sendMessage = async (conversationId, message) => {
+  const sendMessage = async (conversationId, message, imageUrl = null) => {
     if (socket && socket.connected) {
-      console.log('Sending message via Socket.io:', { conversationId, message });
+      console.log('Sending message via Socket.io:', { conversationId, message, imageUrl });
       try {
-        socket.emit('send_message', { conversationId, message });
+        socket.emit('send_message', { conversationId, message, imageUrl });
         // Message will be added via 'new_message' event, so we return immediately
         // Return a simple success object
-        return { success: true, conversationId, message };
+        return { success: true, conversationId, message, imageUrl };
       } catch (error) {
         console.error('Socket emit error:', error);
         throw error;
@@ -122,7 +133,7 @@ export function useChat() {
       console.log('Socket not connected, using REST API fallback');
       // Fallback to REST API if Socket.io is not connected
       try {
-        const response = await api.post('/chat/message', { conversationId, message });
+        const response = await api.post('/chat/message', { conversationId, message, imageUrl });
         console.log('Message sent via REST API:', response.data);
         // Add message to local state if not already added
         if (response.data.message && !messages.value.find(m => m.id === response.data.message.id)) {

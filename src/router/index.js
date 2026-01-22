@@ -109,6 +109,12 @@ const routes = [
     meta: { requiresAuth: true, title: 'About TradeXion' },
   },
   {
+    path: '/chat',
+    name: 'Chat',
+    component: () => import('../views/Chat.vue'),
+    meta: { requiresAuth: true, title: 'Customer Support' },
+  },
+  {
     path: '/privacy-policy',
     name: 'PrivacyPolicy',
     component: () => import('../views/PrivacyPolicy.vue'),

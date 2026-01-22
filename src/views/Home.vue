@@ -468,6 +468,10 @@ const quickMenus = [
 
 const handleQuickMenuClick = (menuName) => {
   console.log('Quick menu clicked:', menuName);
+  if (menuName === 'services') {
+    router.push('/chat');
+  }
+  // Add other menu handlers here if needed
 };
 
 const quickRechargeIcon = new URL('../assets/quick-menus/quickrecharge.png', import.meta.url).href;
