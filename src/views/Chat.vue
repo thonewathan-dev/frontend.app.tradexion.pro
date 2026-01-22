@@ -37,32 +37,32 @@
     <!-- Messages Area - Scrollable middle section -->
     <div ref="messagesContainer" class="flex-1 overflow-y-auto p-4 space-y-3" style="min-height: 0; overflow-x: hidden;">
       <!-- Auto Bot Welcome Message with Menu Buttons -->
-      <div v-if="messages.length === 0 && !loading && !chatEnded" class="flex flex-col items-center justify-center h-full py-8 px-4">
-        <div class="w-20 h-20 bg-blue-500/20 rounded-full flex items-center justify-center mb-4">
-          <img :src="logoUrl" alt="TradeXion" class="w-12 h-12 object-contain" />
+      <div v-if="messages.length === 0 && !loading && !chatEnded" class="flex flex-col items-center justify-center h-full py-6 px-4">
+        <div class="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mb-3">
+          <img :src="logoUrl" alt="TradeXion" class="w-10 h-10 object-contain" />
         </div>
-        <h3 class="text-white text-lg font-semibold mb-2">Welcome to Customer Support</h3>
-        <p class="text-white/60 text-sm text-center max-w-sm mb-6">
+        <h3 class="text-white text-base font-semibold mb-1.5">Welcome to Customer Support</h3>
+        <p class="text-white/60 text-xs text-center max-w-sm mb-4">
           Hi! I'm your support assistant. How can I help you today?
         </p>
         
         <!-- Bot Menu Buttons -->
-        <div class="w-full max-w-sm space-y-2">
+        <div class="w-full max-w-sm space-y-1.5">
           <button
             v-for="option in botMenuOptions"
             :key="option.id"
             @click="handleBotMenuClick(option)"
-            class="w-full text-left px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+            class="w-full text-left px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
           >
-            <div class="flex items-center gap-3">
-              <div :class="option.iconBg" class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0">
-                <component :is="option.iconComponent" class="w-5 h-5" />
+            <div class="flex items-center gap-2.5">
+              <div :class="option.iconBg" class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">
+                <component :is="option.iconComponent" class="w-4 h-4" />
               </div>
               <div class="flex-1">
-                <div class="text-white text-sm font-medium">{{ option.label }}</div>
-                <div class="text-white/50 text-xs">{{ option.description }}</div>
+                <div class="text-white text-xs font-medium">{{ option.label }}</div>
+                <div class="text-white/50 text-[10px]">{{ option.description }}</div>
               </div>
-              <svg class="w-4 h-4 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-3 h-3 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
               </svg>
             </div>
@@ -506,11 +506,20 @@ onMounted(async () => {
     await initializeChat();
     console.log('Chat initialized, conversation:', conversation.value);
     // Ensure we're connected and joined to the conversation
-    if (conversation.value && isConnected.value) {
-      joinConversation(conversation.value.id);
-    }
-    // Reload messages to get latest
     if (conversation.value) {
+      // Wait for socket connection if not connected yet
+      if (!isConnected.value) {
+        // Wait up to 3 seconds for connection
+        let waitCount = 0;
+        while (!isConnected.value && waitCount < 30) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          waitCount++;
+        }
+      }
+      if (isConnected.value) {
+        joinConversation(conversation.value.id);
+      }
+      // Reload messages to get latest
       await loadMessages(conversation.value.id);
     }
   } catch (error) {
@@ -653,6 +662,14 @@ watch(messages, () => {
     }, 100);
   });
 }, { deep: true });
+
+// Watch for conversation changes and ensure we're joined to the room
+watch(() => conversation.value?.id, (newId, oldId) => {
+  if (newId && newId !== oldId && isConnected.value) {
+    joinConversation(newId);
+    console.log('Conversation changed, rejoining room:', newId);
+  }
+});
 
 const handleEndChat = () => {
   if (!conversation.value) {
@@ -821,8 +838,31 @@ const handleBotMenuClick = async (option) => {
     loading.value = false;
   }
 
+  // Ensure we're joined to the conversation room for real-time updates
+  if (conversation.value && isConnected.value) {
+    joinConversation(conversation.value.id);
+  }
+
   // Send the bot menu message
   const message = option.message;
+  
+  // Optimistically add message immediately
+  const tempMessage = {
+    id: `temp-${Date.now()}-${Math.random()}`,
+    conversation_id: conversation.value.id,
+    sender_id: authStore.user?.id,
+    sender_role: 'user',
+    message: message,
+    image_url: null,
+    created_at: new Date().toISOString(),
+    sender_email: authStore.user?.email || '',
+    isOptimistic: true,
+  };
+  
+  messages.value.push(tempMessage);
+  await nextTick();
+  scrollToBottom();
+
   loading.value = true;
 
   try {
@@ -831,7 +871,12 @@ const handleBotMenuClick = async (option) => {
     await nextTick();
     scrollToBottom();
   } catch (error) {
-    console.error('Send message error:', error);
+    console.error('Failed to send bot menu message:', error);
+    // Remove optimistic message on error
+    const optimisticIndex = messages.value.findIndex(m => m.id === tempMessage.id);
+    if (optimisticIndex !== -1) {
+      messages.value.splice(optimisticIndex, 1);
+    }
     alert('Failed to send message. Please try again.');
   } finally {
     loading.value = false;

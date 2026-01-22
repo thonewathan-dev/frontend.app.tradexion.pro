@@ -36,6 +36,11 @@ export function useChat() {
     socket.on('connect', () => {
       console.log('Chat connected');
       isConnected.value = true;
+      // Rejoin conversation if it exists
+      if (conversation.value) {
+        socket.emit('join_conversation', conversation.value.id);
+        console.log('Rejoined conversation after reconnect:', conversation.value.id);
+      }
     });
 
     socket.on('disconnect', () => {
@@ -127,6 +132,13 @@ export function useChat() {
   const joinConversation = (conversationId) => {
     if (socket && socket.connected) {
       socket.emit('join_conversation', conversationId);
+      console.log('Joining conversation room:', conversationId);
+    } else {
+      console.warn('Socket not connected, cannot join conversation');
+      // Try to reconnect
+      if (!socket) {
+        connect();
+      }
     }
   };
 
