@@ -139,11 +139,11 @@
               <div class="mb-3 space-y-0.5">
                 <div class="flex justify-between text-xs">
                   <span class="text-white/70">Profit rate</span>
-                  <span class="text-white truncate ml-2">{{ tradeConfig.value[openTime]?.profitRate || 10 }}%</span>
+                  <span class="text-white truncate ml-2">{{ tradeConfig.value?.[openTime]?.profitRate || 10 }}%</span>
                 </div>
                 <div class="flex justify-between text-xs">
                   <span class="text-white/70">{{ t('contracts.minimumAmount') }}</span>
-                  <span class="text-white truncate ml-2">{{ tradeConfig.value[openTime]?.minAmount || 100 }}.00 USDT</span>
+                  <span class="text-white truncate ml-2">{{ tradeConfig.value?.[openTime]?.minAmount || 100 }}.00 USDT</span>
                 </div>
                 <div class="flex justify-between text-xs">
                   <span class="text-white/70">Usable</span>
@@ -964,11 +964,12 @@ const placeOrder = async () => {
     return;
   }
   
-  const config = tradeConfig.value[openTime.value];
-  if (!config) {
-    alert(`No configuration found for ${openTime.value}s duration`);
+  if (!tradeConfig.value || !tradeConfig.value[openTime.value]) {
+    alert('Trade settings not loaded yet. Please wait a moment and try again.');
     return;
   }
+  
+  const config = tradeConfig.value[openTime.value];
   if (parseFloat(openingQuantity.value) < config.minAmount) {
     alert(`Minimum amount for ${openTime.value}s trade is ${config.minAmount} USDT`);
     return;
@@ -1005,7 +1006,7 @@ const placeOrder = async () => {
         side: createdTrade.side || orderSide.value,
         amount: parseFloat(createdTrade.amount) || parseFloat(openingQuantity.value),
         duration: parseInt(createdTrade.duration) || parseInt(openTime.value),
-        profit_rate: parseFloat(createdTrade.profit_rate) || tradeConfig.value[openTime.value]?.profitRate || 10,
+        profit_rate: parseFloat(createdTrade.profit_rate) || tradeConfig.value?.[openTime.value]?.profitRate || 10,
         entry_price: parseFloat(createdTrade.entry_price) || parseFloat(ticker.value?.price) || 50000,
         expires_at: createdTrade.expires_at,
         status: createdTrade.status || 'pending'
