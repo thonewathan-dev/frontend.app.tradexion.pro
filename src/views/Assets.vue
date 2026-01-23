@@ -251,104 +251,104 @@
     <!-- Client Download Modal -->
     <div
       v-if="showDownloadModal"
-      class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+      class="fixed inset-0 z-[9999] flex items-center justify-center p-2 md:p-4 bg-black/80 backdrop-blur-sm"
       @click.self="showDownloadModal = false"
     >
-      <div class="glass-card rounded-lg p-4 max-w-sm w-full shadow-2xl border border-white/10 animate-slide-up max-h-[85vh] overflow-y-auto">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-white font-semibold text-base">Download TradeXion App</h2>
+      <div class="glass-card rounded-lg p-3 md:p-4 max-w-[90%] md:max-w-sm w-full shadow-2xl border border-white/10 animate-slide-up max-h-[75vh] md:max-h-[85vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-2 md:mb-4">
+          <h2 class="text-white font-semibold text-sm md:text-base">Download TradeXion App</h2>
           <button
             @click="showDownloadModal = false"
-            class="p-1.5 rounded"
+            class="p-1 md:p-1.5 rounded"
           >
-            <svg class="w-4 h-4 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-3.5 h-3.5 md:w-4 md:h-4 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        <div class="space-y-3">
+        <div class="space-y-2 md:space-y-3">
           <!-- Already Installed -->
-          <div v-if="isAppInstalled" class="p-3 bg-green-500/10 border border-green-500/20 rounded">
-            <div class="flex items-center gap-2">
-              <svg class="w-5 h-5 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div v-if="isAppInstalled" class="p-2 md:p-3 bg-green-500/10 border border-green-500/20 rounded">
+            <div class="flex items-center gap-1.5 md:gap-2">
+              <svg class="w-4 h-4 md:w-5 md:h-5 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <div>
-                <p class="text-white font-medium text-sm">App Installed</p>
-                <p class="text-white/70 text-xs">TradeXion is already installed on your device</p>
+                <p class="text-white font-medium text-xs md:text-sm">App Installed</p>
+                <p class="text-white/70 text-[10px] md:text-xs">TradeXion is already installed on your device</p>
               </div>
             </div>
           </div>
 
           <!-- Android/Desktop Install -->
-          <div v-if="!isIOSDevice && !isAppInstalled" class="space-y-2">
-            <div class="p-3 bg-white/5 rounded border border-white/10">
-              <div class="flex items-start gap-2 mb-3">
-                <img src="/icon-192.png" alt="TradeXion" class="w-12 h-12 rounded-lg flex-shrink-0" />
+          <div v-if="!isIOSDevice && !isAppInstalled" class="space-y-1.5 md:space-y-2">
+            <div class="p-2 md:p-3 bg-white/5 rounded border border-white/10">
+              <div class="flex items-start gap-1.5 md:gap-2 mb-2 md:mb-3">
+                <img src="/icon-192.png" alt="TradeXion" class="w-10 h-10 md:w-12 md:h-12 rounded-lg flex-shrink-0" />
                 <div class="flex-1 min-w-0">
-                  <h3 class="text-white font-semibold text-sm">TradeXion</h3>
-                  <p class="text-white/70 text-xs">Professional Trading Platform</p>
+                  <h3 class="text-white font-semibold text-xs md:text-sm">TradeXion</h3>
+                  <p class="text-white/70 text-[10px] md:text-xs">Professional Trading Platform</p>
                 </div>
               </div>
               <button
                 v-if="deferredPrompt"
                 @click="handleInstall"
-                class="w-full px-3 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded font-medium text-sm shadow-lg"
+                class="w-full px-2.5 py-1.5 md:px-3 md:py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded font-medium text-xs md:text-sm shadow-lg"
               >
                 Install App
               </button>
-              <div v-else class="p-2 bg-white/5 rounded">
-                <p class="text-white/70 text-xs text-center">
+              <div v-else class="p-1.5 md:p-2 bg-white/5 rounded">
+                <p class="text-white/70 text-[10px] md:text-xs text-center">
                   Install option will appear automatically. Make sure you're using Chrome or Edge browser.
                 </p>
               </div>
             </div>
-            <div class="text-xs text-white/60 text-center space-y-0.5">
+            <div class="text-[10px] md:text-xs text-white/60 text-center space-y-0.5">
               <p>For the best experience, install TradeXion as an app</p>
               <p>Works offline • Faster loading • App-like experience</p>
             </div>
           </div>
 
           <!-- iOS Install Instructions -->
-          <div v-if="isIOSDevice && !isAppInstalled" class="space-y-3">
-            <div class="p-3 bg-white/5 rounded border border-white/10">
-              <div class="flex items-start gap-2 mb-3">
-                <img src="/icon-192.png" alt="TradeXion" class="w-12 h-12 rounded-lg flex-shrink-0" />
+          <div v-if="isIOSDevice && !isAppInstalled" class="space-y-2 md:space-y-3">
+            <div class="p-2 md:p-3 bg-white/5 rounded border border-white/10">
+              <div class="flex items-start gap-1.5 md:gap-2 mb-2 md:mb-3">
+                <img src="/icon-192.png" alt="TradeXion" class="w-10 h-10 md:w-12 md:h-12 rounded-lg flex-shrink-0" />
                 <div class="flex-1 min-w-0">
-                  <h3 class="text-white font-semibold text-sm">TradeXion</h3>
-                  <p class="text-white/70 text-xs">Professional Trading Platform</p>
+                  <h3 class="text-white font-semibold text-xs md:text-sm">TradeXion</h3>
+                  <p class="text-white/70 text-[10px] md:text-xs">Professional Trading Platform</p>
                 </div>
               </div>
               
-              <div class="space-y-2 mb-3">
-                <div class="flex items-start gap-2">
-                  <div class="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center">
-                    <span class="text-blue-400 font-bold text-xs">1</span>
+              <div class="space-y-1.5 md:space-y-2 mb-2 md:mb-3">
+                <div class="flex items-start gap-1.5 md:gap-2">
+                  <div class="flex-shrink-0 w-5 h-5 md:w-6 md:h-6 rounded-full bg-blue-500/20 flex items-center justify-center">
+                    <span class="text-blue-400 font-bold text-[10px] md:text-xs">1</span>
                   </div>
                   <div class="flex-1">
-                    <p class="text-white text-xs">Tap the <span class="font-semibold">Share</span> button</p>
-                    <p class="text-white/60 text-[10px] mt-0.5">Located at the bottom of Safari</p>
+                    <p class="text-white text-[10px] md:text-xs">Tap the <span class="font-semibold">Share</span> button</p>
+                    <p class="text-white/60 text-[9px] md:text-[10px] mt-0.5">Located at the bottom of Safari</p>
                   </div>
                 </div>
                 
-                <div class="flex items-start gap-2">
-                  <div class="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center">
-                    <span class="text-blue-400 font-bold text-xs">2</span>
+                <div class="flex items-start gap-1.5 md:gap-2">
+                  <div class="flex-shrink-0 w-5 h-5 md:w-6 md:h-6 rounded-full bg-blue-500/20 flex items-center justify-center">
+                    <span class="text-blue-400 font-bold text-[10px] md:text-xs">2</span>
                   </div>
                   <div class="flex-1">
-                    <p class="text-white text-xs">Select <span class="font-semibold">"Add to Home Screen"</span></p>
-                    <p class="text-white/60 text-[10px] mt-0.5">Scroll down if needed</p>
+                    <p class="text-white text-[10px] md:text-xs">Select <span class="font-semibold">"Add to Home Screen"</span></p>
+                    <p class="text-white/60 text-[9px] md:text-[10px] mt-0.5">Scroll down if needed</p>
                   </div>
                 </div>
                 
-                <div class="flex items-start gap-2">
-                  <div class="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center">
-                    <span class="text-blue-400 font-bold text-xs">3</span>
+                <div class="flex items-start gap-1.5 md:gap-2">
+                  <div class="flex-shrink-0 w-5 h-5 md:w-6 md:h-6 rounded-full bg-blue-500/20 flex items-center justify-center">
+                    <span class="text-blue-400 font-bold text-[10px] md:text-xs">3</span>
                   </div>
                   <div class="flex-1">
-                    <p class="text-white text-xs">Tap <span class="font-semibold">"Add"</span></p>
-                    <p class="text-white/60 text-[10px] mt-0.5">The app will appear on your home screen</p>
+                    <p class="text-white text-[10px] md:text-xs">Tap <span class="font-semibold">"Add"</span></p>
+                    <p class="text-white/60 text-[9px] md:text-[10px] mt-0.5">The app will appear on your home screen</p>
                   </div>
                 </div>
               </div>
@@ -356,8 +356,8 @@
           </div>
 
           <!-- Platform Info -->
-          <div class="pt-2 border-t border-white/10">
-            <p class="text-white/60 text-[10px] text-center">
+          <div class="pt-1.5 md:pt-2 border-t border-white/10">
+            <p class="text-white/60 text-[9px] md:text-[10px] text-center">
               <span v-if="isIOSDevice">iOS Safari detected</span>
               <span v-else-if="isAndroidDevice">Android detected</span>
               <span v-else>Desktop browser detected</span>
