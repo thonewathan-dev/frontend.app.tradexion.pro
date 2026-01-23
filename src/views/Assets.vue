@@ -505,7 +505,7 @@ const handleInstall = async () => {
 };
 
 // Handle Client Download button click
-const handleClientDownload = () => {
+const handleClientDownload = async () => {
   // Check if app is already installed
   if (isInstalled.value) {
     showInfo('TradeXion is already installed on your device.');
@@ -520,21 +520,62 @@ const handleClientDownload = () => {
   
   // For Android/Desktop, try to trigger native install prompt
   if (deferredPrompt.value) {
-    handleInstall();
+    await handleInstall();
   } else {
-    // If prompt not available yet, show info
-    showInfo('Install option will appear automatically. Please use Chrome or Edge browser.');
+    // Check why prompt is not available
+    console.log('[PWA] Checking install prompt availability...');
+    
+    // Check if service worker is registered
+    if ('serviceWorker' in navigator) {
+      const registration = await navigator.serviceWorker.getRegistration();
+      if (!registration) {
+        showError('Service worker not registered. Please refresh the page.');
+        return;
+      }
+    }
+    
+    // Check if manifest is accessible
+    try {
+      const manifestResponse = await fetch('/manifest.json');
+      if (!manifestResponse.ok) {
+        showError('Manifest file not found. Please check server configuration.');
+        return;
+      }
+      const manifest = await manifestResponse.json();
+      if (!manifest.icons || manifest.icons.length === 0) {
+        showError('Manifest missing icons. Please check configuration.');
+        return;
+      }
+    } catch (error) {
+      showError('Error loading manifest: ' + error.message);
+      return;
+    }
+    
+    // Check if running on HTTPS
+    if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+      showError('PWA install requires HTTPS. Please use HTTPS to install the app.');
+      return;
+    }
+    
+    // If all checks pass but no prompt, it might be due to:
+    // 1. User hasn't engaged enough with the site
+    // 2. App already installed (but detection failed)
+    // 3. Browser doesn't support PWA install
+    showInfo('Install prompt will appear automatically after you interact with the site more. Please try clicking around the app and then try again. Make sure you\'re using Chrome or Edge browser.');
   }
 };
 
 // Listen for beforeinstallprompt event (Android/Desktop)
 const handleBeforeInstallPrompt = (e) => {
+  console.log('[PWA] beforeinstallprompt event fired!');
   e.preventDefault();
   deferredPrompt.value = e;
+  console.log('[PWA] Deferred prompt stored');
 };
 
 // Listen for app installed event
 const handleAppInstalled = () => {
+  console.log('[PWA] App installed event fired');
   isInstalled.value = true;
   deferredPrompt.value = null;
   showSuccess('TradeXion has been installed successfully!');
@@ -599,11 +640,50 @@ onMounted(async () => {
   // Check PWA install status
   checkInstallStatus();
   
+  // Debug: Check if app is already installed
+  console.log('[PWA] Is app installed?', isInstalled.value);
+  console.log('[PWA] Is iOS?', isIOSDevice.value);
+  
+  // Debug: Check manifest
+  if ('serviceWorker' in navigator) {
+    const registration = await navigator.serviceWorker.getRegistration();
+    console.log('[PWA] Service Worker registered:', !!registration);
+  }
+  
+  // Debug: Check if manifest is accessible
+  try {
+    const manifestResponse = await fetch('/manifest.json');
+    const manifest = await manifestResponse.json();
+    console.log('[PWA] Manifest loaded:', manifest);
+    console.log('[PWA] Manifest icons:', manifest.icons);
+  } catch (error) {
+    console.error('[PWA] Error loading manifest:', error);
+  }
+  
   // Listen for beforeinstallprompt (Chrome/Edge)
+  // Note: This event only fires if:
+  // 1. App is not already installed
+  // 2. User has engaged with the site (interacted)
+  // 3. App meets PWA criteria (manifest + service worker)
+  // 4. Served over HTTPS (or localhost)
   window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+  console.log('[PWA] beforeinstallprompt listener added');
   
   // Listen for app installed
   window.addEventListener('appinstalled', handleAppInstalled);
+  console.log('[PWA] appinstalled listener added');
+  
+  // Check if prompt might be available but event already fired
+  // (This can happen if event fires before listener is added)
+  setTimeout(() => {
+    if (!deferredPrompt.value && !isInstalled.value && !isIOSDevice.value) {
+      console.log('[PWA] No deferred prompt after 2 seconds. Possible reasons:');
+      console.log('[PWA] - App already installed');
+      console.log('[PWA] - User needs to interact with site more');
+      console.log('[PWA] - Manifest or service worker issues');
+      console.log('[PWA] - Not served over HTTPS');
+    }
+  }, 2000);
   
   balanceInterval = setInterval(() => {
     loadWalletsSilently();
