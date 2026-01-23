@@ -441,6 +441,9 @@ const wallets = ref([]);
 const isLoading = ref(true);
 const coinList = ref([]);
 
+// Interval ref for proper cleanup (prevent memory leaks)
+const marketDataInterval = ref(null);
+
 const usableBalance = computed(() => {
   try {
     if (orderSide.value === 'buy') {
@@ -893,9 +896,6 @@ const scheduleReconnect = () => {
   wsBackoffMs = Math.min(wsBackoffMs * 2, MAX_BACKOFF_MS);
 };
 
-// Store interval ID for cleanup
-let marketDataInterval = null;
-
 onMounted(() => {
   loadMarketData();
   loadCoinList();
@@ -904,7 +904,7 @@ onMounted(() => {
   // Refresh orderbook every 5 seconds - reduced from 2s to prevent browser overload
   let isRefreshing = false;
   let walletTick = 0;
-  marketDataInterval = setInterval(async () => {
+  marketDataInterval.value = setInterval(async () => {
     if (!isRefreshing) {
       isRefreshing = true;
       try {
@@ -931,9 +931,9 @@ onUnmounted(() => {
     wsReconnectTimer = null;
   }
   
-  if (marketDataInterval) {
-    clearInterval(marketDataInterval);
-    marketDataInterval = null;
+  if (marketDataInterval.value) {
+    clearInterval(marketDataInterval.value);
+    marketDataInterval.value = null;
   }
   
   try {

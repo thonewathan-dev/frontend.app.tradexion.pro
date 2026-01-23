@@ -96,16 +96,12 @@
                   {{ t('contracts.fall') }}
                 </button>
               </div>
-              <!-- Transaction Mode -->
+              <!-- Transaction Mode - Fixed to USDT -->
               <div class="mb-2">
                 <label class="block text-xs text-white/70 mb-1">{{ t('contracts.transactionMode') }}</label>
-                <CustomSelect
-                  v-model="transactionMode"
-                  :options="[
-                    { value: 'USDT', label: 'USDT' },
-                    { value: 'COIN', label: 'COIN' }
-                  ]"
-                />
+                <div class="px-2 py-1.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white">
+                  USDT
+                </div>
               </div>
 
               <!-- Opening Quantity -->
@@ -684,7 +680,6 @@ const getInitialSymbol = () => {
 
 const selectedSymbol = ref(getInitialSymbol());
 const orderSide = ref(route.query.side === 'sell' ? 'sell' : 'buy');
-const transactionMode = ref('USDT');
 const openingQuantity = ref('');
 const openTime = ref('30');
 const activeTab = ref('transaction');
@@ -700,6 +695,11 @@ const closedTrades = ref([]);
 const countdowns = ref({});
 const showActiveTradeModal = ref(false);
 const currentActiveTrade = ref(null);
+
+// Interval refs for proper cleanup (prevent memory leaks)
+const marketDataInterval = ref(null);
+const countdownInterval = ref(null);
+const tradesInterval = ref(null);
 
 // Trade configuration
 const tradeConfig = {
@@ -1226,11 +1226,6 @@ const scheduleReconnect = () => {
   wsBackoffMs = Math.min(wsBackoffMs * 2, MAX_BACKOFF_MS);
 };
 
-// Store interval IDs for cleanup
-let marketDataInterval = null;
-let countdownInterval = null;
-let tradesInterval = null;
-
 onMounted(() => {
   loadMarketData();
   loadCoinList();
@@ -1240,7 +1235,7 @@ onMounted(() => {
   // Real-time updates every 5 seconds - reduced from 2s to prevent browser overload
   let isRefreshing = false;
   let walletTick = 0;
-  marketDataInterval = setInterval(async () => {
+  marketDataInterval.value = setInterval(async () => {
     if (!isRefreshing) {
       isRefreshing = true;
       try {
@@ -1261,13 +1256,13 @@ onMounted(() => {
   }, 5000);
   
   // Update countdowns every second
-  countdownInterval = setInterval(() => {
+  countdownInterval.value = setInterval(() => {
     updateCountdowns();
   }, 1000);
   
   // Reload contract trades every 5 seconds - reduced from 3s to prevent browser overload
   let isLoadingTrades = false;
-  tradesInterval = setInterval(async () => {
+  tradesInterval.value = setInterval(async () => {
     if (!isLoadingTrades) {
       isLoadingTrades = true;
       try {
@@ -1288,19 +1283,19 @@ onUnmounted(() => {
     wsReconnectTimer = null;
   }
   
-  if (marketDataInterval) {
-    clearInterval(marketDataInterval);
-    marketDataInterval = null;
+  if (marketDataInterval.value) {
+    clearInterval(marketDataInterval.value);
+    marketDataInterval.value = null;
   }
   
-  if (countdownInterval) {
-    clearInterval(countdownInterval);
-    countdownInterval = null;
+  if (countdownInterval.value) {
+    clearInterval(countdownInterval.value);
+    countdownInterval.value = null;
   }
   
-  if (tradesInterval) {
-    clearInterval(tradesInterval);
-    tradesInterval = null;
+  if (tradesInterval.value) {
+    clearInterval(tradesInterval.value);
+    tradesInterval.value = null;
   }
   
   try {
