@@ -139,11 +139,11 @@
               <div class="mb-3 space-y-0.5">
                 <div class="flex justify-between text-xs">
                   <span class="text-white/70">Profit rate</span>
-                  <span class="text-white truncate ml-2">{{ tradeConfig.value?.[openTime]?.profitRate || 10 }}%</span>
+                  <span class="text-white truncate ml-2">{{ currentDurationConfig.profitRate }}%</span>
                 </div>
                 <div class="flex justify-between text-xs">
                   <span class="text-white/70">{{ t('contracts.minimumAmount') }}</span>
-                  <span class="text-white truncate ml-2">{{ tradeConfig.value?.[openTime]?.minAmount || 100 }}.00 USDT</span>
+                  <span class="text-white truncate ml-2">{{ currentDurationConfig.minAmount.toFixed(2) }} USDT</span>
                 </div>
                 <div class="flex justify-between text-xs">
                   <span class="text-white/70">Usable</span>
@@ -711,23 +711,37 @@ const tradeConfig = ref({
   '300': { minAmount: 100000, profitRate: 60 },
 });
 
+// Computed property for current duration config
+const currentDurationConfig = computed(() => {
+  if (!tradeConfig.value || !openTime.value) {
+    return { minAmount: 100, profitRate: 10 };
+  }
+  return tradeConfig.value[openTime.value] || { minAmount: 100, profitRate: 10 };
+});
+
 // Load contract trade settings from backend
 const loadContractTradeSettings = async () => {
   try {
     const response = await api.get('/contracts/settings');
+    console.log('Raw settings response:', response.data);
     if (response.data && response.data.settings) {
       // Convert settings to match expected format (duration as string keys)
       const settings = {};
       Object.keys(response.data.settings).forEach(duration => {
         // Ensure duration is a string key
         const durationKey = String(duration);
+        const setting = response.data.settings[duration];
         settings[durationKey] = {
-          minAmount: response.data.settings[duration].minAmount || 100,
-          profitRate: response.data.settings[duration].profitRate || 10,
+          minAmount: parseFloat(setting.minAmount) || 100,
+          profitRate: parseFloat(setting.profitRate) || 10,
         };
       });
       tradeConfig.value = settings;
       console.log('Contract trade settings loaded:', settings);
+      console.log('Current openTime:', openTime.value);
+      console.log('Settings for current duration:', settings[openTime.value]);
+    } else {
+      console.warn('No settings in response:', response.data);
     }
   } catch (error) {
     console.error('Error loading contract trade settings:', error);
