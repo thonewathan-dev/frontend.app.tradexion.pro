@@ -1,10 +1,10 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-[#0b1020] via-[#101c3a] to-[#2b1554]">
-    <MobileNav v-if="isMobile" />
+    <!-- MobileNav hidden on AboutTradeXion page -->
     <div class="md:flex">
       <DesktopNav v-if="!isMobile" />
 
-      <main class="flex-1 pb-16 md:pb-0">
+      <main class="flex-1 pb-4 md:pb-0">
         <!-- Header (aligned like Spot/Contract/Exchange) -->
         <div class="glass-card-no-hover border-b border-white/10 px-4 py-3 mb-4">
           <div class="flex items-center justify-between">
@@ -76,12 +76,12 @@
             <p class="pt-2 border-t border-white/10 mt-2">
               Follow us and stay close to the investment trends of the blockchain era:
               <a
-                href="https://tradexion.pro/"
+                href="https://www.tradexion.pro/"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="text-teal-300 hover:text-teal-200 underline underline-offset-2"
               >
-                https://tradexion.pro/
+                https://www.tradexion.pro/
               </a>
             </p>
           </div>
@@ -97,7 +97,6 @@
 <script setup>
 import { computed } from 'vue';
 import DesktopNav from '../components/DesktopNav.vue';
-import MobileNav from '../components/MobileNav.vue';
 import SiteFooter from '../components/SiteFooter.vue';
 import bannerImg from '@/assets/banners/banner.jpg';
 
