@@ -66,4 +66,6 @@ export default defineConfig({
   optimizeDeps: {
     include: ['vue', 'vue-router', 'pinia', 'axios', 'lightweight-charts'],
   },
+  // Ensure service worker and manifest are copied to dist
+  publicDir: 'public',
 });

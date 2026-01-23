@@ -14,6 +14,7 @@
     </div>
 
     <Toast ref="toastRef" />
+    <InstallButton />
   </div>
 </template>
 
@@ -21,6 +22,7 @@
 import { ref, onMounted, nextTick } from 'vue';
 import { setToastComponent } from './composables/useAlert';
 import Toast from './components/Toast.vue';
+import InstallButton from './components/InstallButton.vue';
 import { isRouteLoading } from './router';
 
 const toastRef = ref(null);
@@ -41,7 +43,7 @@ onMounted(async () => {
     setTimeout(() => {
       if (toastRef.value) {
         try {
-          setToastComponent(toastRef.value);
+    setToastComponent(toastRef.value);
         } catch (error) {
           console.error('Failed to set toast component (retry):', error);
         }

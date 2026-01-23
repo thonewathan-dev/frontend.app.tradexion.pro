@@ -247,6 +247,125 @@
 
       </main>
     </div>
+
+    <!-- Client Download Modal -->
+    <div
+      v-if="showDownloadModal"
+      class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+      @click.self="showDownloadModal = false"
+    >
+      <div class="glass-card rounded-lg p-4 max-w-sm w-full shadow-2xl border border-white/10 animate-slide-up max-h-[85vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-white font-semibold text-base">Download TradeXion App</h2>
+          <button
+            @click="showDownloadModal = false"
+            class="p-1.5 rounded"
+          >
+            <svg class="w-4 h-4 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="space-y-3">
+          <!-- Already Installed -->
+          <div v-if="isAppInstalled" class="p-3 bg-green-500/10 border border-green-500/20 rounded">
+            <div class="flex items-center gap-2">
+              <svg class="w-5 h-5 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div>
+                <p class="text-white font-medium text-sm">App Installed</p>
+                <p class="text-white/70 text-xs">TradeXion is already installed on your device</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Android/Desktop Install -->
+          <div v-if="!isIOSDevice && !isAppInstalled" class="space-y-2">
+            <div class="p-3 bg-white/5 rounded border border-white/10">
+              <div class="flex items-start gap-2 mb-3">
+                <img src="/icon-192.png" alt="TradeXion" class="w-12 h-12 rounded-lg flex-shrink-0" />
+                <div class="flex-1 min-w-0">
+                  <h3 class="text-white font-semibold text-sm">TradeXion</h3>
+                  <p class="text-white/70 text-xs">Professional Trading Platform</p>
+                </div>
+              </div>
+              <button
+                v-if="deferredPrompt"
+                @click="handleInstall"
+                class="w-full px-3 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded font-medium text-sm shadow-lg"
+              >
+                Install App
+              </button>
+              <div v-else class="p-2 bg-white/5 rounded">
+                <p class="text-white/70 text-xs text-center">
+                  Install option will appear automatically. Make sure you're using Chrome or Edge browser.
+                </p>
+              </div>
+            </div>
+            <div class="text-xs text-white/60 text-center space-y-0.5">
+              <p>For the best experience, install TradeXion as an app</p>
+              <p>Works offline • Faster loading • App-like experience</p>
+            </div>
+          </div>
+
+          <!-- iOS Install Instructions -->
+          <div v-if="isIOSDevice && !isAppInstalled" class="space-y-3">
+            <div class="p-3 bg-white/5 rounded border border-white/10">
+              <div class="flex items-start gap-2 mb-3">
+                <img src="/icon-192.png" alt="TradeXion" class="w-12 h-12 rounded-lg flex-shrink-0" />
+                <div class="flex-1 min-w-0">
+                  <h3 class="text-white font-semibold text-sm">TradeXion</h3>
+                  <p class="text-white/70 text-xs">Professional Trading Platform</p>
+                </div>
+              </div>
+              
+              <div class="space-y-2 mb-3">
+                <div class="flex items-start gap-2">
+                  <div class="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center">
+                    <span class="text-blue-400 font-bold text-xs">1</span>
+                  </div>
+                  <div class="flex-1">
+                    <p class="text-white text-xs">Tap the <span class="font-semibold">Share</span> button</p>
+                    <p class="text-white/60 text-[10px] mt-0.5">Located at the bottom of Safari</p>
+                  </div>
+                </div>
+                
+                <div class="flex items-start gap-2">
+                  <div class="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center">
+                    <span class="text-blue-400 font-bold text-xs">2</span>
+                  </div>
+                  <div class="flex-1">
+                    <p class="text-white text-xs">Select <span class="font-semibold">"Add to Home Screen"</span></p>
+                    <p class="text-white/60 text-[10px] mt-0.5">Scroll down if needed</p>
+                  </div>
+                </div>
+                
+                <div class="flex items-start gap-2">
+                  <div class="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center">
+                    <span class="text-blue-400 font-bold text-xs">3</span>
+                  </div>
+                  <div class="flex-1">
+                    <p class="text-white text-xs">Tap <span class="font-semibold">"Add"</span></p>
+                    <p class="text-white/60 text-[10px] mt-0.5">The app will appear on your home screen</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Platform Info -->
+          <div class="pt-2 border-t border-white/10">
+            <p class="text-white/60 text-[10px] text-center">
+              <span v-if="isIOSDevice">iOS Safari detected</span>
+              <span v-else-if="isAndroidDevice">Android detected</span>
+              <span v-else>Desktop browser detected</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -258,6 +377,7 @@ import { useAlert } from '../composables/useAlert';
 import MobileNav from '../components/MobileNav.vue';
 import DesktopNav from '../components/DesktopNav.vue';
 import api from '../utils/api';
+import { isIOS, isAndroid, isAppInstalled as checkIsAppInstalled } from '../utils/pwa';
 import depositIcon from '@/assets/dp-wd-tf-icons/deposit.png';
 import withdrawIcon from '@/assets/dp-wd-tf-icons/withdraw.png';
 import transferIcon from '@/assets/dp-wd-tf-icons/transfer.png';
@@ -273,6 +393,14 @@ const user = computed(() => authStore.user);
 const wallets = ref([]);
 const loading = ref(false);
 const hasLoadedWallets = ref(false);
+const showDownloadModal = ref(false);
+const deferredPrompt = ref(null);
+const isIOSDevice = ref(false);
+const isAndroidDevice = ref(false);
+const isInstalled = ref(false);
+
+// Computed property for template compatibility
+const isAppInstalled = computed(() => isInstalled.value);
 
 // Prices vs USDT for asset center calculations
 const prices = ref({
@@ -340,8 +468,77 @@ const handleInviteFriends = () => {
   showWarning('Invite friends feature will be available soon.');
 };
 
+// Check install status
+const checkInstallStatus = () => {
+  isIOSDevice.value = isIOS();
+  isAndroidDevice.value = isAndroid();
+  isInstalled.value = checkIsAppInstalled();
+};
+
+// Handle install button click (Android/Desktop)
+const handleInstall = async () => {
+  if (!deferredPrompt.value) {
+    // If no deferred prompt, show info message
+    if (isIOSDevice.value) {
+      // For iOS, show instructions modal
+      showDownloadModal.value = true;
+    } else {
+      showInfo('Install prompt not available. Please use Chrome or Edge browser and make sure the site meets PWA requirements.');
+    }
+    return;
+  }
+  
+  // Show the native browser install prompt
+  deferredPrompt.value.prompt();
+  
+  // Wait for user response
+  const { outcome } = await deferredPrompt.value.userChoice;
+  
+  if (outcome === 'accepted') {
+    showSuccess('App installation started!');
+  } else {
+    showInfo('Installation cancelled.');
+  }
+  
+  // Clear the deferred prompt
+  deferredPrompt.value = null;
+};
+
+// Handle Client Download button click
 const handleClientDownload = () => {
-  showInfo('App download links will be available here soon.');
+  // Check if app is already installed
+  if (isInstalled.value) {
+    showInfo('TradeXion is already installed on your device.');
+    return;
+  }
+  
+  // For iOS, show instructions modal
+  if (isIOSDevice.value) {
+    showDownloadModal.value = true;
+    return;
+  }
+  
+  // For Android/Desktop, try to trigger native install prompt
+  if (deferredPrompt.value) {
+    handleInstall();
+  } else {
+    // If prompt not available yet, show info
+    showInfo('Install option will appear automatically. Please use Chrome or Edge browser.');
+  }
+};
+
+// Listen for beforeinstallprompt event (Android/Desktop)
+const handleBeforeInstallPrompt = (e) => {
+  e.preventDefault();
+  deferredPrompt.value = e;
+};
+
+// Listen for app installed event
+const handleAppInstalled = () => {
+  isInstalled.value = true;
+  deferredPrompt.value = null;
+  showSuccess('TradeXion has been installed successfully!');
+  showDownloadModal.value = false;
 };
 
 const handleAssetInfo = () => {
@@ -399,6 +596,15 @@ onMounted(async () => {
   await loadPrices();
   await loadWallets();
   
+  // Check PWA install status
+  checkInstallStatus();
+  
+  // Listen for beforeinstallprompt (Chrome/Edge)
+  window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+  
+  // Listen for app installed
+  window.addEventListener('appinstalled', handleAppInstalled);
+  
   balanceInterval = setInterval(() => {
     loadWalletsSilently();
     loadPrices();
@@ -407,6 +613,7 @@ onMounted(async () => {
   userRefreshInterval = setInterval(() => {
     if (route.path === '/assets') {
       refreshUser();
+      checkInstallStatus(); // Recheck install status periodically
     }
   }, 10000);
 });
@@ -417,6 +624,24 @@ onUnmounted(() => {
     clearInterval(userRefreshInterval);
     userRefreshInterval = null;
   }
+  window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+  window.removeEventListener('appinstalled', handleAppInstalled);
 });
 </script>
 
+<style scoped>
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
+</style>
