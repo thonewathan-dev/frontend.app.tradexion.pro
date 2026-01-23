@@ -26,13 +26,27 @@ import { isRouteLoading } from './router';
 const toastRef = ref(null);
 
 onMounted(async () => {
+  // Wait for multiple ticks to ensure DOM is fully ready
   await nextTick();
+  await nextTick();
+  
   if (toastRef.value) {
     try {
       setToastComponent(toastRef.value);
     } catch (error) {
       console.error('Failed to set toast component:', error);
     }
+  } else {
+    // Retry after a short delay if ref is not ready
+    setTimeout(() => {
+      if (toastRef.value) {
+        try {
+          setToastComponent(toastRef.value);
+        } catch (error) {
+          console.error('Failed to set toast component (retry):', error);
+        }
+      }
+    }, 100);
   }
 });
 </script>

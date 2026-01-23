@@ -128,14 +128,17 @@ const removeToast = (id) => {
 
 // Expose methods globally
 if (typeof window !== 'undefined') {
-  window.__toast = {
-    add: addToast,
-    remove: removeToast,
-    success: (msg, duration) => addToast(msg, 'success', duration),
-    error: (msg, duration) => addToast(msg, 'error', duration),
-    warning: (msg, duration) => addToast(msg, 'warning', duration),
-    info: (msg, duration) => addToast(msg, 'info', duration)
-  };
+  // Wait for component to be mounted before exposing
+  onMounted(() => {
+    window.__toast = {
+      add: addToast,
+      remove: removeToast,
+      success: (msg, duration) => addToast(msg, 'success', duration),
+      error: (msg, duration) => addToast(msg, 'error', duration),
+      warning: (msg, duration) => addToast(msg, 'warning', duration),
+      info: (msg, duration) => addToast(msg, 'info', duration)
+    };
+  });
 }
 
 defineExpose({

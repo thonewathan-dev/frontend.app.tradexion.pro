@@ -1,5 +1,5 @@
 <template>
-  <Teleport to="body">
+  <Teleport v-if="isMounted" to="body">
     <transition name="alert">
       <div
         v-if="isVisible"
@@ -102,8 +102,14 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { Teleport } from 'vue';
+
+const isMounted = ref(false);
+
+onMounted(() => {
+  isMounted.value = true;
+});
 
 const props = defineProps({
   visible: {
