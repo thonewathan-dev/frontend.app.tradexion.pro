@@ -139,11 +139,11 @@
               <div class="mb-3 space-y-0.5">
                 <div class="flex justify-between text-xs">
                   <span class="text-white/70">Profit rate</span>
-                  <span class="text-white truncate ml-2">{{ tradeConfig[openTime]?.profitRate || 10 }}%</span>
+                  <span class="text-white truncate ml-2">{{ tradeConfig.value[openTime]?.profitRate || 10 }}%</span>
                 </div>
                 <div class="flex justify-between text-xs">
                   <span class="text-white/70">{{ t('contracts.minimumAmount') }}</span>
-                  <span class="text-white truncate ml-2">{{ tradeConfig[openTime]?.minAmount || 100 }}.00 USDT</span>
+                  <span class="text-white truncate ml-2">{{ tradeConfig.value[openTime]?.minAmount || 100 }}.00 USDT</span>
                 </div>
                 <div class="flex justify-between text-xs">
                   <span class="text-white/70">Usable</span>
@@ -701,14 +701,38 @@ const marketDataInterval = ref(null);
 const countdownInterval = ref(null);
 const tradesInterval = ref(null);
 
-// Trade configuration
-const tradeConfig = {
+// Trade configuration - loaded from backend
+const tradeConfig = ref({
   '30': { minAmount: 100, profitRate: 10 },
   '60': { minAmount: 1000, profitRate: 20 },
   '120': { minAmount: 5000, profitRate: 30 },
   '180': { minAmount: 20000, profitRate: 40 },
   '240': { minAmount: 50000, profitRate: 50 },
   '300': { minAmount: 100000, profitRate: 60 },
+});
+
+// Load contract trade settings from backend
+const loadContractTradeSettings = async () => {
+  try {
+    const response = await api.get('/contracts/settings');
+    if (response.data && response.data.settings) {
+      // Convert settings to match expected format (duration as string keys)
+      const settings = {};
+      Object.keys(response.data.settings).forEach(duration => {
+        // Ensure duration is a string key
+        const durationKey = String(duration);
+        settings[durationKey] = {
+          minAmount: response.data.settings[duration].minAmount || 100,
+          profitRate: response.data.settings[duration].profitRate || 10,
+        };
+      });
+      tradeConfig.value = settings;
+      console.log('Contract trade settings loaded:', settings);
+    }
+  } catch (error) {
+    console.error('Error loading contract trade settings:', error);
+    // Keep default values on error
+  }
 };
 
 // Available coins
@@ -940,7 +964,11 @@ const placeOrder = async () => {
     return;
   }
   
-  const config = tradeConfig[openTime.value];
+  const config = tradeConfig.value[openTime.value];
+  if (!config) {
+    alert(`No configuration found for ${openTime.value}s duration`);
+    return;
+  }
   if (parseFloat(openingQuantity.value) < config.minAmount) {
     alert(`Minimum amount for ${openTime.value}s trade is ${config.minAmount} USDT`);
     return;
@@ -977,7 +1005,7 @@ const placeOrder = async () => {
         side: createdTrade.side || orderSide.value,
         amount: parseFloat(createdTrade.amount) || parseFloat(openingQuantity.value),
         duration: parseInt(createdTrade.duration) || parseInt(openTime.value),
-        profit_rate: parseFloat(createdTrade.profit_rate) || tradeConfig[openTime.value]?.profitRate || 10,
+        profit_rate: parseFloat(createdTrade.profit_rate) || tradeConfig.value[openTime.value]?.profitRate || 10,
         entry_price: parseFloat(createdTrade.entry_price) || parseFloat(ticker.value?.price) || 50000,
         expires_at: createdTrade.expires_at,
         status: createdTrade.status || 'pending'
@@ -1226,7 +1254,8 @@ const scheduleReconnect = () => {
   wsBackoffMs = Math.min(wsBackoffMs * 2, MAX_BACKOFF_MS);
 };
 
-onMounted(() => {
+onMounted(async () => {
+  await loadContractTradeSettings(); // Load settings first
   loadMarketData();
   loadCoinList();
   connectWebSocket();
