@@ -1,11 +1,14 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
+import axios from 'axios';
 import api from '../utils/api';
+import { getApiUrl } from '../utils/config.js';
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref(null);
   const accessToken = ref(localStorage.getItem('accessToken') || null);
   const refreshToken = ref(localStorage.getItem('refreshToken') || null);
+  const refreshInFlight = ref(null);
 
   const isAuthenticated = computed(() => {
     // If we have a token, consider authenticated (user will be loaded async)
@@ -165,15 +168,33 @@ export const useAuthStore = defineStore('auth', () => {
 
   const refreshAccessToken = async () => {
     try {
-      const response = await api.post('/auth/refresh', { refreshToken: refreshToken.value });
-      accessToken.value = response.data.accessToken;
-      refreshToken.value = response.data.refreshToken;
-      localStorage.setItem('accessToken', accessToken.value);
-      localStorage.setItem('refreshToken', refreshToken.value);
-      return true;
+      // Deduplicate concurrent refreshes (important when many requests fail at once)
+      if (refreshInFlight.value) {
+        return await refreshInFlight.value;
+      }
+
+      refreshInFlight.value = (async () => {
+        // Use a direct axios call (no interceptors) to avoid refresh loops.
+        const baseURL = getApiUrl();
+        const response = await axios.post(
+          `${baseURL}/auth/refresh`,
+          { refreshToken: refreshToken.value },
+          { headers: { 'Content-Type': 'application/json' } }
+        );
+
+        accessToken.value = response.data.accessToken;
+        refreshToken.value = response.data.refreshToken;
+        localStorage.setItem('accessToken', accessToken.value);
+        localStorage.setItem('refreshToken', refreshToken.value);
+        return true;
+      })();
+
+      return await refreshInFlight.value;
     } catch (error) {
       logout();
       return false;
+    } finally {
+      refreshInFlight.value = null;
     }
   };
 

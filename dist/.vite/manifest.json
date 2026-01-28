@@ -1,0 +1,610 @@
+{
+  "_AuthMarketPanel.Dp_fc3IN.js": {
+    "file": "assets/AuthMarketPanel.Dp_fc3IN.js",
+    "name": "AuthMarketPanel",
+    "imports": [
+      "_vendor.BJKvz4Yw.js",
+      "index.html",
+      "_coinLogos.gwK95kos.js"
+    ]
+  },
+  "_CustomSelect.!~{00w}~.js": {
+    "file": "assets/CustomSelect.BtjHknBL.css",
+    "src": "_CustomSelect.!~{00w}~.js"
+  },
+  "_CustomSelect.aRdt6gUk.js": {
+    "file": "assets/CustomSelect.aRdt6gUk.js",
+    "name": "CustomSelect",
+    "imports": [
+      "_vendor.BJKvz4Yw.js",
+      "index.html"
+    ],
+    "css": [
+      "assets/CustomSelect.BtjHknBL.css"
+    ]
+  },
+  "_DesktopNav.BGZcsY3O.js": {
+    "file": "assets/DesktopNav.BGZcsY3O.js",
+    "name": "DesktopNav",
+    "imports": [
+      "_vendor.BJKvz4Yw.js",
+      "index.html"
+    ]
+  },
+  "_MobileNav.CRat4cih.js": {
+    "file": "assets/MobileNav.CRat4cih.js",
+    "name": "MobileNav",
+    "imports": [
+      "_vendor.BJKvz4Yw.js",
+      "index.html"
+    ]
+  },
+  "_SiteFooter.BaLxjuH9.js": {
+    "file": "assets/SiteFooter.BaLxjuH9.js",
+    "name": "SiteFooter",
+    "imports": [
+      "_vendor.BJKvz4Yw.js"
+    ],
+    "assets": [
+      "assets/Logo-Only.Bi7kxCKJ.png"
+    ]
+  },
+  "_SkeletonLoader.!~{00x}~.js": {
+    "file": "assets/SkeletonLoader.yE5VI3rz.css",
+    "src": "_SkeletonLoader.!~{00x}~.js"
+  },
+  "_SkeletonLoader.DhWxvyw4.js": {
+    "file": "assets/SkeletonLoader.DhWxvyw4.js",
+    "name": "SkeletonLoader",
+    "imports": [
+      "index.html",
+      "_vendor.BJKvz4Yw.js"
+    ],
+    "css": [
+      "assets/SkeletonLoader.yE5VI3rz.css"
+    ]
+  },
+  "_charts.CIWCquZQ.js": {
+    "file": "assets/charts.CIWCquZQ.js",
+    "name": "charts"
+  },
+  "_coinLogos.gwK95kos.js": {
+    "file": "assets/coinLogos.gwK95kos.js",
+    "name": "coinLogos",
+    "assets": [
+      "assets/ADA.B0B5hY_D.png",
+      "assets/BBF.BMrON6gP.png",
+      "assets/BCH.jV-X6R1q.png",
+      "assets/BNB.nzPfaX18.png",
+      "assets/BSV.DofmptpA.png",
+      "assets/BTC.CUVYde77.png",
+      "assets/DOGE.BW3gi87u.png",
+      "assets/DOT.DTnUaTXv.png",
+      "assets/ETC.B_beEgeD.png",
+      "assets/ETH.tfTyAzfy.png",
+      "assets/LUNA.Cis6K7Gj.png",
+      "assets/NEO.DKlx6G2z.png",
+      "assets/USDT-ERC20.DV68RjSM.png",
+      "assets/USDT-TRC20.nefzOlJh.png",
+      "assets/USDT.BGd2xd_o.png"
+    ]
+  },
+  "_vendor.BJKvz4Yw.js": {
+    "file": "assets/vendor.BJKvz4Yw.js",
+    "name": "vendor"
+  },
+  "index.html": {
+    "file": "assets/index.DnUnV9d6.js",
+    "name": "index",
+    "src": "index.html",
+    "isEntry": true,
+    "imports": [
+      "_vendor.BJKvz4Yw.js"
+    ],
+    "dynamicImports": [
+      "src/views/Home.vue",
+      "src/views/Login.vue",
+      "src/views/Register.vue",
+      "src/views/ForgotPassword.vue",
+      "src/views/ResetPassword.vue",
+      "src/views/AuthCallback.vue",
+      "src/views/GoogleInviteCode.vue",
+      "src/views/Spot.vue",
+      "src/views/Kline.vue",
+      "src/views/Contracts.vue",
+      "src/views/Staking.vue",
+      "src/views/Assets.vue",
+      "src/views/SpotAccount.vue",
+      "src/views/ContractAccount.vue",
+      "src/views/Deposit.vue",
+      "src/views/Withdraw.vue",
+      "src/views/Transfer.vue",
+      "src/views/FlashExchange.vue",
+      "src/views/ChangePassword.vue",
+      "src/views/AboutTradeXion.vue",
+      "src/views/Chat.vue",
+      "src/views/PrivacyPolicy.vue",
+      "src/views/TermsOfService.vue"
+    ],
+    "css": [
+      "assets/index.D2yjuUVJ.css"
+    ]
+  },
+  "src/assets/banners/01.jpeg": {
+    "file": "assets/01.Bu4oofdb.jpeg",
+    "src": "src/assets/banners/01.jpeg"
+  },
+  "src/assets/banners/02.jpeg": {
+    "file": "assets/02.DFWs_zWW.jpeg",
+    "src": "src/assets/banners/02.jpeg"
+  },
+  "src/assets/banners/03.jpeg": {
+    "file": "assets/03.DT8us2VN.jpeg",
+    "src": "src/assets/banners/03.jpeg"
+  },
+  "src/assets/banners/banner.jpg": {
+    "file": "assets/banner.DnScocmU.jpg",
+    "src": "src/assets/banners/banner.jpg"
+  },
+  "src/assets/banners/bitcoin-banner.png": {
+    "file": "assets/bitcoin-banner.lGdBcIsi.png",
+    "src": "src/assets/banners/bitcoin-banner.png"
+  },
+  "src/assets/coins/ADA.png": {
+    "file": "assets/ADA.B0B5hY_D.png",
+    "src": "src/assets/coins/ADA.png"
+  },
+  "src/assets/coins/BBF.png": {
+    "file": "assets/BBF.BMrON6gP.png",
+    "src": "src/assets/coins/BBF.png"
+  },
+  "src/assets/coins/BCH.png": {
+    "file": "assets/BCH.jV-X6R1q.png",
+    "src": "src/assets/coins/BCH.png"
+  },
+  "src/assets/coins/BNB.png": {
+    "file": "assets/BNB.nzPfaX18.png",
+    "src": "src/assets/coins/BNB.png"
+  },
+  "src/assets/coins/BSV.png": {
+    "file": "assets/BSV.DofmptpA.png",
+    "src": "src/assets/coins/BSV.png"
+  },
+  "src/assets/coins/BTC.png": {
+    "file": "assets/BTC.CUVYde77.png",
+    "src": "src/assets/coins/BTC.png"
+  },
+  "src/assets/coins/DOGE.png": {
+    "file": "assets/DOGE.BW3gi87u.png",
+    "src": "src/assets/coins/DOGE.png"
+  },
+  "src/assets/coins/DOT.png": {
+    "file": "assets/DOT.DTnUaTXv.png",
+    "src": "src/assets/coins/DOT.png"
+  },
+  "src/assets/coins/ETC.png": {
+    "file": "assets/ETC.B_beEgeD.png",
+    "src": "src/assets/coins/ETC.png"
+  },
+  "src/assets/coins/ETH.png": {
+    "file": "assets/ETH.tfTyAzfy.png",
+    "src": "src/assets/coins/ETH.png"
+  },
+  "src/assets/coins/LUNA.png": {
+    "file": "assets/LUNA.Cis6K7Gj.png",
+    "src": "src/assets/coins/LUNA.png"
+  },
+  "src/assets/coins/NEO.png": {
+    "file": "assets/NEO.DKlx6G2z.png",
+    "src": "src/assets/coins/NEO.png"
+  },
+  "src/assets/coins/USDT-ERC20.png": {
+    "file": "assets/USDT-ERC20.DV68RjSM.png",
+    "src": "src/assets/coins/USDT-ERC20.png"
+  },
+  "src/assets/coins/USDT-TRC20.png": {
+    "file": "assets/USDT-TRC20.nefzOlJh.png",
+    "src": "src/assets/coins/USDT-TRC20.png"
+  },
+  "src/assets/coins/USDT.png": {
+    "file": "assets/USDT.BGd2xd_o.png",
+    "src": "src/assets/coins/USDT.png"
+  },
+  "src/assets/lang-flag/germeny-flag.png": {
+    "file": "assets/germeny-flag.DDgOSH1Q.png",
+    "src": "src/assets/lang-flag/germeny-flag.png"
+  },
+  "src/assets/lang-flag/india-hindi-flag.png": {
+    "file": "assets/india-hindi-flag.CkYxsXNN.png",
+    "src": "src/assets/lang-flag/india-hindi-flag.png"
+  },
+  "src/assets/lang-flag/japan-flag.png": {
+    "file": "assets/japan-flag.DIMCzCTn.png",
+    "src": "src/assets/lang-flag/japan-flag.png"
+  },
+  "src/assets/lang-flag/portugal-flag.png": {
+    "file": "assets/portugal-flag.DerlV5lF.png",
+    "src": "src/assets/lang-flag/portugal-flag.png"
+  },
+  "src/assets/lang-flag/russia-flag.png": {
+    "file": "assets/russia-flag.CPT_Kmln.png",
+    "src": "src/assets/lang-flag/russia-flag.png"
+  },
+  "src/assets/lang-flag/sourthkorea-flag.png": {
+    "file": "assets/sourthkorea-flag.CH4mZ4k3.png",
+    "src": "src/assets/lang-flag/sourthkorea-flag.png"
+  },
+  "src/assets/lang-flag/spin-flag.png": {
+    "file": "assets/spin-flag.N5JcWeLs.png",
+    "src": "src/assets/lang-flag/spin-flag.png"
+  },
+  "src/assets/lang-flag/usa-flag.png": {
+    "file": "assets/usa-flag.LZUVeM7k.png",
+    "src": "src/assets/lang-flag/usa-flag.png"
+  },
+  "src/assets/logo/Logo-Only.png": {
+    "file": "assets/Logo-Only.Bi7kxCKJ.png",
+    "src": "src/assets/logo/Logo-Only.png"
+  },
+  "src/assets/quick-menus/invite.png": {
+    "file": "assets/invite.C50fVWTf.png",
+    "src": "src/assets/quick-menus/invite.png"
+  },
+  "src/assets/quick-menus/loan.png": {
+    "file": "assets/loan.AbtYeaLR.png",
+    "src": "src/assets/quick-menus/loan.png"
+  },
+  "src/assets/quick-menus/quickrecharge.png": {
+    "file": "assets/quickrecharge.DwBAGCwt.png",
+    "src": "src/assets/quick-menus/quickrecharge.png"
+  },
+  "src/assets/quick-menus/services.png": {
+    "file": "assets/services.Bw8b1gqJ.png",
+    "src": "src/assets/quick-menus/services.png"
+  },
+  "src/assets/quick-menus/tuto-center.png": {
+    "file": "assets/tuto-center.DzFfNrbC.png",
+    "src": "src/assets/quick-menus/tuto-center.png"
+  },
+  "src/views/AboutTradeXion.vue": {
+    "file": "assets/AboutTradeXion.BpdFJTjG.js",
+    "name": "AboutTradeXion",
+    "src": "src/views/AboutTradeXion.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_DesktopNav.BGZcsY3O.js",
+      "_SiteFooter.BaLxjuH9.js",
+      "_vendor.BJKvz4Yw.js",
+      "index.html"
+    ],
+    "assets": [
+      "assets/banner.DnScocmU.jpg"
+    ]
+  },
+  "src/views/Assets.vue": {
+    "file": "assets/Assets.CVnx4_Ap.js",
+    "name": "Assets",
+    "src": "src/views/Assets.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor.BJKvz4Yw.js",
+      "index.html",
+      "_MobileNav.CRat4cih.js",
+      "_DesktopNav.BGZcsY3O.js"
+    ],
+    "css": [
+      "assets/Assets.CQnyHUJW.css"
+    ]
+  },
+  "src/views/AuthCallback.vue": {
+    "file": "assets/AuthCallback.DhrDdw6A.js",
+    "name": "AuthCallback",
+    "src": "src/views/AuthCallback.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor.BJKvz4Yw.js",
+      "index.html"
+    ]
+  },
+  "src/views/ChangePassword.vue": {
+    "file": "assets/ChangePassword.CMXEuN3h.js",
+    "name": "ChangePassword",
+    "src": "src/views/ChangePassword.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor.BJKvz4Yw.js",
+      "_DesktopNav.BGZcsY3O.js",
+      "_MobileNav.CRat4cih.js",
+      "index.html"
+    ]
+  },
+  "src/views/Chat.vue": {
+    "file": "assets/Chat.DxN6hOXg.js",
+    "name": "Chat",
+    "src": "src/views/Chat.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor.BJKvz4Yw.js",
+      "index.html"
+    ],
+    "assets": [
+      "assets/Logo-Only.Bi7kxCKJ.png"
+    ]
+  },
+  "src/views/ContractAccount.vue": {
+    "file": "assets/ContractAccount.Cg8QJQxm.js",
+    "name": "ContractAccount",
+    "src": "src/views/ContractAccount.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor.BJKvz4Yw.js",
+      "_DesktopNav.BGZcsY3O.js",
+      "_MobileNav.CRat4cih.js",
+      "index.html",
+      "_coinLogos.gwK95kos.js"
+    ]
+  },
+  "src/views/Contracts.vue": {
+    "file": "assets/Contracts.DsXUplmW.js",
+    "name": "Contracts",
+    "src": "src/views/Contracts.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor.BJKvz4Yw.js",
+      "index.html",
+      "_MobileNav.CRat4cih.js",
+      "_DesktopNav.BGZcsY3O.js",
+      "_SkeletonLoader.DhWxvyw4.js",
+      "_coinLogos.gwK95kos.js",
+      "_CustomSelect.aRdt6gUk.js"
+    ]
+  },
+  "src/views/Deposit.vue": {
+    "file": "assets/Deposit.BeqfL4H_.js",
+    "name": "Deposit",
+    "src": "src/views/Deposit.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor.BJKvz4Yw.js",
+      "index.html",
+      "_MobileNav.CRat4cih.js",
+      "_DesktopNav.BGZcsY3O.js"
+    ],
+    "assets": [
+      "assets/USDT-TRC20.nefzOlJh.png",
+      "assets/USDT-ERC20.DV68RjSM.png",
+      "assets/BTC.CUVYde77.png",
+      "assets/ETH.tfTyAzfy.png"
+    ]
+  },
+  "src/views/FlashExchange.vue": {
+    "file": "assets/FlashExchange.DBNvt22l.js",
+    "name": "FlashExchange",
+    "src": "src/views/FlashExchange.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor.BJKvz4Yw.js",
+      "index.html",
+      "_MobileNav.CRat4cih.js",
+      "_DesktopNav.BGZcsY3O.js",
+      "_coinLogos.gwK95kos.js"
+    ]
+  },
+  "src/views/ForgotPassword.vue": {
+    "file": "assets/ForgotPassword.BRHGKqp_.js",
+    "name": "ForgotPassword",
+    "src": "src/views/ForgotPassword.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor.BJKvz4Yw.js",
+      "_AuthMarketPanel.Dp_fc3IN.js",
+      "_SiteFooter.BaLxjuH9.js",
+      "index.html",
+      "_coinLogos.gwK95kos.js"
+    ],
+    "assets": [
+      "assets/Logo-Only.Bi7kxCKJ.png"
+    ]
+  },
+  "src/views/GoogleInviteCode.vue": {
+    "file": "assets/GoogleInviteCode.CNHfXg9F.js",
+    "name": "GoogleInviteCode",
+    "src": "src/views/GoogleInviteCode.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor.BJKvz4Yw.js",
+      "index.html",
+      "_AuthMarketPanel.Dp_fc3IN.js",
+      "_coinLogos.gwK95kos.js"
+    ],
+    "assets": [
+      "assets/Logo-Only.Bi7kxCKJ.png"
+    ]
+  },
+  "src/views/Home.vue": {
+    "file": "assets/Home.yk1lTcqz.js",
+    "name": "Home",
+    "src": "src/views/Home.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor.BJKvz4Yw.js",
+      "index.html",
+      "_MobileNav.CRat4cih.js",
+      "_DesktopNav.BGZcsY3O.js",
+      "_coinLogos.gwK95kos.js"
+    ],
+    "assets": [
+      "assets/usa-flag.LZUVeM7k.png",
+      "assets/germeny-flag.DDgOSH1Q.png",
+      "assets/india-hindi-flag.CkYxsXNN.png",
+      "assets/japan-flag.DIMCzCTn.png",
+      "assets/portugal-flag.DerlV5lF.png",
+      "assets/russia-flag.CPT_Kmln.png",
+      "assets/sourthkorea-flag.CH4mZ4k3.png",
+      "assets/spin-flag.N5JcWeLs.png",
+      "assets/services.Bw8b1gqJ.png",
+      "assets/invite.C50fVWTf.png",
+      "assets/loan.AbtYeaLR.png",
+      "assets/tuto-center.DzFfNrbC.png",
+      "assets/quickrecharge.DwBAGCwt.png",
+      "assets/01.Bu4oofdb.jpeg",
+      "assets/02.DFWs_zWW.jpeg",
+      "assets/03.DT8us2VN.jpeg"
+    ]
+  },
+  "src/views/Kline.vue": {
+    "file": "assets/Kline.bFdhoHyA.js",
+    "name": "Kline",
+    "src": "src/views/Kline.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor.BJKvz4Yw.js",
+      "index.html",
+      "_SkeletonLoader.DhWxvyw4.js",
+      "_charts.CIWCquZQ.js"
+    ],
+    "css": [
+      "assets/Kline.D0CVpCJW.css"
+    ]
+  },
+  "src/views/Login.vue": {
+    "file": "assets/Login.0zXG146D.js",
+    "name": "Login",
+    "src": "src/views/Login.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor.BJKvz4Yw.js",
+      "_AuthMarketPanel.Dp_fc3IN.js",
+      "_SiteFooter.BaLxjuH9.js",
+      "index.html",
+      "_coinLogos.gwK95kos.js"
+    ],
+    "assets": [
+      "assets/Logo-Only.Bi7kxCKJ.png"
+    ]
+  },
+  "src/views/PrivacyPolicy.vue": {
+    "file": "assets/PrivacyPolicy.CjM9Ikh7.js",
+    "name": "PrivacyPolicy",
+    "src": "src/views/PrivacyPolicy.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor.BJKvz4Yw.js"
+    ],
+    "assets": [
+      "assets/bitcoin-banner.lGdBcIsi.png"
+    ]
+  },
+  "src/views/Register.vue": {
+    "file": "assets/Register.qTD3Hesu.js",
+    "name": "Register",
+    "src": "src/views/Register.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor.BJKvz4Yw.js",
+      "_AuthMarketPanel.Dp_fc3IN.js",
+      "_SiteFooter.BaLxjuH9.js",
+      "index.html",
+      "_coinLogos.gwK95kos.js"
+    ],
+    "assets": [
+      "assets/Logo-Only.Bi7kxCKJ.png"
+    ]
+  },
+  "src/views/ResetPassword.vue": {
+    "file": "assets/ResetPassword.4_VemviA.js",
+    "name": "ResetPassword",
+    "src": "src/views/ResetPassword.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor.BJKvz4Yw.js",
+      "_AuthMarketPanel.Dp_fc3IN.js",
+      "_SiteFooter.BaLxjuH9.js",
+      "index.html",
+      "_coinLogos.gwK95kos.js"
+    ],
+    "assets": [
+      "assets/Logo-Only.Bi7kxCKJ.png"
+    ]
+  },
+  "src/views/Spot.vue": {
+    "file": "assets/Spot.DgiDb6zm.js",
+    "name": "Spot",
+    "src": "src/views/Spot.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor.BJKvz4Yw.js",
+      "index.html",
+      "_MobileNav.CRat4cih.js",
+      "_DesktopNav.BGZcsY3O.js",
+      "_CustomSelect.aRdt6gUk.js",
+      "_SkeletonLoader.DhWxvyw4.js",
+      "_coinLogos.gwK95kos.js"
+    ]
+  },
+  "src/views/SpotAccount.vue": {
+    "file": "assets/SpotAccount.CEtmbsYT.js",
+    "name": "SpotAccount",
+    "src": "src/views/SpotAccount.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor.BJKvz4Yw.js",
+      "_DesktopNav.BGZcsY3O.js",
+      "_MobileNav.CRat4cih.js",
+      "index.html",
+      "_coinLogos.gwK95kos.js"
+    ]
+  },
+  "src/views/Staking.vue": {
+    "file": "assets/Staking.BbCLtSXJ.js",
+    "name": "Staking",
+    "src": "src/views/Staking.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor.BJKvz4Yw.js",
+      "index.html",
+      "_MobileNav.CRat4cih.js",
+      "_DesktopNav.BGZcsY3O.js"
+    ],
+    "css": [
+      "assets/Staking.C_fiNAMr.css"
+    ]
+  },
+  "src/views/TermsOfService.vue": {
+    "file": "assets/TermsOfService.90EbTfpC.js",
+    "name": "TermsOfService",
+    "src": "src/views/TermsOfService.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor.BJKvz4Yw.js"
+    ],
+    "assets": [
+      "assets/bitcoin-banner.lGdBcIsi.png"
+    ]
+  },
+  "src/views/Transfer.vue": {
+    "file": "assets/Transfer.BKlDQTEB.js",
+    "name": "Transfer",
+    "src": "src/views/Transfer.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor.BJKvz4Yw.js",
+      "index.html",
+      "_MobileNav.CRat4cih.js",
+      "_DesktopNav.BGZcsY3O.js",
+      "_coinLogos.gwK95kos.js"
+    ]
+  },
+  "src/views/Withdraw.vue": {
+    "file": "assets/Withdraw.Cb_8aq7u.js",
+    "name": "Withdraw",
+    "src": "src/views/Withdraw.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor.BJKvz4Yw.js",
+      "index.html",
+      "_MobileNav.CRat4cih.js",
+      "_DesktopNav.BGZcsY3O.js"
+    ]
+  }
+}

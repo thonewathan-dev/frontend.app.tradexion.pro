@@ -19,6 +19,7 @@ api.interceptors.request.use(
     config.baseURL = getApiUrl();
     
     const authStore = useAuthStore();
+    const isRefreshRequest = config.url?.includes('/auth/refresh');
     
     // Check cache for GET requests (except auth and user-specific endpoints)
     if (config.method === 'get' && 
@@ -38,7 +39,8 @@ api.interceptors.request.use(
     }
     
     // Check if token is about to expire (within 2 minutes) and refresh proactively
-    if (authStore.accessToken) {
+    // IMPORTANT: never attempt proactive refresh while calling the refresh endpoint itself
+    if (authStore.accessToken && !isRefreshRequest) {
       try {
         // Decode token to check expiration (without verification)
         const tokenParts = authStore.accessToken.split('.');
@@ -62,6 +64,9 @@ api.interceptors.request.use(
       if (authStore.accessToken) {
         config.headers.Authorization = `Bearer ${authStore.accessToken}`;
       }
+    } else if (authStore.accessToken) {
+      // Refresh request still needs Authorization header if present (harmless)
+      config.headers.Authorization = `Bearer ${authStore.accessToken}`;
     }
     
     return config;
