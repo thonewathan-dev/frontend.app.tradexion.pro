@@ -4,6 +4,9 @@ import api from '../utils/api';
 export const useSettingsStore = defineStore('settings', {
     state: () => ({
         themeColor: '#000000',
+        gradientColor1: null,
+        gradientColor2: null,
+        gradientAngle: 135,
     }),
     actions: {
         async fetchSettings() {
@@ -11,14 +14,32 @@ export const useSettingsStore = defineStore('settings', {
                 const response = await api.get('/settings/public');
                 if (response.data.themeColor) {
                     this.themeColor = response.data.themeColor;
-                    this.applyTheme();
                 }
+                if (response.data.gradientColor1 && response.data.gradientColor2) {
+                    this.gradientColor1 = response.data.gradientColor1;
+                    this.gradientColor2 = response.data.gradientColor2;
+                    this.gradientAngle = response.data.gradientAngle || 135;
+                } else {
+                    this.gradientColor1 = null;
+                    this.gradientColor2 = null;
+                }
+                this.applyTheme();
             } catch (error) {
                 console.error('Failed to fetch settings:', error);
             }
         },
         applyTheme() {
-            document.documentElement.style.setProperty('--bg-color', this.themeColor);
+            // Apply gradient if both colors are set, otherwise use solid color
+            if (this.gradientColor1 && this.gradientColor2) {
+                const gradient = `linear-gradient(${this.gradientAngle}deg, ${this.gradientColor1}, ${this.gradientColor2})`;
+                document.documentElement.style.setProperty('--bg-color', 'transparent');
+                document.body.style.background = gradient;
+                document.body.style.backgroundAttachment = 'fixed';
+            } else {
+                document.documentElement.style.setProperty('--bg-color', this.themeColor);
+                document.body.style.background = this.themeColor;
+                document.body.style.backgroundAttachment = 'fixed';
+            }
         }
     }
 });

@@ -239,9 +239,9 @@
               <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="showActiveTradeModal = false"></div>
               
               <!-- Modal Content - compact, clean UI -->
-              <div class="relative bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 rounded-2xl w-full max-w-sm shadow-2xl z-[10000] border border-white/10 overflow-hidden" @click.stop>
+              <div class="relative glass-card rounded-2xl w-full max-w-sm shadow-2xl z-[10000] overflow-hidden" @click.stop>
               <!-- Header -->
-              <div class="flex items-center justify-between px-4 py-3 border-b border-white/5 bg-slate-900/80">
+              <div class="flex items-center justify-between px-4 py-3 border-b border-white/10">
                 <button
                   @click="showActiveTradeModal = false"
                   class="p-2 hover:bg-white/10 rounded-full transition-colors"
