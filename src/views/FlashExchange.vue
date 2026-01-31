@@ -173,7 +173,7 @@
       @click.self="closePreview"
     >
       <div
-        class="w-full min-h-[50vh] max-h-[85vh] bg-[#050816]/95 rounded-t-2xl px-6 pt-6 pb-8 space-y-6 shadow-lg border-t border-white/10 animate-slide-up"
+        class="w-full min-h-[50vh] max-h-[85vh] bg-black/95 rounded-t-2xl px-6 pt-6 pb-8 space-y-6 shadow-lg border-t border-white/10 animate-slide-up"
       >
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-base font-semibold text-white">Confirm Order</h2>
