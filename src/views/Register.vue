@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-[100dvh] overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-white flex flex-col">
+  <div class="min-h-[100dvh] overflow-hidden bg-black text-white flex flex-col">
     <!-- Top bar (same as Login) -->
     <div class="sticky top-0 z-10 glass-card-no-hover border-b border-white/10">
       <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">

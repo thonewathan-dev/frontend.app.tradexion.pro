@@ -19,7 +19,7 @@
                 <div class="text-xs text-white/60">ID: {{ user?.id || 'N/A' }}</div>
               </div>
             </div>
-            <button class="px-2 py-0.5 glass-button-no-hover rounded-full text-[10px] font-medium text-white">
+            <button class="px-2 py-0.5 bg-white/10 border border-white/20 rounded-full text-[10px] font-medium text-white hover:bg-white/20 transition-colors">
               Credit score: {{ parseFloat(user?.credited_score || 100).toFixed(0) }}
             </button>
           </div>

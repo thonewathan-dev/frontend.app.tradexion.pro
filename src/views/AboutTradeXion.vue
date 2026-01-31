@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-[#0b1020] via-[#101c3a] to-[#2b1554]">
+  <div class="min-h-screen bg-black">
     <!-- MobileNav hidden on AboutTradeXion page -->
     <div class="md:flex">
       <DesktopNav v-if="!isMobile" />

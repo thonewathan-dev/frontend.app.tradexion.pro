@@ -71,7 +71,7 @@
             <button
               v-for="interval in intervals"
               :key="interval"
-              @click="selectedInterval = interval; userHasZoomed = false; loadKlines()"
+              @click="selectedInterval = interval; loadKlines()"
               :class="[
                 'px-2 py-2 text-xs font-medium whitespace-nowrap transition-all relative',
                 selectedInterval === interval
@@ -92,13 +92,8 @@
         <div class="glass-card-no-hover rounded-none md:rounded-xl p-2 md:p-4 mb-3 md:mb-4 mx-0 md:mx-4">
           <div
             ref="chartContainer"
-            class="w-full chart-no-watermark"
-            :style="{ height: `${chartHeight}px` }"
-          ></div>
-          <div
-            ref="volumeContainer"
-            class="w-full mt-2 chart-no-watermark"
-            :style="{ height: `${volumeHeight}px` }"
+            class="w-full"
+            :style="{ height: `${totalChartHeight}px` }"
           ></div>
         </div>
 
@@ -180,13 +175,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick, watch, computed } from 'vue';
+import { ref, onMounted, onUnmounted, nextTick, watch, computed, shallowRef } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import SkeletonLoader from '../components/SkeletonLoader.vue';
 import api from '../utils/api';
-import { createChart } from 'lightweight-charts';
-import { getCoinLogoUrl } from '../utils/coinLogos';
+import * as echarts from 'echarts';
 import axios from 'axios';
 
 const { t } = useI18n();
@@ -199,263 +193,169 @@ const router = useRouter();
 
 // Detect mobile for responsive chart sizing
 const isMobile = computed(() => window.innerWidth < 768);
-const chartHeight = computed(() => (isMobile.value ? 320 : 400));
-const volumeHeight = computed(() => (isMobile.value ? 72 : 120));
+const chartHeight = computed(() => isMobile.value ? 280 : 400);
+const volumeHeight = computed(() => isMobile.value ? 60 : 80);
+const totalChartHeight = computed(() => chartHeight.value + volumeHeight.value + 20);
 
-// Use only coins available on Binance
-const binanceCoins = ['BTC', 'ETH', 'BNB', 'XRP', 'ADA', 'DOGE', 'DOT', 'LTC', 'BCH', 'ETC', 'NEO', 'IOTA', 'LUNA'];
-const symbols = ref(binanceCoins.map(coin => `${coin}/USDT`));
+const chartContainer = ref(null);
+let chart = null;
+let resizeObserver = null;
 
-// Get symbol from query or default
-const getInitialSymbol = () => {
-  if (route.query.symbol) {
-    let symbol = route.query.symbol.trim();
-    // If symbol already has a slash, use it as is
-    if (symbol.includes('/')) {
-      // Already in format like "BCH/USDT"
-      if (symbols.value.includes(symbol)) {
-        return symbol;
-      }
-    } else {
-      // Format like "BCHUSDT" - add slash before USDT
+const intervals = ['Realtime', '1min', '5min', '15min', '30min', '1hour', '4hour', '1day', '1week', '1month'];
+const selectedInterval = ref('1min');
+
+const symbols = ref([
+  'BTC/USDT', 'ETH/USDT', 'BNB/USDT', 'SOL/USDT', 'XRP/USDT',
+  'DOGE/USDT', 'ADA/USDT', 'AVAX/USDT', 'SHIB/USDT', 'DOT/USDT',
+  'LINK/USDT', 'TRX/USDT', 'MATIC/USDT', 'LTC/USDT', 'BCH/USDT',
+  'ATOM/USDT', 'UNI/USDT', 'XLM/USDT', 'ETC/USDT', 'FIL/USDT'
+]);
+
+// Get default symbol from query or use first symbol
+const getDefaultSymbol = () => {
+  const querySymbol = route.query.symbol;
+  if (querySymbol) {
+    let symbol = querySymbol.trim();
+    if (!symbol.includes('/')) {
       symbol = symbol.replace(/USDT$/, '/USDT');
-      if (symbols.value.includes(symbol)) {
-        return symbol;
-      }
+    }
+    if (symbols.value.includes(symbol)) {
+      return symbol;
     }
   }
-  return symbols.value[0] || 'BTC/USDT';
+  return symbols.value[0];
 };
 
-const selectedSymbol = ref(getInitialSymbol());
-const selectedInterval = ref('1min');
-const intervals = ['Realtime', '1min', '5min', '15min', '30min', '1hour', '1day', '1week', '1m'];
+const selectedSymbol = ref(getDefaultSymbol());
+
 const ticker = ref(null);
 const recentTrades = ref([]);
 const isLoading = ref(true);
-const chartContainer = ref(null);
-const volumeContainer = ref(null);
-let chart = null;
-let volumeChart = null;
-let candlestickSeries = null;
-let volumeSeries = null;
-let ma1Series = null;
-let ma2Series = null;
-let ma3Series = null;
 
-// Default zoom: show only the most recent candles on first load (looks like "zoomed in")
-const applyDefaultViewport = (candlestickData) => {
-  try {
-    if (!chart || !candlestickData?.length) return;
-    const len = candlestickData.length;
-    const visibleBars = isMobile.value ? 55 : 80; // mobile a bit tighter
-    const fromIndex = Math.max(0, len - visibleBars);
-    const from = candlestickData[fromIndex].time;
-    const to = candlestickData[len - 1].time;
+// Store raw kline data for chart updates
+const klineData = shallowRef([]);
 
-    // Improve default readability
-    chart.applyOptions({
-      timeScale: {
-        rightOffset: 6,
-        barSpacing: isMobile.value ? 7 : 6,
-      },
-      rightPriceScale: {
-        autoScale: true,
-        scaleMargins: { top: 0.12, bottom: 0.18 },
-      },
-    });
-
-    chart.timeScale().setVisibleRange({ from, to });
-    if (volumeChart) {
-      volumeChart.timeScale().setVisibleRange({ from, to });
-    }
-  } catch (e) {
-    console.warn('applyDefaultViewport error:', e);
-  }
-};
-let watermarkObserver = null;
-let isInitialLoad = true; // Track if this is the first data load
-let userHasZoomed = false; // Track if user has manually zoomed
-let handleResize = null;
-
-const formatPrice = (price) => {
-  const num = Number(price);
-  if (!Number.isFinite(num) || num === 0) return '0.00';
-  if (num >= 1) return num.toFixed(2);
-  if (num >= 0.01) return num.toFixed(4);
-  return num.toFixed(8);
-};
-
-const formatQuantity = (qty) => {
-  if (!qty) return '0.0000';
-  return parseFloat(qty).toFixed(6);
-};
-
-const formatVolume = (volume) => {
-  if (!volume) return '0.00';
-  if (volume >= 1e9) return (volume / 1e9).toFixed(2) + 'B';
-  if (volume >= 1e6) return (volume / 1e6).toFixed(2) + 'M';
-  if (volume >= 1e3) return (volume / 1e3).toFixed(2) + 'K';
-  return volume.toFixed(2);
-};
-
-const formatTime = (timestamp) => {
-  const date = new Date(timestamp);
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  const seconds = String(date.getSeconds()).padStart(2, '0');
-  return `${hours}:${minutes}:${seconds}`;
-};
-
-const getCoinLogo = (symbol) => {
-  const baseCurrency = symbol.split('/')[0];
-  return getCoinLogoUrl(baseCurrency) || `https://via.placeholder.com/32?text=${baseCurrency}`;
-};
-
-const handleImageError = (event) => {
-  const symbol = event.target.alt.split('/')[0];
-  event.target.src = `https://via.placeholder.com/32?text=${symbol}`;
-};
-
-const loadMarketData = async () => {
-  isLoading.value = true;
-  const symbol = selectedSymbol.value.replace('/', '');
-  try {
-    await Promise.all([
-      loadTicker(symbol),
-      loadRecentTrades(symbol),
-      // Only load klines if chart is already initialized (to avoid duplicate calls)
-      chart && candlestickSeries ? loadKlines() : Promise.resolve(),
-    ]);
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-let tickerAbortController = null;
-let tradesAbortController = null;
-let klinesAbortController = null;
-
-// WebSocket state management (same as Home page)
+// WebSocket and abort controllers
 let tickerWs = null;
 let wsReconnectTimer = null;
 let wsBackoffMs = 1000;
 const MAX_BACKOFF_MS = 30000;
 
+let tickerAbortController = null;
+let tradesAbortController = null;
+let klinesAbortController = null;
+let handleResize = null;
+
+// Format functions
+const formatPrice = (price) => {
+  const num = Number(price);
+  if (isNaN(num)) return '0.00';
+  if (num >= 1000) return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  if (num >= 1) return num.toFixed(2);
+  if (num >= 0.01) return num.toFixed(4);
+  return num.toFixed(6);
+};
+
+const formatVolume = (volume) => {
+  const num = Number(volume);
+  if (isNaN(num)) return '0';
+  if (num >= 1e9) return (num / 1e9).toFixed(2) + 'B';
+  if (num >= 1e6) return (num / 1e6).toFixed(2) + 'M';
+  if (num >= 1e3) return (num / 1e3).toFixed(2) + 'K';
+  return num.toFixed(2);
+};
+
+const formatTime = (time) => {
+  const date = new Date(time);
+  return date.toLocaleTimeString('en-US', { hour12: false });
+};
+
+const formatQuantity = (quantity) => {
+  const num = Number(quantity);
+  if (isNaN(num)) return '0';
+  return num.toFixed(6);
+};
+
+// Load market data
+const loadMarketData = async () => {
+  const symbol = selectedSymbol.value.replace('/', '');
+  await Promise.all([
+    loadTicker(symbol),
+    loadRecentTrades(symbol),
+    loadKlines(),
+  ]);
+};
+
 const loadTicker = async (symbol) => {
-  // Cancel previous request if still pending
   if (tickerAbortController) {
     tickerAbortController.abort();
   }
   tickerAbortController = new AbortController();
   
   try {
-    const response = await api.get(`/market/ticker/${symbol}/24h`, {
+    const response = await api.get(`/market/ticker/${symbol}`, {
       signal: tickerAbortController.signal,
     });
-    // Ensure numeric fields are properly parsed
-    // IMPORTANT: Mutate existing object instead of replacing to preserve WebSocket reactivity
     if (response.data) {
-      if (!ticker.value) {
-        ticker.value = {
-          price: Number(response.data.price) || 0,
-          priceChangePercent: Number(response.data.priceChangePercent) || 0,
-          priceChange: Number(response.data.priceChange) || 0,
-          volume: Number(response.data.volume) || 0,
-          highPrice: Number(response.data.highPrice) || 0,
-          lowPrice: Number(response.data.lowPrice) || 0,
-        };
-      } else {
-        // Mutate existing object to preserve WebSocket reactivity
-        ticker.value.price = Number(response.data.price) || ticker.value.price;
-        ticker.value.priceChangePercent = Number(response.data.priceChangePercent) || ticker.value.priceChangePercent;
-        ticker.value.priceChange = Number(response.data.priceChange) || ticker.value.priceChange;
-        ticker.value.volume = Number(response.data.volume) || ticker.value.volume;
-        ticker.value.highPrice = Number(response.data.highPrice) || ticker.value.highPrice;
-        ticker.value.lowPrice = Number(response.data.lowPrice) || ticker.value.lowPrice;
-      }
+      ticker.value = {
+        price: response.data.lastPrice || response.data.price,
+        priceChange: response.data.priceChange,
+        priceChangePercent: response.data.priceChangePercent,
+        highPrice: response.data.highPrice,
+        lowPrice: response.data.lowPrice,
+        volume: response.data.volume,
+      };
     }
   } catch (error) {
-    // Ignore abort errors
-    if (error.name === 'AbortError' || error.name === 'CanceledError') {
-      return;
+    if (error.name !== 'AbortError' && error.name !== 'CanceledError') {
+      console.error('Error loading ticker:', error);
     }
-    console.error('Error loading ticker:', error);
   }
 };
 
 const loadRecentTrades = async (symbol) => {
-  // Cancel previous request if still pending
   if (tradesAbortController) {
     tradesAbortController.abort();
   }
   tradesAbortController = new AbortController();
   
   try {
-    let trades = [];
-
-    // Try backend first
-    const response = await api.get(`/market/trades/${symbol}`, { 
+    const response = await api.get(`/market/trades/${symbol}`, {
       params: { limit: 50 },
       signal: tradesAbortController.signal,
     });
-    trades = Array.isArray(response.data) ? response.data : [];
-
-    // If backend returns no data (e.g. Binance 451), fall back to direct Binance HTTP
-    if (!trades.length) {
-      try {
-        const binanceRes = await axios.get(`${BINANCE_HTTP_API}/trades`, {
-          params: { symbol, limit: 50 },
-        });
-        trades = (binanceRes.data || []).map((trade) => ({
-          id: trade.id,
-          price: Number(trade.price),
-          quantity: Number(trade.qty),
-          time: trade.time,
-          isBuyerMaker: trade.isBuyerMaker,
-        }));
-      } catch (fallbackErr) {
-        console.warn('Binance trades fallback failed:', fallbackErr?.message || fallbackErr);
+    if (response.data) {
+      // Log the first trade to help debug field names if needed
+      if (response.data.length > 0 && Math.random() < 0.05) {
+        console.log('Sample trade data:', response.data[0]);
       }
+      
+      recentTrades.value = response.data.map(trade => ({
+        id: trade.id,
+        price: trade.price,
+        // Check multiple possible field names for quantity
+        quantity: trade.qty || trade.quantity || trade.amount || trade.q || 0,
+        time: trade.time,
+        isBuyerMaker: trade.isBuyerMaker,
+      }));
     }
-
-    recentTrades.value = trades;
   } catch (error) {
-    // Ignore abort errors
-    if (error.name === 'AbortError' || error.name === 'CanceledError') {
-      return;
+    if (error.name !== 'AbortError' && error.name !== 'CanceledError') {
+      console.error('Error loading trades:', error);
     }
-    console.error('Error loading recent trades:', error);
   }
 };
 
 const loadKlines = async () => {
-  // Cancel previous request if still pending
   if (klinesAbortController) {
     klinesAbortController.abort();
   }
   klinesAbortController = new AbortController();
   
   try {
-    // Wait for chart to be initialized - retry multiple times
-    let retries = 0;
-    while ((!chart || !candlestickSeries) && retries < 10) {
-      if (retries > 0) {
-        console.log('Chart not initialized yet, waiting...', retries);
-        await new Promise(resolve => setTimeout(resolve, 200));
-      }
-      retries++;
-    }
-    
-    if (!chart || !candlestickSeries) {
-      console.error('Chart still not initialized after retries');
-      return;
-    }
-    
     const symbol = selectedSymbol.value.replace('/', '');
     let interval = selectedInterval.value.toLowerCase();
     
-    // Map interval names to Binance format
     const intervalMap = {
       'realtime': '1m',
       '1min': '1m',
@@ -463,9 +363,10 @@ const loadKlines = async () => {
       '15min': '15m',
       '30min': '30m',
       '1hour': '1h',
+      '4hour': '4h',
       '1day': '1d',
       '1week': '1w',
-      '1m': '1M',
+      '1month': '1M',
     };
     
     const binanceInterval = intervalMap[interval] || '1m';
@@ -480,7 +381,7 @@ const loadKlines = async () => {
     
     let klines = Array.isArray(response.data) ? response.data : [];
 
-    // If backend returns no klines (e.g. Binance 451), fall back to direct Binance HTTP
+    // Fallback to direct Binance API if backend returns empty
     if (!klines.length) {
       try {
         const binanceRes = await axios.get(`${BINANCE_HTTP_API}/klines`, {
@@ -499,126 +400,234 @@ const loadKlines = async () => {
           volume: k[5],
         }));
       } catch (fallbackErr) {
-        console.warn('Binance klines fallback failed:', fallbackErr?.message || fallbackErr);
+        console.warn('Binance klines fallback failed:', fallbackErr?.message);
       }
     }
     
-    if (!klines || klines.length === 0) {
-      console.warn('No klines data received');
-      return;
-    }
-    
-    // Prepare candlestick data - ensure all values are valid numbers
-    const candlestickData = klines
-      .filter((k) => k && k.time && k.open !== undefined && k.high !== undefined && k.low !== undefined && k.close !== undefined)
-      .map((k) => {
-        const time = typeof k.time === 'number' ? Math.floor(k.time / 1000) : Math.floor(new Date(k.time).getTime() / 1000);
-        return {
-          time: time,
-          open: parseFloat(k.open),
-          high: parseFloat(k.high),
-          low: parseFloat(k.low),
-          close: parseFloat(k.close),
-        };
-      })
-      .filter((k) => k.time > 0 && !isNaN(k.open) && !isNaN(k.high) && !isNaN(k.low) && !isNaN(k.close) && k.open > 0 && k.high > 0 && k.low > 0 && k.close > 0);
-    
-    // Prepare volume data
-    const volumeData = klines.map((k) => ({
-      time: Math.floor(k.time / 1000),
-      value: parseFloat(k.volume),
-      color: parseFloat(k.close) >= parseFloat(k.open) ? '#43A047' : '#E53935',
-    }));
-    
-    // Calculate moving averages
-    const ma1Data = calculateMA(candlestickData, 5);
-    const ma2Data = calculateMA(candlestickData, 10);
-    const ma3Data = calculateMA(candlestickData, 20);
-    
-    // Update chart data - candlesticks first, then moving averages
-    if (candlestickSeries && candlestickData.length > 0) {
-      console.log('Setting candlestick data:', candlestickData.length, 'candles');
-      // Set candlestick data
-      candlestickSeries.setData(candlestickData);
-      // Ensure candlesticks are visible
-      candlestickSeries.applyOptions({
-        visible: true,
-        priceLineVisible: false,
-        lastValueVisible: true,
-      });
-      
-      // On first load, set a "zoomed in" default viewport (do NOT fit all candles)
-      if (isInitialLoad && candlestickData.length > 0) {
-        setTimeout(() => {
-          applyDefaultViewport(candlestickData);
-          isInitialLoad = false;
-        }, 150);
-      }
-    } else {
-      console.warn('No candlestick data to display:', {
-        hasSeries: !!candlestickSeries,
-        dataLength: candlestickData.length,
-      });
-    }
-    
-    if (volumeSeries && volumeData.length > 0 && volumeChart) {
-      volumeSeries.setData(volumeData);
-    }
-    
-    // Update moving averages only if we have valid candlestick data
-    if (candlestickData.length > 0) {
-      if (ma1Series && ma1Data.length > 0) {
-        ma1Series.setData(ma1Data);
-      }
-      
-      if (ma2Series && ma2Data.length > 0) {
-        ma2Series.setData(ma2Data);
-      }
-      
-      if (ma3Series && ma3Data.length > 0) {
-        ma3Series.setData(ma3Data);
-      }
-    }
-    
-    // Wait for next tick and resize charts to ensure they render properly
-    await nextTick();
-    if (chart && chartContainer.value && candlestickData.length > 0) {
-      const newWidth = chartContainer.value.clientWidth;
-      if (newWidth > 0) {
-        chart.applyOptions({ width: newWidth });
-      }
-    }
-    if (volumeChart && volumeContainer.value && volumeData.length > 0) {
-      const newVolumeWidth = volumeContainer.value.clientWidth;
-      if (newVolumeWidth > 0) {
-        volumeChart.applyOptions({ width: newVolumeWidth });
-      }
+    if (klines && klines.length > 0) {
+      klineData.value = klines;
+      updateChart();
     }
   } catch (error) {
-    // Ignore abort errors
-    if (error.name === 'AbortError' || error.name === 'CanceledError') {
-      return;
+    if (error.name !== 'AbortError' && error.name !== 'CanceledError') {
+      console.error('Error loading klines:', error);
     }
-    console.error('Error loading klines:', error);
   }
 };
 
+// Calculate moving average
 const calculateMA = (data, period) => {
   const result = [];
   for (let i = 0; i < data.length; i++) {
-    // IMPORTANT: do NOT push null/0 values for early points, it can ruin autoscale when zoomed out
-    if (i < period - 1) continue;
+    if (i < period - 1) {
+      result.push('-');
+      continue;
+    }
     let sum = 0;
     for (let j = 0; j < period; j++) {
-      sum += data[i - j].close;
+      sum += parseFloat(data[i - j][1]); // Close price
     }
-    result.push({ time: data[i].time, value: sum / period });
+    result.push((sum / period).toFixed(2));
   }
   return result;
 };
 
+const initChart = () => {
+  if (!chartContainer.value) return;
+  
+  chart = echarts.init(chartContainer.value, 'dark');
+  
+  // Set up resize observer
+  resizeObserver = new ResizeObserver(() => {
+    chart?.resize();
+  });
+  resizeObserver.observe(chartContainer.value);
+};
+
+const updateChart = () => {
+  if (!chart || !klineData.value.length) return;
+  
+  const data = klineData.value;
+  
+  // Prepare category data (time) and values
+  const categoryData = [];
+  const candlestickData = [];
+  const volumeData = [];
+  
+  data.forEach((k) => {
+    const time = new Date(k.time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+    categoryData.push(time);
+    
+    const open = parseFloat(k.open);
+    const close = parseFloat(k.close);
+    const low = parseFloat(k.low);
+    const high = parseFloat(k.high);
+    const volume = parseFloat(k.volume);
+    
+    // ECharts candlestick format: [open, close, low, high]
+    candlestickData.push([open, close, low, high]);
+    
+    // Volume with color
+    volumeData.push({
+      value: volume,
+      itemStyle: {
+        color: close >= open ? '#43A047' : '#E53935',
+      },
+    });
+  });
+  
+  // Calculate moving averages
+  const ma5 = calculateMA(candlestickData, 5);
+  const ma10 = calculateMA(candlestickData, 10);
+  const ma20 = calculateMA(candlestickData, 20);
+  
+  const option = {
+    backgroundColor: 'transparent',
+    animation: false,
+    legend: {
+      show: false,
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'cross',
+      },
+      backgroundColor: 'rgba(30, 30, 30, 0.9)',
+      borderColor: '#444',
+      textStyle: {
+        color: '#fff',
+      },
+    },
+    axisPointer: {
+      link: [{ xAxisIndex: 'all' }],
+      label: {
+        backgroundColor: '#555',
+      },
+    },
+    grid: [
+      {
+        left: '0%',
+        right: '12%',
+        top: '2%',
+        height: '68%',
+      },
+      {
+        left: '0%',
+        right: '12%',
+        top: '75%',
+        height: '20%',
+      },
+    ],
+    xAxis: [
+      {
+        type: 'category',
+        data: categoryData,
+        boundaryGap: true,
+        axisLine: { lineStyle: { color: 'rgba(255,255,255,0.2)' } },
+        axisLabel: { color: 'rgba(255,255,255,0.6)', fontSize: 10 },
+        splitLine: { show: false },
+        min: 'dataMin',
+        max: 'dataMax',
+        axisPointer: { show: true },
+      },
+      {
+        type: 'category',
+        gridIndex: 1,
+        data: categoryData,
+        boundaryGap: true,
+        axisLine: { lineStyle: { color: 'rgba(255,255,255,0.2)' } },
+        axisLabel: { show: false },
+        splitLine: { show: false },
+        min: 'dataMin',
+        max: 'dataMax',
+      },
+    ],
+    yAxis: [
+      {
+        scale: true,
+        splitArea: { show: false },
+        axisLine: { lineStyle: { color: 'rgba(255,255,255,0.2)' } },
+        axisLabel: { color: 'rgba(255,255,255,0.6)', fontSize: 10 },
+        splitLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } },
+        position: 'right',
+      },
+      {
+        scale: true,
+        gridIndex: 1,
+        splitNumber: 2,
+        axisLabel: { show: false },
+        axisLine: { show: false },
+        axisTick: { show: false },
+        splitLine: { show: false },
+      },
+    ],
+    dataZoom: [
+      {
+        type: 'inside',
+        xAxisIndex: [0, 1],
+        start: 70,
+        end: 100,
+      },
+    ],
+    series: [
+      {
+        name: 'Candlestick',
+        type: 'candlestick',
+        data: candlestickData,
+        itemStyle: {
+          color: '#43A047',
+          color0: '#E53935',
+          borderColor: '#43A047',
+          borderColor0: '#E53935',
+        },
+      },
+      {
+        name: 'MA5',
+        type: 'line',
+        data: ma5,
+        smooth: true,
+        showSymbol: false,
+        lineStyle: {
+          width: 1,
+          color: '#FF6B9D',
+        },
+      },
+      {
+        name: 'MA10',
+        type: 'line',
+        data: ma10,
+        smooth: true,
+        showSymbol: false,
+        lineStyle: {
+          width: 1,
+          color: '#4ECDC4',
+        },
+      },
+      {
+        name: 'MA20',
+        type: 'line',
+        data: ma20,
+        smooth: true,
+        showSymbol: false,
+        lineStyle: {
+          width: 1,
+          color: '#95E1D3',
+        },
+      },
+      {
+        name: 'Volume',
+        type: 'bar',
+        xAxisIndex: 1,
+        yAxisIndex: 1,
+        data: volumeData,
+      },
+    ],
+  };
+  
+  chart.setOption(option);
+};
+
 const handleQuickAction = (side) => {
-  // Navigate to Contracts page with the selected symbol and side
   const symbol = selectedSymbol.value.replace('/', '');
   router.push({ 
     path: '/contracts', 
@@ -629,271 +638,43 @@ const handleQuickAction = (side) => {
   });
 };
 
-const initChart = async () => {
-  await nextTick();
-  if (chartContainer.value && !chart) {
-    // Wait a bit more to ensure container is fully rendered and has dimensions
-    let retries = 0;
-    while ((!chartContainer.value.clientWidth || chartContainer.value.clientWidth === 0) && retries < 10) {
-      await new Promise(resolve => setTimeout(resolve, 50));
-      retries++;
-    }
-    
-    // Main candlestick chart
-    const containerWidth = chartContainer.value.clientWidth || 800;
-    if (containerWidth === 0) {
-      console.error('Chart container has no width');
-      return;
-    }
-    
-    chart = createChart(chartContainer.value, {
-      layout: {
-        background: { color: 'transparent' },
-        textColor: '#ffffff',
-      },
-      grid: {
-        vertLines: { color: 'rgba(255, 255, 255, 0.1)' },
-        horzLines: { color: 'rgba(255, 255, 255, 0.1)' },
-      },
-      width: containerWidth,
-      height: chartHeight.value,
-      timeScale: {
-        timeVisible: true,
-        secondsVisible: false,
-        rightOffset: 6,
-        barSpacing: isMobile.value ? 7 : 6,
-      },
-      rightPriceScale: {
-        autoScale: true,
-        scaleMargins: { top: 0.12, bottom: 0.18 },
-      },
-      watermark: {
-        visible: false,
-      },
-    });
-    
-    // Use the computed isMobile value
-    const isMobileValue = isMobile.value;
-    
-    candlestickSeries = chart.addCandlestickSeries({
-      upColor: '#43A047',
-      downColor: '#E53935',
-      borderUpColor: '#43A047',
-      borderDownColor: '#E53935',
-      wickUpColor: '#43A047',
-      wickDownColor: '#E53935',
-      priceFormat: {
-        type: 'price',
-        precision: 2,
-        minMove: 0.01,
-      },
-      visible: true,
-      priceLineVisible: false,
-      lastValueVisible: true,
-    });
-    
-    // Add moving averages
-    ma1Series = chart.addLineSeries({
-      color: '#FF6B9D',
-      lineWidth: 2,
-      title: 'MA5',
-    });
-    
-    ma2Series = chart.addLineSeries({
-      color: '#4ECDC4',
-      lineWidth: 2,
-      title: 'MA10',
-    });
-    
-    ma3Series = chart.addLineSeries({
-      color: '#95E1D3',
-      lineWidth: 2,
-      title: 'MA20',
-    });
-    
-    // Volume chart
-    if (volumeContainer.value) {
-      // Ensure volume container has dimensions
-      let volumeRetries = 0;
-      while ((!volumeContainer.value.clientWidth || volumeContainer.value.clientWidth === 0) && volumeRetries < 10) {
-        await new Promise(resolve => setTimeout(resolve, 50));
-        volumeRetries++;
-      }
-      
-      const volumeWidth = volumeContainer.value.clientWidth || 800;
-      volumeChart = createChart(volumeContainer.value, {
-        layout: {
-          background: { color: 'transparent' },
-          textColor: '#ffffff',
-        },
-        grid: {
-          vertLines: { visible: false },
-          horzLines: { color: 'rgba(255, 255, 255, 0.1)' },
-        },
-        width: volumeWidth,
-        height: volumeHeight.value,
-        timeScale: {
-          visible: false,
-        },
-        rightPriceScale: {
-          visible: true,
-        },
-        watermark: {
-          visible: false,
-        },
-      });
-      
-      volumeSeries = volumeChart.addHistogramSeries({
-        priceFormat: {
-          type: 'volume',
-        },
-        priceScaleId: '',
-        scaleMargins: {
-          top: 0.8,
-          bottom: 0,
-        },
-      });
-      
-      // Synchronize time scales
-      chart.timeScale().subscribeVisibleTimeRangeChange((timeRange) => {
-        if (timeRange && volumeChart) {
-          try {
-            const volumeTimeScale = volumeChart.timeScale();
-            if (volumeTimeScale && timeRange.from && timeRange.to) {
-              volumeTimeScale.setVisibleRange(timeRange);
-            }
-          } catch (error) {
-            console.warn('Error syncing time scales:', error);
-          }
-        }
-      });
-    }
-    
-    // Function to remove watermark elements
-    const removeWatermarks = () => {
-      if (chartContainer.value) {
-        const watermarks = chartContainer.value.querySelectorAll('svg[class*="watermark"], svg[data-name="watermark"], .watermark, [class*="tradingview"], svg text[class*="watermark"], svg text[data-name="watermark"]');
-        watermarks.forEach(el => {
-          el.style.display = 'none';
-          el.style.visibility = 'hidden';
-          el.style.opacity = '0';
-          el.remove();
-        });
-      }
-      if (volumeContainer.value) {
-        const watermarks = volumeContainer.value.querySelectorAll('svg[class*="watermark"], svg[data-name="watermark"], .watermark, [class*="tradingview"], svg text[class*="watermark"], svg text[data-name="watermark"]');
-        watermarks.forEach(el => {
-          el.style.display = 'none';
-          el.style.visibility = 'hidden';
-          el.style.opacity = '0';
-          el.remove();
-        });
-      }
-    };
-    
-    // Remove watermark elements after chart initialization
-    setTimeout(removeWatermarks, 100);
-    setTimeout(removeWatermarks, 500);
-    setTimeout(removeWatermarks, 1000);
-    
-    // Watch for dynamically added watermark elements
-    if (chartContainer.value && volumeContainer.value) {
-      watermarkObserver = new MutationObserver(() => {
-        removeWatermarks();
-      });
-      
-      watermarkObserver.observe(chartContainer.value, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['class', 'data-name']
-      });
-      
-      watermarkObserver.observe(volumeContainer.value, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['class', 'data-name']
-      });
-    }
-    
-    // Don't load klines here - let onMounted handle it after chart is ready
-    // loadKlines() will be called from onMounted after chart initialization
-  }
-};
-
-// Process WebSocket updates - MUTATE existing ticker object (same as Home page)
-// Must be defined before connectWebSocket since it's used inside it
+// WebSocket for real-time ticker updates
 const processTickerUpdate = (tickerData) => {
   if (!tickerData?.s) return;
   
   const symbol = tickerData.s;
   const currentSymbol = selectedSymbol.value.replace('/', '');
   
-  // Debug logging
-  if (symbol === currentSymbol) {
-    console.log('[Kline WS] Processing update for', symbol, 'price:', tickerData.c);
-  }
-  
-  if (symbol !== currentSymbol) {
-    return; // Not the current symbol, skip
-  }
+  if (symbol !== currentSymbol) return;
   
   const price = Number.parseFloat(tickerData.c);
   const changePercent = Number.parseFloat(tickerData.P) || 0;
-  const change = Number.parseFloat(tickerData.p) || 0;
   const volume = Number.parseFloat(tickerData.v) || 0;
   const highPrice = Number.parseFloat(tickerData.h) || 0;
   const lowPrice = Number.parseFloat(tickerData.l) || 0;
   
   if (!Number.isFinite(price)) return;
   
-  // Always update - mutate existing object or create new one
-  if (!ticker.value) {
-    ticker.value = {
-      price: price,
-      priceChangePercent: changePercent,
-      priceChange: change,
-      volume: volume,
-      highPrice: highPrice,
-      lowPrice: lowPrice,
-    };
-    console.log('[Kline WS] Created new ticker object:', ticker.value);
-  } else {
-    // Directly mutate properties - Vue reactivity will detect changes
-    ticker.value.price = price;
-    ticker.value.priceChangePercent = changePercent;
-    ticker.value.priceChange = change;
-    ticker.value.volume = volume;
-    ticker.value.highPrice = highPrice;
-    ticker.value.lowPrice = lowPrice;
-    console.log('[Kline WS] Updated ticker:', symbol, 'price:', price, 'change%:', changePercent);
-  }
+  ticker.value = {
+    ...ticker.value,
+    price,
+    priceChangePercent: changePercent,
+    volume,
+    highPrice,
+    lowPrice,
+  };
 };
 
-// WebSocket connection management (same as Home page) - defined before watch
 const connectWebSocket = () => {
-  if (tickerWs?.readyState === WebSocket.OPEN) return;
-  
-  console.log('[Kline WS] Connecting to Binance...');
-  
-  try {
-    if (tickerWs) {
-      tickerWs.onopen = null;
-      tickerWs.onmessage = null;
-      tickerWs.onerror = null;
-      tickerWs.onclose = null;
-      tickerWs.close();
-    }
-  } catch (e) {
-    console.warn('[Kline WS] Cleanup error:', e);
+  if (tickerWs) {
+    try { tickerWs.close(); } catch (e) {}
+    tickerWs = null;
   }
   
   try {
     tickerWs = new WebSocket(BINANCE_WS_URL);
     
     tickerWs.onopen = () => {
-      console.log('[Kline WS] Connected successfully');
       wsBackoffMs = 1000;
     };
     
@@ -901,14 +682,8 @@ const connectWebSocket = () => {
       try {
         const data = JSON.parse(event.data);
         if (Array.isArray(data)) {
-          // Log first few updates to verify we're receiving data
-          if (data.length > 0) {
-            console.log('[Kline WS] Received array of', data.length, 'tickers');
-          }
           data.forEach(processTickerUpdate);
         } else if (data.s) {
-          // Handle single ticker update
-          console.log('[Kline WS] Received single ticker:', data.s);
           processTickerUpdate(data);
         }
       } catch (e) {
@@ -920,8 +695,7 @@ const connectWebSocket = () => {
       console.error('[Kline WS] Error:', e);
     };
     
-    tickerWs.onclose = (e) => {
-      console.warn('[Kline WS] Closed:', e.code, e.reason);
+    tickerWs.onclose = () => {
       tickerWs = null;
       scheduleReconnect();
     };
@@ -946,179 +720,85 @@ const scheduleReconnect = () => {
 watch(() => route.query.symbol, (newSymbol) => {
   if (newSymbol) {
     let symbol = newSymbol.trim();
-    // If symbol already has a slash, use it as is
-    if (symbol.includes('/')) {
-      // Already in format like "BCH/USDT"
-      if (symbols.value.includes(symbol)) {
-        selectedSymbol.value = symbol;
-        loadMarketData();
-        // Reconnect WebSocket when symbol changes to ensure we get updates
-        if (tickerWs) {
-          try {
-            tickerWs.close();
-          } catch (e) {
-            console.warn('[Kline WS] Error closing old connection:', e);
-          }
-          tickerWs = null;
-        }
-        connectWebSocket();
-      }
-    } else {
-      // Format like "BCHUSDT" - add slash before USDT
+    if (!symbol.includes('/')) {
       symbol = symbol.replace(/USDT$/, '/USDT');
-      if (symbols.value.includes(symbol)) {
-        selectedSymbol.value = symbol;
-        loadMarketData();
-        // Reconnect WebSocket when symbol changes to ensure we get updates
-        if (tickerWs) {
-          try {
-            tickerWs.close();
-          } catch (e) {
-            console.warn('[Kline WS] Error closing old connection:', e);
-          }
-          tickerWs = null;
-        }
-        connectWebSocket();
+    }
+    if (symbols.value.includes(symbol)) {
+      selectedSymbol.value = symbol;
+      loadMarketData();
+      if (tickerWs) {
+        try { tickerWs.close(); } catch (e) {}
+        tickerWs = null;
       }
+      connectWebSocket();
     }
   }
 }, { immediate: true });
 
 let dataInterval = null;
 
-const refreshMarketData = async () => {
-  const symbol = selectedSymbol.value.replace('/', '');
-  
-  // Preserve zoom state during updates
-  const currentTimeRange = chart?.timeScale()?.getVisibleRange();
-  
-  await Promise.all([
-    loadTicker(symbol),
-    loadRecentTrades(symbol),
-    loadKlines(),
-  ]);
-  
-  // Restore zoom state if user had zoomed (not initial load)
-  if (!isInitialLoad && userHasZoomed && currentTimeRange && chart) {
-    try {
-      chart.timeScale().setVisibleRange(currentTimeRange);
-      if (volumeChart) {
-        volumeChart.timeScale().setVisibleRange(currentTimeRange);
-      }
-    } catch (error) {
-      console.warn('Error restoring zoom:', error);
-    }
-  }
-};
-
 onMounted(async () => {
-  // Initialize chart first, then load data
-  await initChart();
-  // Load market data (ticker and trades), klines will be loaded by initChart
-  const symbol = selectedSymbol.value.replace('/', '');
+  await nextTick();
+  initChart();
+  
   isLoading.value = true;
   try {
-    await Promise.all([
-      loadTicker(symbol),
-      loadRecentTrades(symbol),
-    ]);
-    // Ensure klines are loaded after chart is ready
-    if (chart && candlestickSeries) {
-      await loadKlines();
-    }
+    await loadMarketData();
   } finally {
     isLoading.value = false;
   }
   
-  // Resize charts on window resize (also adjust height on mobile to avoid empty space)
   handleResize = () => {
-    try {
-      if (chart && chartContainer.value) {
-        const w = chartContainer.value.clientWidth;
-        if (w > 0) chart.applyOptions({ width: w, height: chartHeight.value });
-      }
-      if (volumeChart && volumeContainer.value) {
-        const w2 = volumeContainer.value.clientWidth;
-        if (w2 > 0) volumeChart.applyOptions({ width: w2, height: volumeHeight.value });
-      }
-    } catch (e) {
-      console.warn('handleResize error:', e);
-    }
+    chart?.resize();
   };
   window.addEventListener('resize', handleResize, { passive: true });
-  // One extra resize tick for mobile browsers after layout settles
-  setTimeout(handleResize, 250);
   
-  // Connect WebSocket for real-time updates (same as Home page)
   connectWebSocket();
-
-  // Refresh klines and trades every 3 seconds - reduced from 1s to prevent browser overload (ticker updated via WebSocket in real-time)
-  let isRefreshing = false;
+  
+  // Refresh data every 3 seconds
   dataInterval = setInterval(async () => {
-    if (!isRefreshing) {
-      isRefreshing = true;
-      try {
-        const symbol = selectedSymbol.value.replace('/', '');
-        await Promise.all([
-          loadRecentTrades(symbol),
-          loadKlines(),
-        ]);
-      } catch (error) {
-        console.error('Error refreshing market data:', error);
-      } finally {
-        isRefreshing = false;
-      }
-    }
+    const symbol = selectedSymbol.value.replace('/', '');
+    await Promise.all([
+      loadRecentTrades(symbol),
+      loadKlines(),
+    ]);
   }, 3000);
 });
 
 onUnmounted(() => {
-  // Cancel all pending requests
-  if (tickerAbortController) {
-    tickerAbortController.abort();
-  }
-  if (tradesAbortController) {
-    tradesAbortController.abort();
-  }
-  if (klinesAbortController) {
-    klinesAbortController.abort();
-  }
+  if (tickerAbortController) tickerAbortController.abort();
+  if (tradesAbortController) tradesAbortController.abort();
+  if (klinesAbortController) klinesAbortController.abort();
   
-  // Cleanup WebSocket
   if (wsReconnectTimer) {
     clearTimeout(wsReconnectTimer);
     wsReconnectTimer = null;
   }
-  try {
-    if (tickerWs) {
-      tickerWs.onopen = null;
-      tickerWs.onmessage = null;
-      tickerWs.onerror = null;
-      tickerWs.onclose = null;
-      tickerWs.close();
-      tickerWs = null;
-    }
-  } catch {
-    // Ignore cleanup errors
+  
+  if (tickerWs) {
+    tickerWs.onopen = null;
+    tickerWs.onmessage = null;
+    tickerWs.onerror = null;
+    tickerWs.onclose = null;
+    tickerWs.close();
+    tickerWs = null;
   }
   
-  if (watermarkObserver) {
-    watermarkObserver.disconnect();
-    watermarkObserver = null;
-  }
   if (dataInterval) {
     clearInterval(dataInterval);
   }
-  // Remove resize handler
+  
   if (handleResize) {
     window.removeEventListener('resize', handleResize);
-    handleResize = null;
   }
+  
+  if (resizeObserver) {
+    resizeObserver.disconnect();
+  }
+  
   if (chart) {
-    chart.remove();
-  }
-  if (volumeChart) {
-    volumeChart.remove();
+    chart.dispose();
+    chart = null;
   }
 });
 </script>
@@ -1132,6 +812,4 @@ onUnmounted(() => {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
-
-/* IMPORTANT: no forced min-height on mobile (it caused large empty space) */
 </style>
