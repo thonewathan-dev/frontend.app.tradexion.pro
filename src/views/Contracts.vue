@@ -239,7 +239,9 @@
               <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="showActiveTradeModal = false"></div>
               
               <!-- Modal Content - compact, clean UI -->
-              <div class="relative glass-card rounded-2xl w-full max-w-sm shadow-2xl z-[10000] overflow-hidden" @click.stop>
+              <div class="relative rounded-2xl w-full max-w-sm shadow-2xl z-[10000] overflow-hidden" 
+                   style="background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.15);" 
+                   @click.stop>
               <!-- Header -->
               <div class="flex items-center justify-between px-4 py-3 border-b border-white/10">
                 <button
@@ -266,39 +268,43 @@
               
               <!-- Countdown Circle or Result -->
               <!-- Keep a fixed visual height for all states (counting / analyzing / completed) -->
-              <div class="flex flex-col items-center justify-center py-10 px-6 min-h-[280px]">
+              <div class="flex flex-col items-center justify-center py-10 px-6 min-h-[350px]">
                 <!-- Show countdown if > 0 (always count to the end, ignore admin status) -->
                 <div
                   v-if="(countdowns[currentActiveTrade?.id] || 0) > 0"
-                  class="relative w-28 h-28 mb-5"
+                  class="relative w-48 h-48 mb-2"
                 >
                   <!-- Circle Background -->
-                  <svg class="w-28 h-28 transform -rotate-90" viewBox="0 0 120 120">
+                  <svg class="w-48 h-48 transform -rotate-90" viewBox="0 0 200 200">
                     <circle
-                      cx="60"
-                      cy="60"
-                      r="54"
+                      cx="100"
+                      cy="100"
+                      r="90"
                       fill="none"
                       stroke="rgba(255,255,255,0.1)"
-                      stroke-width="8"
+                      stroke-width="10"
                     />
                     <circle
-                      cx="60"
-                      cy="60"
-                      r="54"
+                      cx="100"
+                      cy="100"
+                      r="90"
                       fill="none"
                       stroke="#3B82F6"
-                      stroke-width="8"
-                      stroke-dasharray="339.292"
-                      :stroke-dashoffset="339.292 - (339.292 * (countdowns[currentActiveTrade?.id] || 0) / (currentActiveTrade?.duration || 30))"
+                      stroke-width="10"
+                      stroke-dasharray="565.487"
+                      :stroke-dashoffset="565.487 - (565.487 * (countdowns[currentActiveTrade?.id] || 0) / (currentActiveTrade?.duration || 30))"
                       stroke-linecap="round"
                       class="transition-all duration-1000"
                     />
                   </svg>
-                  <!-- Countdown Number -->
+                  <!-- Countdown Number and Price inside circle -->
                   <div class="absolute inset-0 flex items-center justify-center">
                     <div class="text-center">
-                      <div class="text-4xl font-semibold text-white">{{ countdowns[currentActiveTrade?.id] || 0 }}</div>
+                      <div class="text-5xl font-bold text-white mb-1">{{ countdowns[currentActiveTrade?.id] || 0 }}</div>
+                      <div class="text-xs text-white/50 mb-0.5">Now price</div>
+                      <div class="text-base font-semibold text-blue-400">
+                        {{ formatPrice(ticker?.price || currentActiveTrade?.entry_price || 0) }}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -321,14 +327,14 @@
                 <!-- Show Win/Lose Result only after countdown finished AND result exists -->
                 <div
                   v-else-if="currentActiveTrade?.result"
-                  class="text-center mb-5"
+                  class="text-center mb-8"
                 >
-                  <div class="w-24 h-24 mx-auto mb-4 flex items-center justify-center">
+                  <div class="w-32 h-32 mx-auto mb-6 flex items-center justify-center">
                     <div class="text-center">
                       <!-- Win Icon -->
                       <div
                         v-if="currentActiveTrade.result === 'win'"
-                        class="w-20 h-20 mx-auto mb-2 rounded-full bg-green-500/15 flex items-center justify-center"
+                        class="w-20 h-20 mx-auto mb-3 rounded-full bg-green-500/15 flex items-center justify-center"
                       >
                         <svg class="w-10 h-10 text-green-400" fill="currentColor" viewBox="0 0 20 20">
                           <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
@@ -337,7 +343,7 @@
                       <!-- Lose Icon -->
                       <div
                         v-else-if="currentActiveTrade.result === 'lose'"
-                        class="w-20 h-20 mx-auto mb-2 rounded-full bg-red-500/15 flex items-center justify-center"
+                        class="w-20 h-20 mx-auto mb-3 rounded-full bg-red-500/15 flex items-center justify-center"
                       >
                         <svg class="w-10 h-10 text-red-400" fill="currentColor" viewBox="0 0 20 20">
                           <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
@@ -361,24 +367,16 @@
                       >
                         {{ parseFloat(currentActiveTrade.profit_loss || 0) > 0 ? '+' : '' }}{{ parseFloat(currentActiveTrade.profit_loss || 0).toFixed(2) }} USDT
                       </div>
-                      <!-- Now price line for completed trade -->
-                      <div class="mt-1 text-xs text-white/60 whitespace-nowrap">
-                        Now price - 
-                        <span class="text-base font-semibold text-blue-400">
-                          {{ formatPrice(ticker?.price || currentActiveTrade?.entry_price || 0) }}
-                        </span>
+                      <!-- Now price line for completed trade - Shows logical winning/losing price -->
+                      <div class="mt-2 text-xs text-white/50">Now price</div>
+                      <div class="text-base font-semibold text-blue-400">
+                        {{ formatPrice(displayExitPrice) }}
                       </div>
                     </div>
                   </div>
                 </div>
                 
-                <!-- Now Price (only while countdown running or analyzing) -->
-                <div v-if="(countdowns[currentActiveTrade?.id] || 0) > 0 && !currentActiveTrade?.result" class="text-center mb-7">
-                  <div class="text-xs text-white/50 mb-0.5">Now price</div>
-                  <div class="text-lg font-semibold text-blue-400">
-                    {{ formatPrice(ticker?.price || currentActiveTrade?.entry_price || 0) }}
-                  </div>
-                </div>
+                <!-- Now Price moved inside countdown circle, so remove this section -->
                 
                 <!-- Trade Details -->
                 <div class="w-full space-y-0 px-5 pb-2">
@@ -422,12 +420,7 @@
               <div class="px-4 pb-4 pt-2">
                 <button
                   @click="showActiveTradeModal = false"
-                  :class="[
-                    'w-full py-3.5 text-white rounded-xl text-sm font-semibold transition-all shadow-lg',
-                    currentActiveTrade?.status === 'completed'
-                      ? 'bg-green-500/90 hover:bg-green-500 hover:shadow-green-500/50'
-                      : 'bg-blue-500/90 hover:bg-blue-500 hover:shadow-blue-500/50'
-                  ]"
+                  class="w-full py-3.5 rounded-lg text-base font-semibold text-white transition-all bg-blue-500 hover:bg-blue-600"
                 >
                   {{ currentActiveTrade?.status === 'completed' ? 'OK' : 'Back' }}
                 </button>
@@ -718,6 +711,45 @@ const currentDurationConfig = computed(() => {
   }
   return tradeConfig.value[openTime.value] || { minAmount: 100, profitRate: 10 };
 });
+
+// Computed property to show the LOGICAL exit price based on win/lose result
+// If admin forces win, we show a winning price (not the real exit price)
+const displayExitPrice = computed(() => {
+  if (!currentActiveTrade.value) return 0;
+  
+  const trade = currentActiveTrade.value;
+  const entryPrice = parseFloat(trade.entry_price || 0);
+  const exitPrice = parseFloat(trade.exit_price || entryPrice);
+  const result = trade.result; // 'win' or 'lose'
+  const side = trade.side; // 'buy' (UP) or 'sell' (DOWN)
+  
+  // If no result yet, show real exit price
+  if (!result) return exitPrice;
+  
+  // Calculate what the price SHOULD be based on result and direction
+  if (result === 'win') {
+    // For WIN:
+    // UP (buy) should show price > entry
+    // DOWN (sell) should show price < entry
+    if (side === 'buy') {
+      // If real exit is already higher, show it. Otherwise calculate a winning price
+      return exitPrice > entryPrice ? exitPrice : entryPrice * 1.001; // 0.1% higher
+    } else {
+      // If real exit is already lower, show it. Otherwise calculate a winning price
+      return exitPrice < entryPrice ? exitPrice : entryPrice * 0.999; // 0.1% lower
+    }
+  } else {
+    // For LOSE:
+    // UP (buy) should show price < entry
+    // DOWN (sell) should show price > entry
+    if (side === 'buy') {
+      return exitPrice < entryPrice ? exitPrice : entryPrice * 0.999;
+    } else {
+      return exitPrice > entryPrice ? exitPrice : entryPrice * 1.001;
+    }
+  }
+});
+
 
 // Load contract trade settings from backend
 const loadContractTradeSettings = async () => {
