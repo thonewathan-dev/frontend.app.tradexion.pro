@@ -449,6 +449,20 @@ const updateChart = () => {
   
   const data = klineData.value;
   
+  // Get current zoom level if available to preserve it
+  let start = 70;
+  let end = 100;
+  
+  try {
+    const currentOption = chart.getOption();
+    if (currentOption && currentOption.dataZoom && currentOption.dataZoom.length > 0) {
+      start = currentOption.dataZoom[0].start;
+      end = currentOption.dataZoom[0].end;
+    }
+  } catch (e) {
+    console.warn('Failed to get current zoom level:', e);
+  }
+  
   // Prepare category data (time) and values
   const categoryData = [];
   const candlestickData = [];
@@ -565,8 +579,8 @@ const updateChart = () => {
       {
         type: 'inside',
         xAxisIndex: [0, 1],
-        start: 70,
-        end: 100,
+        start: start,
+        end: end,
       },
     ],
     series: [

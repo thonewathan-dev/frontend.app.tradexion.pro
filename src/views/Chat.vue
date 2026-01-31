@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed inset-0 bg-black flex flex-col overflow-hidden">
+  <div class="fixed inset-0 bg-dark flex flex-col overflow-hidden">
     <!-- Header - Fixed at top -->
     <div class="glass-card-no-hover border-b border-white/10 px-4 py-3 flex-shrink-0 z-10">
       <div class="flex items-center justify-between">
@@ -124,7 +124,7 @@
     <!-- Image Preview Before Sending -->
     <div
       v-if="imagePreview && imagePreview.preview"
-      class="border-t border-white/10 bg-black/90 backdrop-blur-sm flex-shrink-0 px-4 py-3"
+      class="border-t border-white/10 bg-dark/90 backdrop-blur-sm flex-shrink-0 px-4 py-3"
     >
       <div class="flex items-center gap-3">
         <div class="relative">
@@ -153,7 +153,7 @@
     </div>
 
     <!-- Input Area - Fixed at bottom (when chat is active) -->
-    <div v-if="!chatEnded" class="border-t border-white/10 bg-black/90 backdrop-blur-sm flex-shrink-0 z-10">
+    <div v-if="!chatEnded" class="border-t border-white/10 bg-dark/90 backdrop-blur-sm flex-shrink-0 z-10">
       <div class="px-4 py-3">
         <form @submit.prevent="() => handleSend()" class="flex items-end gap-3">
           <div class="flex-1 relative">
@@ -214,7 +214,7 @@
     </div>
 
     <!-- Chat Ended Area - Fixed at bottom (replaces input when chat is ended) -->
-    <div v-else class="border-t border-white/10 bg-black/90 backdrop-blur-sm flex-shrink-0 z-10">
+    <div v-else class="border-t border-white/10 bg-dark/90 backdrop-blur-sm flex-shrink-0 z-10">
       <div class="px-4 py-4">
         <div class="flex flex-col items-center gap-3">
           <div class="flex items-center gap-2">
@@ -248,7 +248,7 @@
     <!-- Image Preview Modal (for viewing sent images) -->
     <div
       v-if="selectedImage"
-      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-dark/80 backdrop-blur-sm"
       @click="selectedImage = null"
     >
       <div class="max-w-4xl max-h-[90vh] relative">

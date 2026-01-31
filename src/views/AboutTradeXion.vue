@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-black">
+  <div class="min-h-screen">
     <!-- MobileNav hidden on AboutTradeXion page -->
     <div class="md:flex">
       <DesktopNav v-if="!isMobile" />

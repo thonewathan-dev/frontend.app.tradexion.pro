@@ -47,7 +47,6 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          'vendor': ['vue', 'vue-router', 'pinia'],
           'charts': ['echarts'],
         },
         // Add hash to filenames for cache-busting

@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-[100dvh] overflow-hidden bg-black text-white">
+  <div class="min-h-[100dvh] overflow-hidden text-white">
     <!-- Top bar -->
     <div class="sticky top-0 z-10 glass-card-no-hover border-b border-white/10">
       <div class="max-w-3xl mx-auto px-4 h-14 flex items-center">
