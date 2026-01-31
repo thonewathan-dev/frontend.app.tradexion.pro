@@ -8,9 +8,13 @@
   box-sizing: border-box;
 }
 
+:root {
+  --bg-color: #000000;
+}
+
 body {
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #000000;
+  background-color: var(--bg-color);
   background-attachment: fixed;
   color: #ffffff;
   overflow-x: hidden;

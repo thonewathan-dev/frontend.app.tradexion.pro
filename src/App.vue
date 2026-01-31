@@ -24,10 +24,13 @@ import { setToastComponent } from './composables/useAlert';
 import Toast from './components/Toast.vue';
 import InstallButton from './components/InstallButton.vue';
 import { isRouteLoading } from './router';
+import { useSettingsStore } from './stores/settings';
 
 const toastRef = ref(null);
+const settingsStore = useSettingsStore();
 
 onMounted(async () => {
+  settingsStore.fetchSettings();
   // Wait for multiple ticks to ensure DOM is fully ready
   await nextTick();
   await nextTick();
