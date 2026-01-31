@@ -48,7 +48,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           'vendor': ['vue', 'vue-router', 'pinia'],
-          'charts': ['lightweight-charts'],
+          'charts': ['echarts'],
         },
         // Add hash to filenames for cache-busting
         entryFileNames: 'assets/[name].[hash].js',
@@ -64,7 +64,7 @@ export default defineConfig({
   },
   // Optimize dependencies
   optimizeDeps: {
-    include: ['vue', 'vue-router', 'pinia', 'axios', 'lightweight-charts'],
+    include: ['vue', 'vue-router', 'pinia', 'axios', 'echarts'],
   },
   // Ensure service worker and manifest are copied to dist
   publicDir: 'public',
