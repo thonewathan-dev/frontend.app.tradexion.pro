@@ -157,10 +157,13 @@
             <div
               v-for="(ticker, index) in top3Tickers"
               :key="ticker?.symbol || index"
-              class="glass-card rounded-lg p-3 cursor-pointer hover:border-blue-500/50 transition-colors"
+              class="glass-card rounded-lg p-3 cursor-pointer hover:border-blue-500/50 transition-colors relative overflow-hidden group"
               @click="selectSymbol(ticker.symbol)"
             >
-              <div class="flex flex-col items-center text-center">
+              <!-- Decorative Background Overlay -->
+              <img src="/background shadow.png" alt="" class="absolute top-0 right-0 w-14 h-14 md:w-24 md:h-24 object-contain opacity-10 pointer-events-none group-hover:scale-110 transition-transform duration-700" />
+              
+              <div class="flex flex-col items-start text-left relative z-10">
                 <img
                   :src="getCoinLogo(ticker.symbol)"
                   :alt="ticker.symbol"

@@ -1,7 +1,7 @@
 <template>
   <nav class="hidden md:flex md:flex-col md:w-64 glass-dark border-r border-white/10 min-h-screen">
     <div class="p-4 border-b border-white/10">
-      <h1 class="text-xl font-bold gradient-text">Trading App</h1>
+      <h1 class="text-xl font-bold gradient-text">TradeXion</h1>
     </div>
     <div class="flex-1 p-4">
       <router-link

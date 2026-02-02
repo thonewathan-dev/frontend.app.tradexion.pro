@@ -15,7 +15,7 @@
                 </svg>
               </div>
               <div>
-                <div class="text-sm font-medium text-white">{{ user?.email || 'User' }}</div>
+                <div class="text-sm font-medium text-white">{{ formatEmail(user?.email) }}</div>
                 <div class="text-xs text-white/60">ID: {{ user?.id || 'N/A' }}</div>
               </div>
             </div>
@@ -27,42 +27,54 @@
 
         <div class="p-3 space-y-3">
           <!-- Asset Center -->
-          <div class="glass-card rounded-lg p-4">
-            <div class="flex items-center justify-between mb-1">
-              <div class="text-white/70 text-xs">Asset Center (USDT)</div>
-              <button
-                type="button"
-                class="p-1 rounded-full hover:bg-white/10 transition-colors"
-                @click="handleAssetInfo"
-                aria-label="Asset center information"
-              >
-                <svg class="w-4 h-4 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 1010 10A10.011 10.011 0 0012 2z" />
-                </svg>
-              </button>
+          <div class="glass-card-no-hover rounded-xl p-5 relative overflow-hidden usdt-card-bg group">
+            <!-- Decorative Background Overlay -->
+            <img src="/background shadow.png" alt="" class="absolute top-0 right-0 w-24 h-24 md:w-48 md:h-48 object-contain opacity-10 pointer-events-none group-hover:scale-105 transition-transform duration-700" />
+            
+            <div class="relative z-10">
+              <div class="flex items-center justify-between mb-2">
+                <div class="text-white/60 text-xs font-medium flex items-center gap-2">
+                  <div class="w-1.5 h-1.5 rounded-full bg-blue-400"></div>
+                  Asset Center (USDT)
+                </div>
+                <button
+                  type="button"
+                  class="p-1 rounded-full hover:bg-white/10 transition-colors"
+                  @click="handleAssetInfo"
+                >
+                  <svg class="w-4 h-4 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 1010 10A10.011 10.011 0 0012 2z" />
+                  </svg>
+                </button>
+              </div>
+              
+              <div class="text-white text-3xl font-bold mb-4 tracking-tight">
+                <span v-if="!hasLoadedWallets" class="inline-block h-8 w-32 rounded bg-white/10 animate-pulse" />
+                <span v-else class="flex items-baseline gap-1">
+                  <span class="text-xl text-white/60 font-medium">≈</span>{{ formatBalance(totalBalance) }}
+                  <span class="text-sm text-white/40 font-normal ml-1">USDT</span>
+                </span>
+              </div>
+
+              <div class="flex items-center justify-between py-2.5 px-3 bg-black/20 backdrop-blur-md rounded-xl border border-white/5">
+                <div class="flex-1 text-center">
+                  <div class="text-white/50 text-[10px] uppercase tracking-wider mb-1">Contract account</div>
+                  <div class="text-white text-base font-bold">
+                    <span v-if="!hasLoadedWallets" class="inline-block h-4 w-16 rounded bg-white/10 animate-pulse" />
+                    <span v-else>{{ formatBalance(contractBalance) }}</span>
                   </div>
-            <div class="text-white text-3xl font-bold mb-3">
-              <span v-if="!hasLoadedWallets" class="inline-block h-7 w-28 rounded bg-white/10 animate-pulse" />
-              <span v-else>≈{{ formatBalance(totalBalance) }}</span>
-            </div>
-            <div class="flex items-center justify-between py-2 px-2 bg-white/5 rounded-md">
-              <div class="flex-1 text-center">
-                <div class="text-white/60 text-xs mb-1">Contract account</div>
-                <div class="text-white text-base font-semibold">
-                  <span v-if="!hasLoadedWallets" class="inline-block h-4 w-16 rounded bg-white/10 animate-pulse" />
-                  <span v-else>{{ formatBalance(contractBalance) }}</span>
+                </div>
+                <div class="w-px h-6 bg-white/10"></div>
+                <div class="flex-1 text-center">
+                  <div class="text-white/50 text-[10px] uppercase tracking-wider mb-1">Spot account</div>
+                  <div class="text-white text-base font-bold">
+                    <span v-if="!hasLoadedWallets" class="inline-block h-4 w-16 rounded bg-white/10 animate-pulse" />
+                    <span v-else>{{ formatBalance(spotBalance) }}</span>
+                  </div>
                 </div>
               </div>
-              <div class="w-px h-8 bg-white/10"></div>
-              <div class="flex-1 text-center">
-                <div class="text-white/60 text-xs mb-1">Spot account</div>
-                <div class="text-white text-base font-semibold">
-                  <span v-if="!hasLoadedWallets" class="inline-block h-4 w-16 rounded bg-white/10 animate-pulse" />
-                  <span v-else>{{ formatBalance(spotBalance) }}</span>
-                </div>
-              </div>
-              </div>
             </div>
+          </div>
             
           <!-- Actions -->
           <div class="glass-card rounded-lg p-4">
@@ -171,6 +183,7 @@
               </button>
               <button
                 class="w-full flex items-center justify-between px-3 py-3 transition-colors hover:bg-white/5"
+                @click="router.push('/chat')"
               >
                 <div class="flex items-center gap-3">
                   <svg class="w-5 h-5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -389,6 +402,14 @@ const { showSuccess, showError, showWarning, showInfo } = useAlert();
 
 const isMobile = computed(() => window.innerWidth < 768);
 const user = computed(() => authStore.user);
+
+const formatEmail = (email) => {
+  if (!email) return 'User';
+  const [localPart, domain] = email.split('@');
+  if (!domain) return email;
+  if (localPart.length <= 5) return email;
+  return `${localPart.substring(0, 5)}......@${domain}`;
+};
 
 const wallets = ref([]);
 const loading = ref(false);
@@ -723,5 +744,10 @@ onUnmounted(() => {
 
 .animate-slide-up {
   animation: slide-up 0.3s ease-out;
+}
+
+.usdt-card-bg {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 </style>

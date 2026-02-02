@@ -179,9 +179,9 @@
               
               <!-- Sell Orders (Asks) -->
               <div class="mb-2">
-                <div class="flex justify-between text-xs text-white/60 mb-1">
-                  <span>{{ t('contracts.price') }}</span>
-                  <span>{{ t('contracts.quantity') }}</span>
+                <div class="flex justify-between text-[10px] text-white/40 mb-1 px-1">
+                  <span>Unit Price</span>
+                  <span>Number</span>
                 </div>
                 <div class="space-y-0 max-h-32 md:max-h-48 overflow-y-auto">
                   <div
@@ -190,9 +190,9 @@
                     class="relative flex justify-between items-center text-xs cursor-pointer hover:bg-white/5 py-0.5 px-1"
                     @click="selectOrderBookPrice(ask.price)"
                   >
-                    <!-- Volume bar background -->
+                    <!-- Volume bar background - right aligned -->
                     <div 
-                      class="absolute left-0 top-0 bottom-0 bg-red-500/10 transition-all"
+                      class="absolute right-0 top-0 bottom-0 bg-red-500/10 transition-all"
                       :style="{ width: `${getVolumePercent(ask.quantity, 'ask')}%` }"
                     ></div>
                     <span class="relative z-10 text-red-400 font-medium text-xs truncate">{{ formatPrice(ask.price) }}</span>
@@ -215,9 +215,9 @@
                     class="relative flex justify-between items-center text-xs cursor-pointer hover:bg-white/5 py-0.5 px-1"
                     @click="selectOrderBookPrice(bid.price)"
                   >
-                    <!-- Volume bar background -->
+                    <!-- Volume bar background - right aligned -->
                     <div 
-                      class="absolute left-0 top-0 bottom-0 bg-blue-500/10 transition-all"
+                      class="absolute right-0 top-0 bottom-0 bg-blue-500/10 transition-all"
                       :style="{ width: `${getVolumePercent(bid.quantity, 'bid')}%` }"
                     ></div>
                     <span class="relative z-10 text-blue-400 font-medium text-xs truncate">{{ formatPrice(bid.price) }}</span>
@@ -648,7 +648,7 @@ import CustomSelect from '../components/CustomSelect.vue';
 import axios from 'axios';
 
 const BINANCE_HTTP_API = 'https://api.binance.com/api/v3';
-const BINANCE_WS_URL = 'wss://stream.binance.com:9443/ws/!ticker@arr';
+const BINANCE_WS_BASE = 'wss://stream.binance.com:9443';
 
 const { t } = useI18n();
 
@@ -681,13 +681,26 @@ const orderBook = ref({ bids: [], asks: [] });
 const walletBalance = ref(0);
 const loading = ref(false);
 const showCoinSelector = ref(false);
-const coinList = ref([]);
+const coinList = computed(() => {
+  return binanceCoins.map(coin => {
+    const symbol = `${coin}USDT`;
+    const tickerData = allTickersMap.value[symbol];
+    return {
+      symbol: `${coin}/USDT`,
+      price: tickerData?.price || 0,
+      change: tickerData?.change || 0,
+    };
+  }).sort((a, b) => a.symbol.localeCompare(b.symbol));
+});
 const isLoading = ref(true);
 const activeTrades = ref([]);
 const closedTrades = ref([]);
 const countdowns = ref({});
 const showActiveTradeModal = ref(false);
 const currentActiveTrade = ref(null);
+const allTickersMap = ref({}); // Map of symbol -> ticker data
+let lastDepthUpdate = 0;
+let lastTickerUpdate = 0;
 
 // Interval refs for proper cleanup (prevent memory leaks)
 const marketDataInterval = ref(null);
@@ -754,9 +767,13 @@ const displayExitPrice = computed(() => {
 // Load contract trade settings from backend
 const loadContractTradeSettings = async () => {
   try {
-    const response = await api.get('/contracts/settings');
+    const response = await api.get(`/contracts/settings?t=${Date.now()}`);
+
     console.log('Raw settings response:', response.data);
+    
+
     if (response.data && response.data.settings) {
+
       // Convert settings to match expected format (duration as string keys)
       const settings = {};
       Object.keys(response.data.settings).forEach(duration => {
@@ -790,17 +807,16 @@ const symbols = ref(binanceCoins.map(coin => `${coin}/USDT`));
 // >= 0.01   -> 4 decimals
 // <  0.01   -> 8 decimals
 const formatPrice = (price) => {
-  if (price === null || price === undefined) return '0.00';
+  if (price === null || price === undefined) return '0.0000';
   const numPrice = typeof price === 'string' ? parseFloat(price) : price;
-  if (isNaN(numPrice)) return '0.00';
-  if (numPrice >= 1) return numPrice.toFixed(2);
-  if (numPrice >= 0.01) return numPrice.toFixed(4);
-  return numPrice.toFixed(8);
+  if (isNaN(numPrice)) return '0.0000';
+  if (numPrice >= 0.01) return numPrice.toFixed(4); // Force 4 decimals for standard prices
+  return numPrice.toFixed(8); // More for very small prices
 };
 
 const formatQuantity = (qty) => {
-  if (!qty) return '0.00';
-  return parseFloat(qty).toFixed(2);
+  if (!qty) return '0.0000';
+  return parseFloat(qty).toFixed(4);
 };
 
 const selectOrderBookPrice = (price) => {
@@ -808,15 +824,16 @@ const selectOrderBookPrice = (price) => {
 };
 
 const getVolumePercent = (quantity, type) => {
-  if (!orderBook.value.bids.length || !orderBook.value.asks.length) return 0;
+  const visibleRows = type === 'bid' 
+    ? orderBook.value.bids.slice(0, 6)
+    : orderBook.value.asks.slice(0, 6);
+    
+  if (!visibleRows.length) return 0;
   
-  const allQuantities = type === 'bid' 
-    ? orderBook.value.bids.map(b => parseFloat(b.quantity))
-    : orderBook.value.asks.map(a => parseFloat(a.quantity));
-  
+  const allQuantities = visibleRows.map(row => parseFloat(row.quantity));
   const maxQuantity = Math.max(...allQuantities);
-  if (maxQuantity === 0) return 0;
   
+  if (maxQuantity === 0) return 0;
   return (parseFloat(quantity) / maxQuantity) * 100;
 };
 
@@ -959,39 +976,16 @@ const loadWalletBalance = async () => {
 };
 
 const loadCoinList = async () => {
-  try {
-    const promises = binanceCoins.map(async (coin) => {
-      try {
-        const symbol = `${coin}USDT`;
-        const response = await api.get(`/market/ticker/${symbol}/24h`);
-        if (response.data && response.data.price) {
-          return {
-            symbol: `${coin}/USDT`,
-            price: response.data.price,
-            change: response.data.priceChangePercent || 0,
-          };
-        }
-        return null;
-      } catch (error) {
-        console.debug(`Failed to fetch ${coin}:`, error.message);
-        return null;
-      }
-    });
-    
-    const results = await Promise.all(promises);
-    coinList.value = results.filter(Boolean).sort((a, b) => {
-      // Sort by symbol name
-      return a.symbol.localeCompare(b.symbol);
-    });
-  } catch (error) {
-    console.error('Error loading coin list:', error);
-  }
+    // We'll primarily use the WebSocket ticker data for the list
+    // This function can still fetch initial data if needed, but it's less critical now
 };
 
 const selectCoin = (symbol) => {
   selectedSymbol.value = symbol;
   showCoinSelector.value = false;
   loadMarketData();
+  // Reconnect WebSocket for the new depth stream
+  connectWebSocket();
 };
 
 const getCoinLogo = (symbol) => {
@@ -1230,10 +1224,19 @@ const MAX_BACKOFF_MS = 30000;
 const processTickerUpdate = (tickerData) => {
   if (!tickerData?.s) return;
   const symbol = tickerData.s;
+  
+  // Update the global map for the coin list (can be frequent, it's just a data map)
+  allTickersMap.value[symbol] = {
+    price: Number(tickerData.c),
+    change: Number(tickerData.P),
+  };
+
   const currentSymbol = selectedSymbol.value.replace('/', '');
   if (symbol !== currentSymbol) return;
   
-  if (ticker.value) {
+  const now = Date.now();
+  if (ticker.value && (now - lastTickerUpdate >= 500)) {
+    lastTickerUpdate = now;
     ticker.value.price = Number(tickerData.c) || ticker.value.price;
     ticker.value.priceChangePercent = Number(tickerData.P) || ticker.value.priceChangePercent;
     ticker.value.priceChange = Number(tickerData.p) || ticker.value.priceChange;
@@ -1244,8 +1247,6 @@ const processTickerUpdate = (tickerData) => {
 };
 
 const connectWebSocket = () => {
-  if (tickerWs?.readyState === WebSocket.OPEN) return;
-  
   try {
     if (tickerWs) {
       tickerWs.onopen = null;
@@ -1253,24 +1254,50 @@ const connectWebSocket = () => {
       tickerWs.onerror = null;
       tickerWs.onclose = null;
       tickerWs.close();
+      tickerWs = null;
     }
   } catch (e) {
     console.warn('[Contracts WS] Cleanup error:', e);
   }
   
   try {
-    tickerWs = new WebSocket(BINANCE_WS_URL);
+    const currentSymbol = selectedSymbol.value.replace('/', '').toLowerCase();
+    // Correct URL format for combined streams: /stream?streams=stream1/stream2
+    const wsUrl = `${BINANCE_WS_BASE}/stream?streams=!ticker@arr/${currentSymbol}@depth20@100ms`;
+    tickerWs = new WebSocket(wsUrl);
     
     tickerWs.onopen = () => {
-      console.log('[Contracts WS] Connected');
+      console.log('[Contracts WS] Connected to:', wsUrl);
       wsBackoffMs = 1000;
     };
     
     tickerWs.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        if (Array.isArray(data)) {
-          data.forEach(processTickerUpdate);
+        
+        // Handle combined stream format
+        if (data.stream === '!ticker@arr') {
+            data.data.forEach(processTickerUpdate);
+        } else if (data.stream?.endsWith('@depth20@100ms')) {
+            const now = Date.now();
+            if (now - lastDepthUpdate >= 500) {
+                lastDepthUpdate = now;
+                const depthData = data.data;
+                orderBook.value = {
+                    bids: (depthData.bids || []).map(([price, quantity]) => ({
+                        price: Number(price) || 0,
+                        quantity: Number(quantity) || 0,
+                    })),
+                    asks: (depthData.asks || []).map(([price, quantity]) => ({
+                        price: Number(price) || 0,
+                        quantity: Number(quantity) || 0,
+                    })),
+                    timestamp: now,
+                };
+            }
+        } else if (Array.isArray(data)) {
+            // Fallback for single stream format
+            data.forEach(processTickerUpdate);
         }
       } catch (e) {
         console.error('[Contracts WS] Parse error:', e);
@@ -1308,23 +1335,22 @@ onMounted(async () => {
   connectWebSocket();
   loadContractTrades();
   
-  // Real-time updates every 5 seconds - reduced from 2s to prevent browser overload
+  // Real-time updates interval for less frequent data
   let isRefreshing = false;
   let walletTick = 0;
   marketDataInterval.value = setInterval(async () => {
     if (!isRefreshing) {
       isRefreshing = true;
       try {
-        // Only refresh orderbook (ticker is updated via WebSocket)
-        const symbol = selectedSymbol.value.replace('/', '');
-        await loadOrderBook(symbol);
+        // Orderbook and Ticker are now handled via WebSocket!
+        
         // Wallet balance does NOT need frequent polling (causes 429). Refresh every ~15s.
         walletTick = (walletTick + 1) % 3;
         if (walletTick === 0) {
           await loadWalletBalance();
         }
       } catch (error) {
-        console.error('Error refreshing market data:', error);
+        console.error('Error refreshing ancillary data:', error);
       } finally {
         isRefreshing = false;
       }
