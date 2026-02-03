@@ -90,7 +90,7 @@
               <div
                 v-for="(banner, index) in banners"
                 :key="index"
-                class="min-w-full h-full flex-shrink-0 px-2"
+                class="w-full h-full flex-shrink-0 px-2 overflow-hidden"
               >
                 <img
                   :src="banner"
