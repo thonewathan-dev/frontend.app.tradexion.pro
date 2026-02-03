@@ -5,7 +5,7 @@
       <DesktopNav v-if="!isMobile" />
       <main class="flex-1 pb-16 md:pb-0">
         <!-- Header with Profile and Language Selector -->
-        <div class="glass-card-no-hover border-b border-white/10 px-4 py-3 flex items-center justify-between relative z-50">
+        <div class="glass-card-no-hover border-b border-white/10 px-4 pt-safe-header pb-3 flex items-center justify-between relative z-50">
           <!-- Profile Icon (Left) -->
           <button
             @click="goToAssets"

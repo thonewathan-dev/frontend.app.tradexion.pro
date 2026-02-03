@@ -416,3 +416,8 @@ body {
     transform: translate(0, 0) rotateX(0) rotateY(360deg);
   }
 }
+
+/* Safe area padding for header */
+.pt-safe-header {
+  padding-top: calc(0.75rem + env(safe-area-inset-top, 0px));
+}
