@@ -71,8 +71,7 @@
         <!-- Banner Carousel -->
         <div class="w-full px-3 md:px-4 py-3 md:py-4">
           <div 
-            class="overflow-hidden relative rounded-lg md:rounded-xl cursor-grab active:cursor-grabbing w-full"
-            style="aspect-ratio: 96 / 35;"
+            class="overflow-hidden relative rounded-lg md:rounded-xl cursor-grab active:cursor-grabbing w-full aspect-[16/9] md:aspect-[96/35]"
             @touchstart="handleTouchStart"
             @touchmove="handleTouchMove"
             @touchend="handleTouchEnd"
