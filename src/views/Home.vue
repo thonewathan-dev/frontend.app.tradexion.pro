@@ -90,12 +90,12 @@
               <div
                 v-for="(banner, index) in banners"
                 :key="index"
-                class="min-w-full h-full flex-shrink-0"
+                class="min-w-full h-full flex-shrink-0 px-2"
               >
                 <img
                   :src="banner"
                   :alt="`Banner ${index + 1}`"
-                  class="w-full h-full object-cover pointer-events-none"
+                  class="w-full h-full object-cover pointer-events-none rounded-lg"
                 />
               </div>
             </div>
