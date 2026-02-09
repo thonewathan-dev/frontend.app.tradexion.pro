@@ -360,7 +360,7 @@
           >
             <div class="flex justify-between items-start mb-2">
               <div>
-                <div class="text-white font-medium">{{ exchange.fromCurrency }} → {{ exchange.toCurrency }}</div>
+                <div class="text-white font-medium">{{ exchange.from_currency || exchange.fromCurrency }} → {{ exchange.to_currency || exchange.toCurrency }}</div>
                 <div class="text-white/60 text-sm">{{ formatDate(exchange.created_at) }}</div>
               </div>
               <span class="px-2 py-1 rounded text-xs bg-green-500/20 text-green-300">
@@ -368,8 +368,8 @@
               </span>
             </div>
             <div class="text-white/70 text-sm">
-              {{ formatBalance(exchange.amount_from) }} {{ exchange.from_currency }} =
-              {{ formatBalance(exchange.amount_to) }} {{ exchange.to_currency }}
+              {{ formatBalance(exchange.amount_from) }} {{ exchange.from_currency || exchange.fromCurrency }} =
+              {{ formatBalance(exchange.amount_to) }} {{ exchange.to_currency || exchange.toCurrency }}
             </div>
           </div>
           <div v-if="exchangeHistory.length === 0" class="text-center text-white/60 py-8">

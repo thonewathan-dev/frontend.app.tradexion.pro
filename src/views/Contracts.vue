@@ -269,41 +269,67 @@
               <!-- Countdown Circle or Result -->
               <!-- Keep a fixed visual height for all states (counting / analyzing / completed) -->
               <div class="flex flex-col items-center justify-center py-10 px-6 min-h-[350px]">
+                <!-- Show Preparing Loader -->
+                <div v-if="isProcessingTrade" class="w-full flex flex-col items-center justify-center py-12">
+                   <div class="w-16 h-16 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin mb-4"></div>
+                   <div class="text-white font-medium text-lg">Preparing trade...</div>
+                   <div class="text-white/50 text-sm mt-1">Please wait a moment</div>
+                </div>
+
                 <!-- Show countdown if > 0 (always count to the end, ignore admin status) -->
                 <div
-                  v-if="(countdowns[currentActiveTrade?.id] || 0) > 0"
-                  class="relative w-48 h-48 mb-2"
+                  v-else-if="(countdowns[currentActiveTrade?.id] || 0) > 0"
+                  class="w-full mb-4"
                 >
-                  <!-- Circle Background -->
-                  <svg class="w-48 h-48 transform -rotate-90" viewBox="0 0 200 200">
-                    <circle
-                      cx="100"
-                      cy="100"
-                      r="90"
-                      fill="none"
-                      stroke="rgba(255,255,255,0.1)"
-                      stroke-width="10"
-                    />
-                    <circle
-                      cx="100"
-                      cy="100"
-                      r="90"
-                      fill="none"
-                      stroke="#3B82F6"
-                      stroke-width="10"
-                      stroke-dasharray="565.487"
-                      :stroke-dashoffset="565.487 - (565.487 * (countdowns[currentActiveTrade?.id] || 0) / (currentActiveTrade?.duration || 30))"
-                      stroke-linecap="round"
-                      class="transition-all duration-1000"
-                    />
-                  </svg>
-                  <!-- Countdown Number and Price inside circle -->
-                  <div class="absolute inset-0 flex items-center justify-center">
-                    <div class="text-center">
-                      <div class="text-5xl font-bold text-white mb-1">{{ countdowns[currentActiveTrade?.id] || 0 }}</div>
-                      <div class="text-xs text-white/50 mb-0.5">Now price</div>
-                      <div class="text-base font-semibold text-blue-400">
-                        {{ formatPrice(ticker?.price || currentActiveTrade?.entry_price || 0) }}
+                  
+                  <!-- Circular Countdown Timer -->
+                  <div class="relative px-2 py-0">
+                    <div class="flex justify-center items-center">
+                      <!-- Circular progress ring -->
+                      <div class="relative w-56 h-56">
+                        <!-- Background circle -->
+                        <svg class="w-full h-full transform -rotate-90">
+                          <circle
+                            cx="112"
+                            cy="112"
+                            r="100"
+                            stroke="currentColor"
+                            stroke-width="4"
+                            fill="none"
+                            class="text-white/10"
+                          />
+                          <!-- Progress circle - Always blue -->
+                          <circle
+                            cx="112"
+                            cy="112"
+                            r="100"
+                            stroke="#3B82F6"
+                            stroke-width="4"
+                            fill="none"
+                            stroke-linecap="round"
+                            :style="{
+                              strokeDasharray: `${2 * Math.PI * 100}`,
+                              strokeDashoffset: `${2 * Math.PI * 100 * (1 - (countdowns[currentActiveTrade?.id] || 0) / (currentActiveTrade?.duration || 30))}`
+                            }"
+                            class="transition-all duration-1000 ease-linear"
+                          />
+                        </svg>
+                        
+                        <!-- Center content -->
+                        <div class="absolute inset-0 flex flex-col items-center justify-center">
+                          <div class="text-5xl font-bold text-blue-400">
+                            {{ countdowns[currentActiveTrade?.id] || 0 }}
+                          </div>
+                          <div class="text-xs text-white/50 mt-1 mb-3">seconds</div>
+                          
+                          <!-- Current Price inside circle -->
+                          <div class="text-center">
+                            <div class="text-[10px] text-white/40 mb-0.5">Now price</div>
+                            <div class="text-base font-bold text-blue-400">
+                              {{ formatPrice(ticker?.price || currentActiveTrade?.entry_price || 0) }}
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -571,22 +597,22 @@
     </div>
 
     <!-- Coin Selector Modal -->
-    <div
-      v-if="showCoinSelector"
-      class="fixed inset-0 z-50 flex items-end md:items-center md:justify-center"
-      @click.self="showCoinSelector = false"
-    >
-      <!-- Backdrop -->
-      <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="showCoinSelector = false"></div>
-      
-      <!-- Modal Content -->
+    <Transition name="modal-fade">
       <div
-        class="relative glass-card w-full md:w-96 md:max-w-md rounded-b-2xl md:rounded-b-2xl shadow-2xl max-h-[80vh] flex flex-col animate-slide-up"
+        v-if="showCoinSelector"
+        class="fixed inset-0 z-50 flex items-end md:items-center md:justify-center"
       >
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="showCoinSelector = false"></div>
+        
+        <!-- Modal Content -->
+        <div
+          class="relative bg-[#1e2329] w-full md:w-96 md:max-w-md rounded-t-3xl md:rounded-3xl shadow-2xl max-h-[90vh] flex flex-col modal-content-anim"
+        >
         <!-- Header -->
-        <div class="sticky top-0 glass-card-no-hover border-b border-white/10 px-4 py-4 z-10">
-          <div class="flex items-center justify-between">
-            <h2 class="text-lg font-bold text-white">USDT</h2>
+        <div class="sticky top-0 bg-[#1e2329] border-b border-white/10 z-10">
+          <div class="flex items-center justify-between px-4 py-4">
+            <h2 class="text-lg font-bold text-white">Market</h2>
             <button
               @click="showCoinSelector = false"
               class="p-2 hover:bg-white/10 rounded-full transition-colors"
@@ -596,24 +622,58 @@
               </svg>
             </button>
           </div>
+          
+          <!-- Category Tabs with Sliding Indicator -->
+          <div class="px-3 pb-3">
+            <div class="bg-white/5 p-1 rounded-xl flex relative h-10 overflow-hidden isolate">
+              <!-- Sliding Background Indicator -->
+              <div 
+                class="absolute inset-y-1 transition-all duration-300 ease-out bg-blue-500 rounded-lg shadow-lg shadow-blue-500/30 -z-10"
+                :style="{
+                  width: 'calc(25% - 4px)',
+                  left: activeCategory === 'hot' ? '4px' : 
+                        activeCategory === 'crypto' ? '25.6%' : 
+                        activeCategory === 'metals' ? '49.8%' : '74.2%'
+                }"
+              ></div>
+              
+              <button
+                v-for="cat in ['hot', 'crypto', 'metals', 'forex']"
+                :key="cat"
+                @click="activeCategory = cat"
+                class="flex-1 text-[11px] font-bold uppercase transition-colors duration-300 z-10"
+                :class="activeCategory === cat ? 'text-white' : 'text-white/40 hover:text-white/60'"
+              >
+                {{ cat }}
+              </button>
+            </div>
+          </div>
         </div>
 
         <!-- Coin List -->
-        <div class="flex-1 overflow-y-auto">
+        <div class="h-[70vh] overflow-y-auto custom-scrollbar pb-10">
           <div
             v-for="coin in coinList"
-            :key="coin.symbol"
-            @click="selectCoin(coin.symbol)"
+            :key="coin.originalSymbol"
+            @click="selectCoin(coin)"
             class="flex items-center justify-between px-4 py-3 hover:bg-white/5 active:bg-white/10 transition-colors cursor-pointer border-b border-white/10"
           >
             <div class="flex items-center gap-3 flex-1 min-w-0">
-              <img
-                :src="getCoinLogo(coin.symbol)"
-                :alt="coin.symbol"
-                class="w-8 h-8 rounded-full flex-shrink-0"
-                @error="handleImageError"
-              />
-              <span class="text-white font-medium">{{ coin.symbol.split('/')[0] }}</span>
+              <div class="relative w-10 h-10 flex-shrink-0">
+                <!-- Quote Currency (Bottom Left) - UNDER -->
+                <img
+                  :src="getQuoteLogo(coin.symbol)"
+                  class="w-7 h-7 rounded-full absolute bottom-0 left-0 z-0 border border-white/20 opacity-95 brightness-110"
+                />
+                <!-- Base Currency (Top Right) - ON TOP -->
+                <img
+                  :src="getCoinLogo(coin.symbol)"
+                  :alt="coin.symbol"
+                  class="w-7 h-7 rounded-full absolute top-0 right-0 z-10 border border-white/30 shadow-xl brightness-110"
+                  @error="handleImageError"
+                />
+              </div>
+              <span class="text-white font-medium">{{ coin.symbol }}</span>
             </div>
             <div class="flex items-center gap-4 flex-shrink-0">
               <span
@@ -631,13 +691,14 @@
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </Transition>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted, computed, watch, nextTick } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import MobileNav from '../components/MobileNav.vue';
 import DesktopNav from '../components/DesktopNav.vue';
@@ -646,6 +707,8 @@ import api from '../utils/api';
 import { getCoinLogoUrl } from '../utils/coinLogos';
 import CustomSelect from '../components/CustomSelect.vue';
 import axios from 'axios';
+import { BINANCE_AVAILABLE_COINS } from '../utils/binanceCoins';
+import { io } from 'socket.io-client';
 
 const BINANCE_HTTP_API = 'https://api.binance.com/api/v3';
 const BINANCE_WS_BASE = 'wss://stream.binance.com:9443';
@@ -653,20 +716,25 @@ const BINANCE_WS_BASE = 'wss://stream.binance.com:9443';
 const { t } = useI18n();
 
 const route = useRoute();
+const router = useRouter();
 const isMobile = computed(() => window.innerWidth < 768);
 
 // Get symbol from query or default
 const getInitialSymbol = () => {
-  if (route.query.symbol) {
-    let symbol = route.query.symbol.trim();
-    // If symbol already has a slash, use it as is
-    if (symbol.includes('/')) {
-      return symbol;
-    } else {
-      // Format like "BCHUSDT" - add slash before USDT
-      symbol = symbol.replace(/USDT$/, '/USDT');
-      return symbol;
-    }
+  const querySymbol = route.query.symbol;
+  if (querySymbol) {
+    let s = querySymbol.trim().toUpperCase();
+    
+    // Exact match (e.g. BTC/USDT)
+    if (s.includes('/')) return s;
+    
+    // Crypto (BTCUSDT -> BTC/USDT)
+    if (s.endsWith('USDT')) return s.replace(/USDT$/, '/USDT');
+    
+    // Forex/Metals (GBPUSD -> GBP/USD, XAUUSD -> XAU/USD)
+    if (s.length === 6) return `${s.slice(0, 3)}/${s.slice(3)}`;
+    
+    return s;
   }
   return 'BTC/USDT';
 };
@@ -679,20 +747,57 @@ const activeTab = ref('transaction');
 const ticker = ref(null);
 const orderBook = ref({ bids: [], asks: [] });
 const walletBalance = ref(0);
-const loading = ref(false);
+const isLoading = ref(true); // Start true, set false after initial load
 const showCoinSelector = ref(false);
+const activeCategory = ref('hot');
+const cryptoList = ref([
+  'BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'XRPUSDT', 'ADAUSDT', 'DOGEUSDT', 
+  'LTCUSDT', 'ETCUSDT', 'BCHUSDT', 'DOTUSDT', 'NEOUSDT', 'IOTAUSDT', 'LUNAUSDT'
+]);
+const metalsList = ref(['XAUUSDT', 'XAGUSDT', 'XPTUSDT', 'XPDUSDT']);
+const forexList = ref([
+  'AUDUSD', 'BRLUSD', 'CADUSD', 'CHFUSD', 'CNYUSD', 'CZKUSD', 'DKKUSD',
+  'EURUSD', 'GBPUSD', 'HKDUSD', 'HUFUSD', 'IDRUSD', 'ILSUSD', 'INRUSD', 'ISKUSD',
+  'JPYUSD', 'KRWUSD', 'MXNUSD', 'MYRUSD', 'NOKUSD', 'NZDUSD', 'PHPUSD', 'PLNUSD',
+  'RONUSD', 'SEKUSD', 'SGDUSD', 'THBUSD', 'TRYUSD', 'USDUSD', 'ZARUSD'
+]);
+
 const coinList = computed(() => {
-  return binanceCoins.map(coin => {
-    const symbol = `${coin}USDT`;
-    const tickerData = allTickersMap.value[symbol];
+  let targetList = [];
+  
+  if (activeCategory.value === 'hot') {
+    targetList = ['BTCUSDT', 'ETHUSDT', 'XRPUSDT', 'XAUUSDT', 'XAGUSDT', 'GBPUSD', 'EURUSD'];
+  } else if (activeCategory.value === 'crypto') {
+    targetList = cryptoList.value;
+  } else if (activeCategory.value === 'metals') {
+    targetList = metalsList.value;
+  } else if (activeCategory.value === 'forex') {
+    targetList = forexList.value;
+  }
+  
+  return targetList.map(k => {
+    const tickerData = allTickersMap.value[k];
+    
+    // Formatting logic similar to Home page
+    let displaySymbol = k;
+    if (k.includes('USDT')) {
+      if (['XAUUSDT', 'XAGUSDT', 'XPTUSDT', 'XPDUSDT'].includes(k)) {
+        displaySymbol = k.replace('USDT', '/USD');
+      } else {
+        displaySymbol = k.replace('USDT', '/USDT');
+      }
+    } else if (k.length === 6) {
+      displaySymbol = `${k.slice(0, 3)}/${k.slice(3)}`;
+    }
+    
     return {
-      symbol: `${coin}/USDT`,
+      symbol: displaySymbol,
+      originalSymbol: k,
       price: tickerData?.price || 0,
       change: tickerData?.change || 0,
     };
-  }).sort((a, b) => a.symbol.localeCompare(b.symbol));
+  });
 });
-const isLoading = ref(true);
 const activeTrades = ref([]);
 const closedTrades = ref([]);
 const countdowns = ref({});
@@ -701,6 +806,11 @@ const currentActiveTrade = ref(null);
 const allTickersMap = ref({}); // Map of symbol -> ticker data
 let lastDepthUpdate = 0;
 let lastTickerUpdate = 0;
+
+// Chart animation data
+const chartPriceHistory = ref([]);
+const chartBasePrice = ref(0);
+const isProcessingTrade = ref(false);
 
 // Interval refs for proper cleanup (prevent memory leaks)
 const marketDataInterval = ref(null);
@@ -810,6 +920,8 @@ const formatPrice = (price) => {
   if (price === null || price === undefined) return '0.0000';
   const numPrice = typeof price === 'string' ? parseFloat(price) : price;
   if (isNaN(numPrice)) return '0.0000';
+  // For Forex pairs (typically around 1.0), use 5 decimals for precision
+  if (numPrice >= 0.1 && numPrice <= 10) return numPrice.toFixed(5);
   if (numPrice >= 0.01) return numPrice.toFixed(4); // Force 4 decimals for standard prices
   return numPrice.toFixed(8); // More for very small prices
 };
@@ -823,37 +935,214 @@ const selectOrderBookPrice = (price) => {
   // Could be used to set a price if needed
 };
 
-const getVolumePercent = (quantity, type) => {
-  const visibleRows = type === 'bid' 
-    ? orderBook.value.bids.slice(0, 6)
-    : orderBook.value.asks.slice(0, 6);
-    
-  if (!visibleRows.length) return 0;
-  
-  const allQuantities = visibleRows.map(row => parseFloat(row.quantity));
-  const maxQuantity = Math.max(...allQuantities);
-  
-  if (maxQuantity === 0) return 0;
-  return (parseFloat(quantity) / maxQuantity) * 100;
+const getCoinLogo = (symbol) => {
+  const base = symbol.split('/')[0];
+  return getCoinLogoUrl(base);
+};
+
+const getQuoteLogo = (symbol) => {
+  const quote = symbol.split('/')[1] || 'USD';
+  return getCoinLogoUrl(quote);
+};
+
+const handleImageError = (event) => {
+  const symbol = event.target.alt ? event.target.alt.split('/')[0] : 'Coin';
+  event.target.src = `https://ui-avatars.com/api/?name=${symbol}&background=random&color=fff&rounded=true`;
 };
 
 const loadMarketData = async () => {
-  isLoading.value = true;
   const symbol = selectedSymbol.value.replace('/', '');
+  isLoading.value = true;
+  
+  // Clear old order book data to prevent "ghost" prices if requests fail
+  ticker.value = null;
+  orderBook.value = { bids: [], asks: [] };
+  
   try {
     await Promise.all([
       loadTicker(symbol),
       loadOrderBook(symbol),
-      loadWalletBalance(),
     ]);
+    
+    // Fallback: Generate mock ticker if still empty (e.g. for Forex)
+    // Cover ALL Forex/Metals (ending in /USD)
+    if (!ticker.value && selectedSymbol.value.endsWith('/USD')) {
+        generateMockTicker(symbol);
+    }
   } finally {
     isLoading.value = false;
   }
 };
 
-const loadTicker = async (symbol) => {
+const GOLD_API_KEY = '152ca358-8a3f-474d-9e7e-bb9af2057a3c';
+
+const fetchGoldPrice = async (symbol) => {
+  const clean = symbol.replace('/', '').toUpperCase();
+  const metalCode = ['XAU', 'XAG', 'XPT', 'XPD'].find(m => clean.startsWith(m));
+  if (!metalCode) return null;
+  
   try {
-    const response = await api.get(`/market/ticker/${symbol}/24h`);
+    const res = await axios.get(`https://app.goldapi.net/api/price/${metalCode}/USD`, {
+      headers: { 'x-api-key': GOLD_API_KEY }
+    });
+    if (res.data && res.data.price) return { price: res.data.price, high: res.data.high_price, low: res.data.low_price, changePercent: res.data.chp || 0 };
+  } catch (e) {}
+  return null;
+};
+
+const mockUpdateInterval = ref(null);
+
+const startMockUpdates = (symbol) => {
+  if (mockUpdateInterval.value) clearInterval(mockUpdateInterval.value);
+  
+  let tickCount = 0;
+  mockUpdateInterval.value = setInterval(async () => {
+    if (!ticker.value) return;
+    tickCount++;
+    
+    // 0. Update Real Metal Price every 10s
+    if (tickCount % 10 === 0 && ['XAU', 'XAG', 'XPT', 'XPD'].some(m => symbol.includes(m))) {
+        const goldData = await fetchGoldPrice(symbol);
+        if (goldData) {
+            ticker.value.price = goldData.price;
+            ticker.value.highPrice = goldData.high;
+            ticker.value.lowPrice = goldData.low;
+            ticker.value.priceChangePercent = goldData.changePercent;
+        }
+    }
+    
+    // 0.5 Self-heal: Check if global map has better data
+    const cleanSymbol = symbol.replace('/', '');
+    let globalData = allTickersMap.value[cleanSymbol];
+    if (!globalData && !cleanSymbol.endsWith('T')) {
+        globalData = allTickersMap.value[`${cleanSymbol}T`]; 
+    }
+    const globalPrice = globalData?.price;
+    
+    if (globalPrice && Math.abs(globalPrice - ticker.value.price) / ticker.value.price > 0.1) {
+         const gp = Number(globalPrice);
+         ticker.value.price = gp;
+         ticker.value.highPrice = gp * 1.02;
+         ticker.value.lowPrice = gp * 0.98;
+         ticker.value.priceChange = gp * (ticker.value.priceChangePercent / 100);
+    }
+    
+    // Safety Sanity Check: if Forex pair price > 200 (and not Metal/Crypto), force reset
+    if (ticker.value.price > 200 && 
+        ['EUR', 'GBP', 'AUD', 'CAD', 'CHF', 'NZD', 'USD'].some(c => symbol.includes(c)) &&
+        !['BTC', 'ETH', 'BNB', 'XAU', 'XAG', 'XPT', 'XPD'].some(c => symbol.includes(c)) 
+    ) {
+         ticker.value.price = 1.0;
+         ticker.value.highPrice = 1.02;
+         ticker.value.lowPrice = 0.98;
+    }
+    
+    // 1. Jitter Price
+    const currentPrice = parseFloat(ticker.value.price);
+    const volatility = currentPrice * 0.0001; // Small movement
+    const change = (Math.random() - 0.5) * volatility;
+    const newPrice = currentPrice + change;
+    
+    ticker.value = {
+      ...ticker.value,
+      price: newPrice,
+      priceChange: (ticker.value.priceChange || 0) + change,
+      highPrice: Math.max(ticker.value.highPrice, newPrice),
+      lowPrice: Math.min(ticker.value.lowPrice, newPrice)
+    };
+    
+    // 2. Update Order Book based on new Price
+    generateMockOrderBook(symbol, newPrice);
+    
+  }, 1000); // 1-second updates
+};
+
+const generateMockTicker = (symbol) => {
+    // Stop any existing mock updates first
+    if (mockUpdateInterval.value) clearInterval(mockUpdateInterval.value);
+
+    let price = 1.0;
+    const cleanSymbol = symbol.replace('/', '');
+    
+    // 1. Try to get price from global ticker map (Popup data) first
+    if (allTickersMap.value[cleanSymbol]?.price) {
+        price = allTickersMap.value[cleanSymbol].price;
+    } 
+    // 2. Fallback to hardcoded reasonable defaults
+    else {
+        if (symbol.includes('BTC')) price = 65000;
+        else if (symbol.includes('ETH')) price = 3500;
+        else if (symbol.includes('XAU')) price = 2300;
+        else if (symbol.includes('XAG')) price = 30;
+        else if (symbol.includes('XPT')) price = 980;
+        else if (symbol.includes('XPD')) price = 1050;
+        else if (symbol.includes('GBP')) price = 1.27;
+        else if (symbol.includes('EUR')) price = 1.09;
+        else if (symbol.includes('JPY')) price = 150;
+        else if (symbol.includes('AUD')) price = 0.65;
+        else if (symbol.includes('CAD')) price = 0.73;
+        else if (symbol.includes('CHF')) price = 1.10;
+        else if (symbol.includes('CNY')) price = 0.14;
+    }
+    
+    ticker.value = {
+        price: price,
+        priceChangePercent: 0.05,
+        priceChange: price * 0.0005,
+        volume: 100000,
+        highPrice: price * 1.01,
+        lowPrice: price * 0.99
+    };
+    
+    // Start continuous updates
+    startMockUpdates(symbol);
+};
+
+// Clean up on unmount
+onUnmounted(() => {
+  if (mockUpdateInterval.value) clearInterval(mockUpdateInterval.value);
+  if (tickerWs) tickerWs.close();
+  if (marketSocket) marketSocket.disconnect();
+});
+
+const loadTicker = async (symbol) => {
+  const clean = symbol.toUpperCase().replace('/', '');
+  
+  // 1. Metals: Use instant defaults, fetch real data in background (non-blocking)
+  if (['XAU', 'XAG', 'XPT', 'XPD'].some(m => clean.startsWith(m))) {
+      const defaults = { XAU: 2350, XAG: 30, XPT: 980, XPD: 1050 };
+      const metalCode = ['XAU', 'XAG', 'XPT', 'XPD'].find(m => clean.startsWith(m));
+      const defaultPrice = defaults[metalCode] || 2300;
+      
+      ticker.value = {
+        price: defaultPrice,
+        priceChangePercent: 0.05,
+        priceChange: 0,
+        volume: 100000,
+        highPrice: defaultPrice * 1.01,
+        lowPrice: defaultPrice * 0.99,
+      };
+      
+      // Background fetch - don't await
+      fetchGoldPrice(symbol).then(goldData => {
+        if (goldData && ticker.value) {
+          ticker.value.price = goldData.price;
+          ticker.value.highPrice = goldData.high || goldData.price * 1.01;
+          ticker.value.lowPrice = goldData.low || goldData.price * 0.99;
+          ticker.value.priceChangePercent = goldData.changePercent || 0;
+        }
+      }).catch(() => {});
+      
+      return;
+  }
+
+  // 2. Crypto/Forex: Try backend first with timeout
+  try {
+    const response = await Promise.race([
+      api.get(`/market/ticker/${symbol}/24h`),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000))
+    ]);
+    
     if (response.data && response.data.price) {
       ticker.value = {
         ...response.data,
@@ -864,59 +1153,79 @@ const loadTicker = async (symbol) => {
         highPrice: Number(response.data.highPrice) || 0,
         lowPrice: Number(response.data.lowPrice) || 0,
       };
-    } else {
-      // Fallback: fetch directly from Binance
-      try {
-        const binanceResponse = await axios.get(`${BINANCE_HTTP_API}/ticker/24hr`, {
-          params: { symbol: symbol.toUpperCase() }
-        });
-        const data = binanceResponse.data;
-        ticker.value = {
-          price: Number(data.lastPrice) || 0,
-          priceChangePercent: Number(data.priceChangePercent) || 0,
-          priceChange: Number(data.priceChange) || 0,
-          volume: Number(data.volume) || 0,
-          highPrice: Number(data.highPrice) || 0,
-          lowPrice: Number(data.lowPrice) || 0,
-        };
-      } catch (binanceError) {
-        console.error('Binance fallback failed:', binanceError);
-      }
+      return;
     }
-  } catch (error) {
-    console.error('Error loading ticker:', error);
-    // Try Binance fallback on error
-    try {
-      const binanceResponse = await axios.get(`${BINANCE_HTTP_API}/ticker/24hr`, {
-        params: { symbol: symbol.toUpperCase() }
-      });
-      const data = binanceResponse.data;
-      ticker.value = {
-        price: Number(data.lastPrice) || 0,
-        priceChangePercent: Number(data.priceChangePercent) || 0,
-        priceChange: Number(data.priceChange) || 0,
-        volume: Number(data.volume) || 0,
-        highPrice: Number(data.highPrice) || 0,
-        lowPrice: Number(data.lowPrice) || 0,
-      };
-    } catch (binanceError) {
-      console.error('Binance fallback failed:', binanceError);
-    }
-  }
+  } catch (error) { }
+
+  // 3. Binance fallback with timeout
+  try {
+     let binanceSymbol = clean;
+     if (binanceSymbol.length === 6 && !binanceSymbol.endsWith('T') && 
+        !['BTC', 'ETH', 'BNB', 'SOL', 'XRP', 'ADA', 'DOGE'].some(c => binanceSymbol.startsWith(c))) {
+          binanceSymbol += 'T';
+     }
+
+     const binanceResponse = await Promise.race([
+       axios.get(`${BINANCE_HTTP_API}/ticker/24hr`, { params: { symbol: binanceSymbol } }),
+       new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 2000))
+     ]);
+     
+     const data = binanceResponse.data;
+     ticker.value = {
+       price: Number(data.lastPrice) || 0,
+       priceChangePercent: Number(data.priceChangePercent) || 0,
+       priceChange: Number(data.priceChange) || 0,
+       volume: Number(data.volume) || 0,
+       highPrice: Number(data.highPrice) || 0,
+       lowPrice: Number(data.lowPrice) || 0,
+     };
+  } catch (binanceError) { }
 };
 
 const loadOrderBook = async (symbol) => {
+  const clean = symbol.toUpperCase().replace('/', '');
+  
+  // 1. Metals Optimization: Skip backend/binance real orderbook
+  if (['XAU', 'XAG', 'XPT', 'XPD'].some(m => clean.startsWith(m))) {
+      if (ticker.value?.price) {
+          generateMockOrderBook(symbol, ticker.value.price);
+      } else {
+          generateMockOrderBook(symbol, 2300);
+      }
+      return;
+  }
+  
+  // 2. Forex Optimization: Skip Binance (most Forex pairs don't exist), use mock
+  const isForex = clean.endsWith('USD') && clean.length === 6 && 
+                  !['BTC', 'ETH', 'BNB', 'SOL', 'XRP', 'ADA', 'DOGE'].some(c => clean.startsWith(c));
+  if (isForex) {
+      if (ticker.value?.price) {
+          generateMockOrderBook(symbol, ticker.value.price);
+      } else {
+          generateMockOrderBook(symbol, 1.0);
+      }
+      return;
+  }
+
   try {
     const response = await api.get(`/market/orderbook/${symbol}`, { params: { limit: 20 } });
     if (response.data && (response.data.bids?.length > 0 || response.data.asks?.length > 0)) {
-    orderBook.value = response.data;
+       orderBook.value = response.data;
     } else {
-      // Fallback: fetch directly from Binance
-      try {
-        const binanceResponse = await axios.get(`${BINANCE_HTTP_API}/depth`, {
-          params: { symbol: symbol.toUpperCase(), limit: 20 }
-        });
-        orderBook.value = {
+       throw new Error('Backend depth empty');
+    }
+  } catch (error) {
+    // Binance Fallback with Forex T suffix fix
+    try {
+       let binanceSymbol = clean;
+       if (binanceSymbol.length === 6 && !binanceSymbol.endsWith('T') && 
+           !['BTC', 'ETH', 'BNB', 'SOL', 'XRP'].some(c => binanceSymbol.startsWith(c))) {
+             binanceSymbol += 'T';
+       }
+       const binanceResponse = await axios.get(`${BINANCE_HTTP_API}/depth`, {
+          params: { symbol: binanceSymbol, limit: 20 }
+       });
+       orderBook.value = {
           bids: (binanceResponse.data.bids || []).map(([price, quantity]) => ({
             price: Number(price) || 0,
             quantity: Number(quantity) || 0,
@@ -926,33 +1235,38 @@ const loadOrderBook = async (symbol) => {
             quantity: Number(quantity) || 0,
           })),
           timestamp: Date.now(),
-        };
-      } catch (binanceError) {
-        console.error('Binance orderbook fallback failed:', binanceError);
-      }
-    }
-  } catch (error) {
-    console.error('Error loading order book:', error);
-    // Try Binance fallback on error
-    try {
-      const binanceResponse = await axios.get(`${BINANCE_HTTP_API}/depth`, {
-        params: { symbol: symbol.toUpperCase(), limit: 20 }
-      });
-      orderBook.value = {
-        bids: (binanceResponse.data.bids || []).map(([price, quantity]) => ({
-          price: Number(price) || 0,
-          quantity: Number(quantity) || 0,
-        })),
-        asks: (binanceResponse.data.asks || []).map(([price, quantity]) => ({
-          price: Number(price) || 0,
-          quantity: Number(quantity) || 0,
-        })),
-        timestamp: Date.now(),
-      };
-    } catch (binanceError) {
-      console.error('Binance orderbook fallback failed:', binanceError);
-    }
+       };
+    } catch (binanceError) { }
   }
+  
+  // Final Mock Fallback
+  if ((!orderBook.value.bids.length || !orderBook.value.asks.length) && ticker.value?.price) {
+      generateMockOrderBook(symbol, ticker.value.price);
+  }
+};
+
+const generateMockOrderBook = (symbol, basePrice) => {
+    const bids = [];
+    const asks = [];
+    const spread = basePrice * 0.0002; // 0.02% spread
+    
+    // Generate 15 levels
+    for(let i=0; i<15; i++) {
+        const bidPrice = basePrice - spread - (i * spread);
+        const askPrice = basePrice + spread + (i * spread);
+        
+        bids.push({
+            price: bidPrice,
+            quantity: Math.random() * (basePrice > 1000 ? 0.5 : 1000)
+        });
+        
+        asks.push({
+            price: askPrice,
+            quantity: Math.random() * (basePrice > 1000 ? 0.5 : 1000)
+        });
+    }
+    
+    orderBook.value = { bids, asks, timestamp: Date.now() };
 };
 
 // Load wallet balance for USDT (same logic as Spot page)
@@ -980,22 +1294,29 @@ const loadCoinList = async () => {
     // This function can still fetch initial data if needed, but it's less critical now
 };
 
-const selectCoin = (symbol) => {
+const selectCoin = (data) => {
+  // data can be a symbol string or an object with originalSymbol
+  const symbol = typeof data === 'object' ? data.symbol : data;
+  const originalSymbol = typeof data === 'object' ? data.originalSymbol : symbol.replace('/', '');
+
   selectedSymbol.value = symbol;
   showCoinSelector.value = false;
   loadMarketData();
-  // Reconnect WebSocket for the new depth stream
   connectWebSocket();
 };
 
-const getCoinLogo = (symbol) => {
-  const baseCurrency = symbol.split('/')[0];
-  return getCoinLogoUrl(baseCurrency) || `https://via.placeholder.com/32?text=${baseCurrency}`;
-};
-
-const handleImageError = (event) => {
-  const symbol = event.target.alt.split('/')[0];
-  event.target.src = `https://via.placeholder.com/32?text=${symbol}`;
+const getVolumePercent = (quantity, type) => {
+  const visibleRows = type === 'bid' 
+    ? orderBook.value.bids.slice(0, 6)
+    : orderBook.value.asks.slice(0, 6);
+    
+  if (!visibleRows.length) return 0;
+  
+  const allQuantities = visibleRows.map(row => parseFloat(row.quantity));
+  const maxQuantity = Math.max(...allQuantities);
+  
+  if (maxQuantity === 0) return 0;
+  return (parseFloat(quantity) / maxQuantity) * 100;
 };
 
 const placeOrder = async () => {
@@ -1015,91 +1336,73 @@ const placeOrder = async () => {
     return;
   }
   
-  loading.value = true;
+  // PREPARE UI locally first (Loader state)
+  const duration = parseInt(openTime.value);
+  const entryPrice = ticker.value?.price || 50000;
+  
+  // Set temporary display data (for modal details) but NO countdown yet
+  currentActiveTrade.value = {
+    id: 'temp_preparing',
+    symbol: selectedSymbol.value,
+    side: orderSide.value,
+    amount: parseFloat(openingQuantity.value),
+    duration: duration,
+    profit_rate: config.profitRate || 10,
+    entry_price: entryPrice,
+    status: 'preparing'
+  };
+  
+  // Flag to show loader instead of countdown
+  isProcessingTrade.value = true;
+  showActiveTradeModal.value = true;
+  
+  // Clear input
+  const savedAmount = openingQuantity.value;
+  openingQuantity.value = '';
+  
+  // API call
   try {
     const response = await api.post('/contracts', {
       symbol: selectedSymbol.value,
       side: orderSide.value,
-      amount: parseFloat(openingQuantity.value),
-      duration: parseInt(openTime.value),
-      entry_price: ticker.value?.price || 50000,
+      amount: parseFloat(savedAmount),
+      duration: duration,
+      entry_price: entryPrice,
     });
     
-    console.log('Trade created:', response.data);
-    
-    // Clear input
-    openingQuantity.value = '';
-    
-    // Get the created trade from response
     const createdTrade = response.data.trade;
-    console.log('=== TRADE CREATED ===');
-    console.log('Full response:', response);
-    console.log('Response data:', response.data);
-    console.log('Created trade:', createdTrade);
     
     if (createdTrade) {
-      // Force set the trade immediately with all required fields
-      // Convert all numeric fields to numbers (PostgreSQL returns strings)
-      currentActiveTrade.value = {
-        id: createdTrade.id,
-        symbol: createdTrade.symbol || selectedSymbol.value,
-        side: createdTrade.side || orderSide.value,
-        amount: parseFloat(createdTrade.amount) || parseFloat(openingQuantity.value),
-        duration: parseInt(createdTrade.duration) || parseInt(openTime.value),
-        profit_rate: parseFloat(createdTrade.profit_rate) || tradeConfig.value?.[openTime.value]?.profitRate || 10,
-        entry_price: parseFloat(createdTrade.entry_price) || parseFloat(ticker.value?.price) || 50000,
-        expires_at: createdTrade.expires_at,
-        status: createdTrade.status || 'pending'
-      };
+      // 1. Set the REAL trade data
+      currentActiveTrade.value = createdTrade;
       
-      // Force show modal
-      showActiveTradeModal.value = true;
-      
-      // Initialize countdown for the new trade
+      // 2. Initialize countdown from Server Time (prevents pauses/skips)
       if (createdTrade.expires_at) {
         const expiresAt = new Date(createdTrade.expires_at).getTime();
         const now = Date.now();
-        const remaining = Math.floor((expiresAt - now) / 1000);
-        // Cap countdown at 0 (don't allow negative)
-        countdowns.value[createdTrade.id] = Math.max(0, remaining);
-        console.log('Countdown initialized from expires_at:', countdowns.value[createdTrade.id], 'seconds');
-      } else if (createdTrade.duration) {
-        // If no expires_at, use duration as initial countdown
-        countdowns.value[createdTrade.id] = Math.max(0, parseInt(createdTrade.duration));
-        console.log('Countdown set from duration:', createdTrade.duration);
+        const remaining = Math.max(0, Math.floor((expiresAt - now) / 1000));
+        countdowns.value[createdTrade.id] = remaining;
       } else {
-        // Fallback to selected duration
-        const duration = parseInt(openTime.value);
-        countdowns.value[createdTrade.id] = Math.max(0, duration);
-        console.log('Countdown set to selected duration:', duration);
+        countdowns.value[createdTrade.id] = duration;
       }
       
-      // Force Vue to update
-      await nextTick();
+      // 3. Add to active trades list
+      activeTrades.value.unshift(createdTrade);
+      chartPriceHistory.value = [parseFloat(createdTrade.entry_price)];
       
-      console.log('=== MODAL STATE ===');
-      console.log('currentActiveTrade:', currentActiveTrade.value);
-      console.log('showActiveTradeModal:', showActiveTradeModal.value);
-      console.log('Modal condition check:', !!currentActiveTrade.value && showActiveTradeModal.value);
-      console.log('Countdown value:', countdowns.value[createdTrade.id]);
+      // 4. Remove processing flag - Countdown appears smoothly now
+      isProcessingTrade.value = false;
       
-      // Add to active trades list immediately
-      activeTrades.value.unshift(currentActiveTrade.value);
-    } else {
-      console.error('❌ No trade in response!');
-      console.error('Response:', response);
-      console.error('Response data:', response.data);
-      alert('Trade created but no trade data returned. Please check console.');
+      // Reload balance in background
+      loadWalletBalance();
     }
-    
-    // Reload market data and trades in background (non-blocking)
-    loadMarketData();
-    loadContractTrades();
   } catch (error) {
-    console.error('Error creating trade:', error);
-    alert(error.response?.data?.error || 'Failed to create contract trade');
+    console.error('Trade failed:', error);
+    showActiveTradeModal.value = false;
+    isProcessingTrade.value = false;
+    // Show error toast/alert if needed
+    alert(error.response?.data?.message || 'Failed to place order');
   }
-  loading.value = false;
 };
 
 const loadContractTrades = async () => {
@@ -1199,6 +1502,38 @@ const updateCountdowns = () => {
   }
 };
 
+// Watch for symbol changes from route
+watch(() => route.query.symbol, (newSymbol) => {
+  if (newSymbol) {
+    let s = newSymbol.trim().toUpperCase();
+    
+    // 1. Exact match (already has slash)
+    if (s.includes('/')) {
+       selectedSymbol.value = s;
+       loadMarketData();
+       return;
+    }
+    
+    // 2. Crypto (BTCUSDT -> BTC/USDT)
+    if (s.endsWith('USDT')) {
+      selectedSymbol.value = s.replace(/USDT$/, '/USDT');
+      loadMarketData();
+      return;
+    }
+    
+    // 3. Forex/Metals (GBPUSD -> GBP/USD)
+    if (s.length === 6) {
+      selectedSymbol.value = `${s.slice(0, 3)}/${s.slice(3)}`;
+      loadMarketData();
+      return;
+    }
+    
+    // 4. Default fallback
+    selectedSymbol.value = s;
+    loadMarketData();
+  }
+}, { immediate: true });
+
 // Watch for new active trades to auto-show modal
 watch(() => activeTrades.value.length, (newLength, oldLength) => {
   if (newLength > 0 && !showActiveTradeModal.value) {
@@ -1215,67 +1550,92 @@ const refreshMarketData = async () => {
   ]);
 };
 
-// WebSocket for real-time ticker updates
+// WebSocket for real-time updates
 let tickerWs = null;
+let marketSocket = null;
 let wsReconnectTimer = null;
 let wsBackoffMs = 1000;
 const MAX_BACKOFF_MS = 30000;
 
-const processTickerUpdate = (tickerData) => {
-  if (!tickerData?.s) return;
-  const symbol = tickerData.s;
-  
-  // Update the global map for the coin list (can be frequent, it's just a data map)
-  allTickersMap.value[symbol] = {
-    price: Number(tickerData.c),
-    change: Number(tickerData.P),
-  };
-
-  const currentSymbol = selectedSymbol.value.replace('/', '');
-  if (symbol !== currentSymbol) return;
-  
-  const now = Date.now();
-  if (ticker.value && (now - lastTickerUpdate >= 500)) {
-    lastTickerUpdate = now;
-    ticker.value.price = Number(tickerData.c) || ticker.value.price;
-    ticker.value.priceChangePercent = Number(tickerData.P) || ticker.value.priceChangePercent;
-    ticker.value.priceChange = Number(tickerData.p) || ticker.value.priceChange;
-    ticker.value.volume = Number(tickerData.v) || ticker.value.volume;
-    ticker.value.highPrice = Number(tickerData.h) || ticker.value.highPrice;
-    ticker.value.lowPrice = Number(tickerData.l) || ticker.value.lowPrice;
+// Update URL when symbol changes
+watch(selectedSymbol, (newSymbol) => {
+  if (newSymbol) {
+    const query = { ...route.query, symbol: newSymbol.replace('/', '') };
+    router.replace({ query });
   }
+});
+
+const processTickerUpdate = (tickerData) => {
+  // Handle both array and single object data
+  const updates = Array.isArray(tickerData) ? tickerData : [tickerData];
+  
+  updates.forEach(item => {
+    if (!item?.s) return;
+    const symbol = item.s;
+    
+    // Normalize symbol for the map (remove slash if present)
+    const mapSymbol = symbol.replace('/', '');
+    
+    // Update the global map for the coin list
+    allTickersMap.value[mapSymbol] = {
+      price: Number(item.c),
+      change: Number(item.P),
+    };
+
+    // Check if this update matches appropriate selected symbol
+    const currentSymbolClean = selectedSymbol.value.replace('/', '');
+    // Match exact OR match with T suffix (GBPUSD vs GBPUSDT)
+    const isMatch = mapSymbol === currentSymbolClean || mapSymbol === `${currentSymbolClean}T`;
+    
+    if (!isMatch) return;
+    
+    const now = Date.now();
+    // For the active ticker, we update more frequently or immediately
+    if (ticker.value) {
+      const newPrice = Number(item.c);
+      ticker.value.price = newPrice || ticker.value.price;
+      ticker.value.priceChangePercent = Number(item.P) || ticker.value.priceChangePercent;
+      ticker.value.priceChange = Number(item.p || 0) || ticker.value.priceChange; // p is price change if avail
+      ticker.value.volume = Number(item.v) || ticker.value.volume;
+      ticker.value.highPrice = Number(item.h || item.c) || ticker.value.highPrice;
+      ticker.value.lowPrice = Number(item.l || item.c) || ticker.value.lowPrice;
+      lastTickerUpdate = now;
+      
+      // Track price history for active trade chart
+      if (currentActiveTrade.value && newPrice) {
+        chartPriceHistory.value.push(newPrice);
+        // Keep only last 100 prices to avoid memory issues
+        if (chartPriceHistory.value.length > 100) {
+          chartPriceHistory.value.shift();
+        }
+      }
+      
+      // Force mock orderbook update for Forex/Metals (all /USD pairs)
+      if (selectedSymbol.value.endsWith('/USD')) {
+          generateMockOrderBook(selectedSymbol.value, ticker.value.price);
+      }
+    }
+  });
 };
 
 const connectWebSocket = () => {
+  // 1. Standard Binance WebSockets
   try {
     if (tickerWs) {
-      tickerWs.onopen = null;
-      tickerWs.onmessage = null;
-      tickerWs.onerror = null;
-      tickerWs.onclose = null;
       tickerWs.close();
       tickerWs = null;
     }
-  } catch (e) {
-    console.warn('[Contracts WS] Cleanup error:', e);
-  }
-  
-  try {
     const currentSymbol = selectedSymbol.value.replace('/', '').toLowerCase();
-    // Correct URL format for combined streams: /stream?streams=stream1/stream2
     const wsUrl = `${BINANCE_WS_BASE}/stream?streams=!ticker@arr/${currentSymbol}@depth20@100ms`;
     tickerWs = new WebSocket(wsUrl);
     
     tickerWs.onopen = () => {
-      console.log('[Contracts WS] Connected to:', wsUrl);
       wsBackoffMs = 1000;
     };
     
     tickerWs.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        
-        // Handle combined stream format
         if (data.stream === '!ticker@arr') {
             data.data.forEach(processTickerUpdate);
         } else if (data.stream?.endsWith('@depth20@100ms')) {
@@ -1284,39 +1644,40 @@ const connectWebSocket = () => {
                 lastDepthUpdate = now;
                 const depthData = data.data;
                 orderBook.value = {
-                    bids: (depthData.bids || []).map(([price, quantity]) => ({
-                        price: Number(price) || 0,
-                        quantity: Number(quantity) || 0,
-                    })),
-                    asks: (depthData.asks || []).map(([price, quantity]) => ({
-                        price: Number(price) || 0,
-                        quantity: Number(quantity) || 0,
-                    })),
+                    bids: (depthData.bids || []).map(([p, q]) => ({ price: Number(p), quantity: Number(q) })),
+                    asks: (depthData.asks || []).map(([p, q]) => ({ price: Number(p), quantity: Number(q) })),
                     timestamp: now,
                 };
             }
-        } else if (Array.isArray(data)) {
-            // Fallback for single stream format
-            data.forEach(processTickerUpdate);
         }
-      } catch (e) {
-        console.error('[Contracts WS] Parse error:', e);
-      }
+      } catch (e) {}
     };
     
-    tickerWs.onerror = (e) => {
-      console.error('[Contracts WS] Error:', e);
-    };
-    
-    tickerWs.onclose = (e) => {
-      console.warn('[Contracts WS] Closed:', e.code);
+    tickerWs.onclose = () => {
       tickerWs = null;
       scheduleReconnect();
     };
   } catch (e) {
-    console.error('[Contracts WS] Setup error:', e);
     scheduleReconnect();
   }
+
+  // 2. Custom Backend Market Socket (Metals)
+  if (marketSocket) {
+      marketSocket.disconnect();
+      marketSocket = null;
+  }
+
+  const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+  const baseUrl = backendUrl.replace('/api', '');
+
+  marketSocket = io(`${baseUrl}/market`, {
+      transports: ['websocket', 'polling'],
+      secure: true,
+  });
+
+  marketSocket.on('ticker', (data) => {
+      processTickerUpdate(data);
+  });
 };
 
 const scheduleReconnect = () => {
@@ -1328,12 +1689,17 @@ const scheduleReconnect = () => {
   wsBackoffMs = Math.min(wsBackoffMs * 2, MAX_BACKOFF_MS);
 };
 
-onMounted(async () => {
-  await loadContractTradeSettings(); // Load settings first
-  loadMarketData();
-  loadCoinList();
+onMounted(() => {
+  // Fire all requests in parallel to speed up initial load
+  Promise.all([
+    loadContractTradeSettings(),
+    loadMarketData(),
+    loadCoinList(),
+    loadContractTrades(),
+    loadWalletBalance() // Load balance immediately on mount
+  ]).catch(err => console.error('[Contracts] Parallel load error:', err));
+  
   connectWebSocket();
-  loadContractTrades();
   
   // Real-time updates interval for less frequent data
   let isRefreshing = false;
@@ -1402,15 +1768,78 @@ onUnmounted(() => {
   
   try {
     if (tickerWs) {
-      tickerWs.onopen = null;
-      tickerWs.onmessage = null;
-      tickerWs.onerror = null;
-      tickerWs.onclose = null;
       tickerWs.close();
       tickerWs = null;
+    }
+    if (marketSocket) {
+      marketSocket.disconnect();
+      marketSocket = null;
     }
   } catch {
     // Ignore cleanup errors
   }
 });
 </script>
+
+<style scoped>
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+  opacity: 0;
+}
+
+.modal-fade-enter-active .modal-content-anim {
+  animation: modal-slide-in 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-fade-leave-active .modal-content-anim {
+  animation: modal-slide-in 0.3s cubic-bezier(0.4, 0, 0.2, 1) reverse;
+}
+
+@keyframes modal-slide-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* For desktop centered modal */
+@media (min-width: 768px) {
+  @keyframes modal-slide-in {
+    from {
+      transform: scale(0.95) translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  .modal-fade-enter-active .modal-content-anim,
+  .modal-fade-leave-active .modal-content-anim {
+    transition: all 0.3s ease;
+    animation: none;
+  }
+  
+  .modal-fade-enter-from .modal-content-anim,
+  .modal-fade-leave-to .modal-content-anim {
+    transform: scale(0.95) translateY(20px);
+    opacity: 0;
+  }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+</style>

@@ -1,8 +1,8 @@
 // List of coins that are actually available on Binance
 // Only include coins that are actively traded on Binance
 export const BINANCE_AVAILABLE_COINS = [
-  'BTC', 'ETH', 'BNB', 'XRP', 'ADA', 'DOGE', 'DOT', 'LTC', 'BCH', 
-  'ETC', 'NEO', 'IOTA', 'LUNA'
+  'BTC', 'ETH', 'BNB', 'XRP', 'ADA', 'DOGE', 'DOT', 'LTC', 'BCH',
+  'ETC', 'NEO', 'IOTA', 'LUNA', 'XAU', 'XAG', 'XPT', 'XPD'
 ];
 
 // Coins that are NOT available on Binance (filter these out)

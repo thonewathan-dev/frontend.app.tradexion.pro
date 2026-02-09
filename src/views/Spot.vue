@@ -320,22 +320,22 @@
     </div>
 
     <!-- Coin Selector Modal -->
-    <div
-      v-if="showSymbolSelector"
-      class="fixed inset-0 z-50 flex items-end md:items-center md:justify-center"
-      @click.self="showSymbolSelector = false"
-    >
-      <!-- Backdrop -->
-      <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="showSymbolSelector = false"></div>
-      
-      <!-- Modal Content -->
+    <Transition name="modal-fade">
       <div
-        class="relative glass-card w-full md:w-96 md:max-w-md rounded-b-2xl md:rounded-b-2xl shadow-2xl max-h-[80vh] flex flex-col animate-slide-up"
+        v-if="showSymbolSelector"
+        class="fixed inset-0 z-50 flex items-end md:items-center md:justify-center"
       >
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" @click="showSymbolSelector = false"></div>
+        
+        <!-- Modal Content -->
+        <div
+          class="relative bg-[#1e2329] w-full md:w-96 md:max-w-md rounded-t-3xl md:rounded-3xl shadow-2xl max-h-[90vh] flex flex-col modal-content-anim"
+        >
         <!-- Header -->
-        <div class="sticky top-0 glass-card-no-hover border-b border-white/10 px-4 py-4 z-10">
-          <div class="flex items-center justify-between">
-            <h2 class="text-lg font-bold text-white">USDT</h2>
+        <div class="sticky top-0 bg-[#1e2329] border-b border-white/10 z-10">
+          <div class="flex items-center justify-between px-4 py-4">
+            <h2 class="text-lg font-bold text-white">Market</h2>
             <button
               @click="showSymbolSelector = false"
               class="p-2 hover:bg-white/10 rounded-full transition-colors"
@@ -345,24 +345,58 @@
               </svg>
             </button>
           </div>
+          
+          <!-- Category Tabs with Sliding Indicator -->
+          <div class="px-3 pb-3">
+            <div class="bg-white/5 p-1 rounded-xl flex relative h-10 overflow-hidden isolate">
+              <!-- Sliding Background Indicator -->
+              <div 
+                class="absolute inset-y-1 transition-all duration-300 ease-out bg-blue-500 rounded-lg shadow-lg shadow-blue-500/30 -z-10"
+                :style="{
+                  width: 'calc(25% - 4px)',
+                  left: activeCategory === 'hot' ? '4px' : 
+                        activeCategory === 'crypto' ? '25.6%' : 
+                        activeCategory === 'metals' ? '49.8%' : '74.2%'
+                }"
+              ></div>
+              
+              <button
+                v-for="cat in ['hot', 'crypto', 'metals', 'forex']"
+                :key="cat"
+                @click="activeCategory = cat"
+                class="flex-1 text-[11px] font-bold uppercase transition-colors duration-300 z-10"
+                :class="activeCategory === cat ? 'text-white' : 'text-white/40 hover:text-white/60'"
+              >
+                {{ cat }}
+              </button>
+            </div>
+          </div>
         </div>
 
         <!-- Coin List -->
-        <div class="flex-1 overflow-y-auto">
+        <div class="h-[70vh] overflow-y-auto custom-scrollbar pb-10">
           <div
             v-for="coin in coinList"
-            :key="coin.symbol"
-            @click="selectSymbol(coin.symbol)"
+            :key="coin.originalSymbol"
+            @click="selectSymbol(coin)"
             class="flex items-center justify-between px-4 py-3 hover:bg-white/5 active:bg-white/10 transition-colors cursor-pointer border-b border-white/10"
           >
             <div class="flex items-center gap-3 flex-1 min-w-0">
-              <img
-                :src="getCoinLogo(coin.symbol)"
-                :alt="coin.symbol"
-                class="w-8 h-8 rounded-full flex-shrink-0"
-                @error="handleImageError"
-              />
-              <span class="text-white font-medium">{{ coin.symbol.split('/')[0] }}</span>
+              <div class="relative w-10 h-10 flex-shrink-0">
+                <!-- Quote Currency (Bottom Left) - UNDER -->
+                <img
+                  :src="getQuoteLogo(coin.symbol)"
+                  class="w-7 h-7 rounded-full absolute bottom-0 left-0 z-0 border border-white/20 opacity-95 brightness-110"
+                />
+                <!-- Base Currency (Top Right) - ON TOP -->
+                <img
+                  :src="getCoinLogo(coin.symbol)"
+                  :alt="coin.symbol"
+                  class="w-7 h-7 rounded-full absolute top-0 right-0 z-10 border border-white/30 shadow-xl brightness-110"
+                  @error="handleImageError"
+                />
+              </div>
+              <span class="text-white font-medium">{{ coin.symbol }}</span>
             </div>
             <div class="flex items-center gap-4 flex-shrink-0">
               <span
@@ -380,13 +414,14 @@
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </Transition>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import MobileNav from '../components/MobileNav.vue';
 import DesktopNav from '../components/DesktopNav.vue';
@@ -396,6 +431,7 @@ import api from '../utils/api';
 import { BINANCE_AVAILABLE_COINS } from '../utils/binanceCoins';
 import { getCoinLogoUrl } from '../utils/coinLogos';
 import axios from 'axios';
+import { io } from 'socket.io-client';
 
 const BINANCE_HTTP_API = 'https://api.binance.com/api/v3';
 const BINANCE_WS_BASE = 'wss://stream.binance.com:9443';
@@ -403,26 +439,32 @@ const BINANCE_WS_BASE = 'wss://stream.binance.com:9443';
 const { t } = useI18n();
 
 const route = useRoute();
+const router = useRouter();
 const isMobile = computed(() => window.innerWidth < 768);
 
 const availableSymbols = BINANCE_AVAILABLE_COINS.map(coin => `${coin}/USDT`);
 
 // Get symbol from query or default
 const getInitialSymbol = () => {
-  if (route.query.symbol) {
-    let symbol = route.query.symbol.trim();
-    if (symbol.includes('/')) {
-      if (availableSymbols.includes(symbol)) {
-        return symbol;
-      }
-    } else {
-      symbol = symbol.replace(/USDT$/, '/USDT');
-      if (availableSymbols.includes(symbol)) {
-        return symbol;
-      }
+  const querySymbol = route.query.symbol;
+  if (querySymbol) {
+    let s = querySymbol.trim().toUpperCase();
+    
+    // 1. Exact match (already has slash)
+    if (s.includes('/')) return s;
+    
+    // 2. Crypto (BTCUSDT -> BTC/USDT)
+    if (s.endsWith('USDT')) return s.replace(/USDT$/, '/USDT');
+    
+    // 3. Forex/Metals (GBPUSD -> GBP/USD, XAUUSD -> XAU/USD)
+    if (s.length === 6) {
+      return `${s.slice(0, 3)}/${s.slice(3)}`;
     }
+    
+    // 4. Fallback for other formats
+    return s;
   }
-  return availableSymbols[0] || 'BTC/USDT';
+  return 'BTC/USDT';
 };
 
 const selectedSymbol = ref(getInitialSymbol());
@@ -433,25 +475,100 @@ const orderQuantity = ref('');
 const quantityMode = ref('currency');
 const quantityPercent = ref(0);
 const loading = ref(false);
+const activeCategory = ref('hot');
+const cryptoList = ref([
+  'BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'XRPUSDT', 'ADAUSDT', 'DOGEUSDT', 
+  'LTCUSDT', 'ETCUSDT', 'BCHUSDT', 'DOTUSDT', 'NEOUSDT', 'IOTAUSDT', 'LUNAUSDT'
+]);
+const metalsList = ref(['XAUUSDT', 'XAGUSDT', 'XPTUSDT', 'XPDUSDT']);
+const forexList = ref([
+  'AUDUSD', 'BRLUSD', 'CADUSD', 'CHFUSD', 'CNYUSD', 'CZKUSD', 'DKKUSD',
+  'EURUSD', 'GBPUSD', 'HKDUSD', 'HUFUSD', 'IDRUSD', 'ILSUSD', 'INRUSD', 'ISKUSD',
+  'JPYUSD', 'KRWUSD', 'MXNUSD', 'MYRUSD', 'NOKUSD', 'NZDUSD', 'PHPUSD', 'PLNUSD',
+  'RONUSD', 'SEKUSD', 'SGDUSD', 'THBUSD', 'TRYUSD', 'USDUSD', 'ZARUSD'
+]);
+
 const showSymbolSelector = ref(false);
 const activeTab = ref('current');
 const ticker = ref(null);
 const orderBook = ref({ bids: [], asks: [] });
 const wallets = ref([]);
 const isLoading = ref(true);
+const GOLD_API_KEY = '152ca358-8a3f-474d-9e7e-bb9af2057a3c';
+
+const fetchGoldPrice = async (symbol) => {
+  const clean = symbol.replace('/', '').toUpperCase();
+  // Only for supported metals
+  const metalCode = ['XAU', 'XAG', 'XPT', 'XPD'].find(m => clean.startsWith(m));
+  if (!metalCode) return null;
+  
+  try {
+    const res = await axios.get(`https://app.goldapi.net/api/price/${metalCode}/USD`, {
+      headers: { 
+        'x-api-key': GOLD_API_KEY,
+        'Content-Type': 'application/json' 
+      }
+    });
+    
+    if (res.data && res.data.price) {
+      return {
+        price: res.data.price,
+        bid: res.data.bid,
+        ask: res.data.ask,
+        low: res.data.low_price,
+        high: res.data.high_price,
+        change: res.data.ch || 0,
+        changePercent: res.data.chp || 0
+      };
+    }
+  } catch (err) {
+    console.warn('GoldAPI fetch failed:', err);
+  }
+  return null;
+};
+
 const allTickersMap = ref({}); // Map of symbol -> ticker data
 let lastDepthUpdate = 0;
 let lastTickerUpdate = 0;
 const coinList = computed(() => {
-  return BINANCE_AVAILABLE_COINS.map(coin => {
-    const symbol = `${coin}USDT`;
-    const tickerData = allTickersMap.value[symbol];
+  let targetList = [];
+  
+  if (activeCategory.value === 'hot') {
+    targetList = ['BTCUSDT', 'ETHUSDT', 'XRPUSDT', 'XAUUSDT', 'XAGUSDT', 'GBPUSD', 'EURUSD'];
+  } else if (activeCategory.value === 'crypto') {
+    targetList = cryptoList.value;
+  } else if (activeCategory.value === 'metals') {
+    targetList = metalsList.value;
+  } else if (activeCategory.value === 'forex') {
+    targetList = forexList.value;
+  }
+  
+  return targetList.map(k => {
+    // Better mapping lookup: Try Exact -> Try USDT appended -> Try without T
+    let tickerData = allTickersMap.value[k];
+    if (!tickerData && !k.endsWith('T')) {
+        tickerData = allTickersMap.value[`${k}T`]; // AUDUSD -> AUDUSDT
+    }
+    
+    // Formatting logic similar to Home page
+    let displaySymbol = k;
+    if (k.includes('USDT')) {
+      if (['XAUUSDT', 'XAGUSDT', 'XPTUSDT', 'XPDUSDT'].includes(k)) {
+        displaySymbol = k.replace('USDT', '/USD');
+      } else {
+        displaySymbol = k.replace('USDT', '/USDT');
+      }
+    } else if (k.length === 6) {
+      displaySymbol = `${k.slice(0, 3)}/${k.slice(3)}`;
+    }
+    
     return {
-      symbol: `${coin}/USDT`,
+      symbol: displaySymbol,
+      originalSymbol: k,
       price: tickerData?.price || 0,
       change: tickerData?.change || 0,
     };
-  }).sort((a, b) => a.symbol.localeCompare(b.symbol));
+  });
 });
 
 // Interval ref for proper cleanup (prevent memory leaks)
@@ -508,6 +625,8 @@ const formatPrice = (price) => {
   if (price === null || price === undefined) return '0.0000';
   const numPrice = typeof price === 'string' ? parseFloat(price) : price;
   if (isNaN(numPrice)) return '0.0000';
+  // For Forex pairs (typically around 1.0), use 5 decimals for precision
+  if (numPrice >= 0.1 && numPrice <= 10) return numPrice.toFixed(5);
   if (numPrice >= 0.01) return numPrice.toFixed(4); // Force 4 decimals for standard prices
   return numPrice.toFixed(8); // More for very small prices
 };
@@ -521,17 +640,25 @@ const formatBalance = (balance) => {
   return num.toFixed(8);
 };
 
-const selectSymbol = (symbol) => {
+const selectSymbol = (data) => {
+  // data can be a symbol string or an object with originalSymbol
+  const symbol = typeof data === 'object' ? data.symbol : data;
+  const originalSymbol = typeof data === 'object' ? data.originalSymbol : symbol.replace('/', '');
+  
   selectedSymbol.value = symbol;
   showSymbolSelector.value = false;
   loadMarketData();
-  // Reconnect WebSocket for the new depth stream
   connectWebSocket();
 };
 
 const getCoinLogo = (symbol) => {
-  const baseCurrency = symbol.split('/')[0];
-  return getCoinLogoUrl(baseCurrency) || `https://via.placeholder.com/32?text=${baseCurrency}`;
+  const base = symbol.split('/')[0];
+  return getCoinLogoUrl(base);
+};
+
+const getQuoteLogo = (symbol) => {
+  const quote = symbol.split('/')[1] || 'USD';
+  return getCoinLogoUrl(quote);
 };
 
 const handleImageError = (event) => {
@@ -591,20 +718,198 @@ const getVolumePercent = (quantity, type) => {
 const loadMarketData = async () => {
   isLoading.value = true;
   const symbol = selectedSymbol.value.replace('/', '');
+  
+  // Clear old data to prevent stale values
+  ticker.value = null;
+  orderBook.value = { bids: [], asks: [] };
+  
   try {
     await Promise.all([
       loadTicker(symbol),
       loadOrderBook(symbol),
       loadWallets(),
     ]);
+
+    // Mock data fallback if ticker is still empty
+    // Trigger for ALL Forex/Metals (ending in /USD) or if specific known mock logic is needed
+    if (!ticker.value && (symbol.includes('/USD') || !symbol.includes('USDT'))) {
+        generateMockTicker(symbol);
+    }
   } finally {
     isLoading.value = false;
   }
 };
 
+const mockUpdateInterval = ref(null);
+
+const startMockUpdates = (symbol) => {
+  if (mockUpdateInterval.value) clearInterval(mockUpdateInterval.value);
+  
+  let tickCount = 0;
+  mockUpdateInterval.value = setInterval(async () => {
+    if (!ticker.value) return;
+    tickCount++;
+    
+    // 0. Update Real Metal Price every 10s
+    if (tickCount % 10 === 0 && ['XAU', 'XAG', 'XPT', 'XPD'].some(m => symbol.includes(m))) {
+        const goldData = await fetchGoldPrice(symbol);
+        if (goldData) {
+            ticker.value.price = goldData.price;
+            ticker.value.highPrice = goldData.high;
+            ticker.value.lowPrice = goldData.low;
+            ticker.value.priceChangePercent = goldData.changePercent;
+        }
+    }
+    
+    // 0.5 Self-heal: Check if global map has better data (Binance fallback)
+    const cleanSymbol = symbol.replace('/', '');
+    let globalData = allTickersMap.value[cleanSymbol];
+    if (!globalData && !cleanSymbol.endsWith('T')) {
+        globalData = allTickersMap.value[`${cleanSymbol}T`];
+    }
+    
+    const globalPrice = globalData?.price;
+    
+    if (globalPrice && Math.abs(globalPrice - ticker.value.price) / ticker.value.price > 0.1) {
+        // Price discrepancy > 10%, assume we started with bad default (1.0) and global map now has info
+         ticker.value.price = globalPrice;
+         // Also update high/low to be reasonable around this new price
+         ticker.value.highPrice = globalPrice * 1.02;
+         ticker.value.lowPrice = globalPrice * 0.98;
+    }
+
+    // Safety Sanity Check for Standard Forex (avoid 4976 glitch)
+    // Most forex pairs are < 200 (JPY ~150). If > 200 and NOT gold/silver/crypto/metals, reset.
+    if (ticker.value.price > 200 && 
+        ['EUR', 'GBP', 'AUD', 'CAD', 'CHF', 'NZD', 'USD'].some(c => symbol.includes(c)) &&
+        !['BTC', 'ETH', 'BNB', 'XAU', 'XAG', 'XPT', 'XPD', 'PAX'].some(c => symbol.includes(c)) 
+    ) {
+         // Corrupt price detected, force reset to 1.0
+         ticker.value.price = 1.0;
+         ticker.value.highPrice = 1.02;
+         ticker.value.lowPrice = 0.98;
+    }
+    
+    // 1. Jitter Price
+    const currentPrice = parseFloat(ticker.value.price);
+    const volatility = currentPrice * 0.0001; // Small movement
+    const change = (Math.random() - 0.5) * volatility;
+    const newPrice = currentPrice + change;
+    
+    ticker.value = {
+      ...ticker.value,
+      price: newPrice,
+      priceChange: (ticker.value.priceChange || 0) + change,
+      // Update high/low if needed
+      highPrice: Math.max(ticker.value.highPrice, newPrice),
+      lowPrice: Math.min(ticker.value.lowPrice, newPrice)
+    };
+    
+    // 2. Update Order Book based on new Price
+    generateMockOrderBook(symbol, newPrice);
+    
+    // 3. Update Input Price if in market mode
+    if (transactionMode.value === 'market' && (!orderPrice.value || Math.random() > 0.7)) {
+       orderPrice.value = formatPrice(newPrice);
+    }
+    
+  }, 1000); // 1-second updates
+};
+
+const generateMockTicker = (symbol) => {
+    // Stop any existing mock updates first
+    if (mockUpdateInterval.value) clearInterval(mockUpdateInterval.value);
+
+    let price = 1.0;
+    const cleanSymbol = symbol.replace('/', '');
+    
+    // 1. Try to get price from global ticker map (Popup data) first
+    if (allTickersMap.value[cleanSymbol]?.price) {
+        price = allTickersMap.value[cleanSymbol].price;
+    } 
+    // 2. Fallback to hardcoded reasonable defaults
+    else {
+        if (symbol.includes('BTC')) price = 65000;
+        else if (symbol.includes('ETH')) price = 3500;
+        else if (symbol.includes('XAU')) price = 2300;
+        else if (symbol.includes('XAG')) price = 30;
+        else if (symbol.includes('XPT')) price = 980;
+        else if (symbol.includes('XPD')) price = 1050;
+        else if (symbol.includes('GBP')) price = 1.27;
+        else if (symbol.includes('EUR')) price = 1.09;
+        else if (symbol.includes('JPY')) price = 150;
+        else if (symbol.includes('AUD')) price = 0.65;
+        else if (symbol.includes('CAD')) price = 0.73;
+        else if (symbol.includes('CHF')) price = 1.10;
+    }
+    
+    // Set initial state
+    ticker.value = {
+        price: price,
+        priceChangePercent: 0.05,
+        priceChange: price * 0.0005,
+        volume: 100000,
+        highPrice: price * 1.01,
+        lowPrice: price * 0.99
+    };
+    
+    if (transactionMode.value === 'market' && !orderPrice.value) {
+       orderPrice.value = formatPrice(ticker.value.price);
+    }
+    
+    // Start continuous updates
+    startMockUpdates(symbol);
+};
+
+// Clean up on unmount
+onUnmounted(() => {
+  if (mockUpdateInterval.value) clearInterval(mockUpdateInterval.value);
+  if (tickerWs) tickerWs.close();
+  if (marketSocket) marketSocket.disconnect();
+});
+
 const loadTicker = async (symbol) => {
+  const clean = symbol.toUpperCase().replace('/', '');
+  
+  // 1. Metals: Use instant defaults, fetch real data in background (non-blocking)
+  if (['XAU', 'XAG', 'XPT', 'XPD'].some(m => clean.startsWith(m))) {
+      // Set instant default values
+      const defaults = { XAU: 2350, XAG: 30, XPT: 980, XPD: 1050 };
+      const metalCode = ['XAU', 'XAG', 'XPT', 'XPD'].find(m => clean.startsWith(m));
+      const defaultPrice = defaults[metalCode] || 2300;
+      
+      ticker.value = {
+        price: defaultPrice,
+        priceChangePercent: 0.05,
+        priceChange: 0,
+        volume: 100000,
+        highPrice: defaultPrice * 1.01,
+        lowPrice: defaultPrice * 0.99,
+      };
+      if (transactionMode.value === 'market' && !orderPrice.value) {
+          orderPrice.value = formatPrice(ticker.value.price);
+      }
+      
+      // Background fetch - don't await, let it update when ready
+      fetchGoldPrice(symbol).then(goldData => {
+        if (goldData && ticker.value) {
+          ticker.value.price = goldData.price;
+          ticker.value.highPrice = goldData.high || goldData.price * 1.01;
+          ticker.value.lowPrice = goldData.low || goldData.price * 0.99;
+          ticker.value.priceChangePercent = goldData.changePercent || 0;
+        }
+      }).catch(() => {});
+      
+      return; // Return immediately with defaults
+  }
+
+  // 2. Crypto/Forex: Try backend first with timeout
   try {
-    const response = await api.get(`/market/ticker/${symbol}/24h`);
+    const response = await Promise.race([
+      api.get(`/market/ticker/${symbol}/24h`),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000))
+    ]);
+    
     if (response.data && response.data.price) {
       ticker.value = {
         ...response.data,
@@ -618,87 +923,78 @@ const loadTicker = async (symbol) => {
       if (transactionMode.value === 'market' && !orderPrice.value) {
         orderPrice.value = formatPrice(ticker.value.price);
       }
-    } else {
-      // Fallback: fetch directly from Binance
-      try {
-        const binanceResponse = await axios.get(`${BINANCE_HTTP_API}/ticker/24hr`, {
-          params: { symbol: symbol.toUpperCase() }
-        });
-        const data = binanceResponse.data;
-        ticker.value = {
-          price: Number(data.lastPrice) || 0,
-          priceChangePercent: Number(data.priceChangePercent) || 0,
-          priceChange: Number(data.priceChange) || 0,
-          volume: Number(data.volume) || 0,
-          highPrice: Number(data.highPrice) || 0,
-          lowPrice: Number(data.lowPrice) || 0,
-        };
-    if (transactionMode.value === 'market' && !orderPrice.value) {
-      orderPrice.value = formatPrice(ticker.value.price);
-        }
-      } catch (binanceError) {
-        console.error('Binance fallback failed:', binanceError);
-      }
+      return;
     }
-  } catch (error) {
-    console.error('Error loading ticker:', error);
-    // Try Binance fallback on error
-    try {
-      const binanceResponse = await axios.get(`${BINANCE_HTTP_API}/ticker/24hr`, {
-        params: { symbol: symbol.toUpperCase() }
-      });
-      const data = binanceResponse.data;
-      ticker.value = {
-        price: Number(data.lastPrice) || 0,
-        priceChangePercent: Number(data.priceChangePercent) || 0,
-        priceChange: Number(data.priceChange) || 0,
-        volume: Number(data.volume) || 0,
-        highPrice: Number(data.highPrice) || 0,
-        lowPrice: Number(data.lowPrice) || 0,
-      };
-      if (transactionMode.value === 'market' && !orderPrice.value) {
-        orderPrice.value = formatPrice(ticker.value.price);
-      }
-    } catch (binanceError) {
-      console.error('Binance fallback failed:', binanceError);
-    }
-  }
+  } catch (error) { }
+
+  // 3. Binance fallback with timeout
+  try {
+     let binanceSymbol = clean;
+     if (binanceSymbol.length === 6 && !binanceSymbol.endsWith('T') && 
+        !['BTC', 'ETH', 'BNB', 'SOL', 'XRP', 'ADA', 'DOGE'].some(c => binanceSymbol.startsWith(c))) {
+          binanceSymbol += 'T';
+     }
+
+     const binanceResponse = await Promise.race([
+       axios.get(`${BINANCE_HTTP_API}/ticker/24hr`, { params: { symbol: binanceSymbol } }),
+       new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 2000))
+     ]);
+     
+     const data = binanceResponse.data;
+     ticker.value = {
+       price: Number(data.lastPrice) || 0,
+       priceChangePercent: Number(data.priceChangePercent) || 0,
+       priceChange: Number(data.priceChange) || 0,
+       volume: Number(data.volume) || 0,
+       highPrice: Number(data.highPrice) || 0,
+       lowPrice: Number(data.lowPrice) || 0,
+     };
+     if (transactionMode.value === 'market' && !orderPrice.value) {
+         orderPrice.value = formatPrice(ticker.value.price);
+     }
+  } catch (binanceError) { }
 };
 
 const loadOrderBook = async (symbol) => {
+  const clean = symbol.toUpperCase().replace('/', '');
+  
+  // 1. Metals Optimization: Skip backend/binance real orderbook for now (GoldAPI doesn't give depth)
+  if (['XAU', 'XAG', 'XPT', 'XPD'].some(m => clean.startsWith(m))) {
+      generateMockOrderBook(symbol, ticker.value?.price || 2300);
+      return;
+  }
+  
+  // 2. Forex Optimization: Skip Binance (most Forex pairs don't exist), use mock
+  const isForex = clean.endsWith('USD') && clean.length === 6 && 
+                  !['BTC', 'ETH', 'BNB', 'SOL', 'XRP', 'ADA', 'DOGE'].some(c => clean.startsWith(c));
+  if (isForex) {
+      generateMockOrderBook(symbol, ticker.value?.price || 1.0);
+      return;
+  }
+
   try {
     const response = await api.get(`/market/orderbook/${symbol}`, { params: { limit: 12 } });
     if (response.data && (response.data.bids?.length > 0 || response.data.asks?.length > 0)) {
-    orderBook.value = response.data;
+       orderBook.value = response.data;
     } else {
-      // Fallback: fetch directly from Binance
-      try {
-        const binanceResponse = await axios.get(`${BINANCE_HTTP_API}/depth`, {
-          params: { symbol: symbol.toUpperCase(), limit: 12 }
-        });
-        orderBook.value = {
-          bids: (binanceResponse.data.bids || []).map(([price, quantity]) => ({
-            price: Number(price) || 0,
-            quantity: Number(quantity) || 0,
-          })),
-          asks: (binanceResponse.data.asks || []).map(([price, quantity]) => ({
-            price: Number(price) || 0,
-            quantity: Number(quantity) || 0,
-          })),
-          timestamp: Date.now(),
-        };
-      } catch (binanceError) {
-        console.error('Binance orderbook fallback failed:', binanceError);
-      }
+       throw new Error('Backend depth empty');
     }
   } catch (error) {
-    console.error('Error loading order book:', error);
-    // Try Binance fallback on error
+    // Fail silently on backend error to avoid console spam, try Binance
+    
+    // Binance Fallback
     try {
-      const binanceResponse = await axios.get(`${BINANCE_HTTP_API}/depth`, {
-        params: { symbol: symbol.toUpperCase(), limit: 12 }
-      });
-      orderBook.value = {
+       let binanceSymbol = clean;
+       // Forex fix: EURUSD -> EURUSDT
+       if (binanceSymbol.length === 6 && !binanceSymbol.endsWith('T') && 
+           !['BTC', 'ETH', 'BNB', 'SOL', 'XRP'].some(c => binanceSymbol.startsWith(c))) {
+             binanceSymbol += 'T';
+       }
+       
+       const binanceResponse = await axios.get(`${BINANCE_HTTP_API}/depth`, {
+        params: { symbol: binanceSymbol, limit: 12 }
+       });
+       orderBook.value = {
         bids: (binanceResponse.data.bids || []).map(([price, quantity]) => ({
           price: Number(price) || 0,
           quantity: Number(quantity) || 0,
@@ -710,9 +1006,40 @@ const loadOrderBook = async (symbol) => {
         timestamp: Date.now(),
       };
     } catch (binanceError) {
-      console.error('Binance orderbook fallback failed:', binanceError);
+      // console.warn('Binance depth fallback failed');
     }
   }
+  
+  // Final Mock Fallback for Forex/Metals or missing data
+  if ((!orderBook.value.bids.length || !orderBook.value.asks.length)) {
+      if (ticker.value?.price) {
+          generateMockOrderBook(symbol, ticker.value.price);
+      }
+  }
+};
+
+const generateMockOrderBook = (symbol, basePrice) => {
+    const bids = [];
+    const asks = [];
+    const spread = basePrice * 0.0002; // 0.02% spread
+    
+    // Generate 15 levels
+    for(let i=0; i<15; i++) {
+        const bidPrice = basePrice - spread - (i * spread);
+        const askPrice = basePrice + spread + (i * spread);
+        
+        bids.push({
+            price: bidPrice,
+            quantity: Math.random() * (basePrice > 1000 ? 0.5 : 1000)
+        });
+        
+        asks.push({
+            price: askPrice,
+            quantity: Math.random() * (basePrice > 1000 ? 0.5 : 1000)
+        });
+    }
+    
+    orderBook.value = { bids, asks, timestamp: Date.now() };
 };
 
 const loadWallets = async () => {
@@ -764,21 +1091,35 @@ const handlePlaceOrder = async () => {
 };
 
 // Watch for symbol changes from route
+// Watch for symbol changes from route
 watch(() => route.query.symbol, (newSymbol) => {
   if (newSymbol) {
-    let symbol = newSymbol.trim();
-    if (symbol.includes('/')) {
-      if (availableSymbols.includes(symbol)) {
-        selectedSymbol.value = symbol;
-        loadMarketData();
-      }
-    } else {
-      symbol = symbol.replace(/USDT$/, '/USDT');
-      if (availableSymbols.includes(symbol)) {
-        selectedSymbol.value = symbol;
-        loadMarketData();
-      }
+    let s = newSymbol.trim().toUpperCase();
+    
+    // 1. Exact match (already has slash)
+    if (s.includes('/')) {
+       selectedSymbol.value = s;
+       loadMarketData();
+       return;
     }
+    
+    // 2. Crypto (BTCUSDT -> BTC/USDT)
+    if (s.endsWith('USDT')) {
+      selectedSymbol.value = s.replace(/USDT$/, '/USDT');
+      loadMarketData();
+      return;
+    }
+    
+    // 3. Forex/Metals (GBPUSD -> GBP/USD)
+    if (s.length === 6) {
+      selectedSymbol.value = `${s.slice(0, 3)}/${s.slice(3)}`;
+      loadMarketData();
+      return;
+    }
+    
+    // 4. Default fallback
+    selectedSymbol.value = s;
+    loadMarketData();
   }
 }, { immediate: true });
 
@@ -796,80 +1137,89 @@ watch(orderSide, () => {
   loadWallets();
 });
 
-const refreshMarketData = async () => {
-  const symbol = selectedSymbol.value.replace('/', '');
-  await Promise.all([
-    loadTicker(symbol),
-    loadOrderBook(symbol),
-  ]);
-};
 
-// WebSocket for real-time ticker updates
+
+// WebSocket for real-time updates
 let tickerWs = null;
+let marketSocket = null;
 let wsReconnectTimer = null;
 let wsBackoffMs = 1000;
 const MAX_BACKOFF_MS = 30000;
 
-const processTickerUpdate = (tickerData) => {
-  if (!tickerData?.s) return;
-  const symbol = tickerData.s;
-  
-  // Update the global map for the coin list (can be frequent)
-  allTickersMap.value[symbol] = {
-    price: Number(tickerData.c),
-    change: Number(tickerData.P),
-  };
-
-  const currentSymbol = selectedSymbol.value.replace('/', '');
-  if (symbol !== currentSymbol) return;
-  
-  const now = Date.now();
-  if (ticker.value && (now - lastTickerUpdate >= 500)) {
-    lastTickerUpdate = now;
-    ticker.value.price = Number(tickerData.c) || ticker.value.price;
-    ticker.value.priceChangePercent = Number(tickerData.P) || ticker.value.priceChangePercent;
-    ticker.value.priceChange = Number(tickerData.p) || ticker.value.priceChange;
-    ticker.value.volume = Number(tickerData.v) || ticker.value.volume;
-    ticker.value.highPrice = Number(tickerData.h) || ticker.value.highPrice;
-    ticker.value.lowPrice = Number(tickerData.l) || ticker.value.lowPrice;
-    
-    if (transactionMode.value === 'market' && !orderPrice.value) {
-      orderPrice.value = formatPrice(ticker.value.price);
-    }
+// Update URL when symbol changes
+watch(selectedSymbol, (newSymbol) => {
+  if (newSymbol) {
+    const query = { ...route.query, symbol: newSymbol.replace('/', '') };
+    router.replace({ query });
   }
+});
+
+const processTickerUpdate = (tickerData) => {
+  // Handle both array and single object data
+  const updates = Array.isArray(tickerData) ? tickerData : [tickerData];
+  
+  updates.forEach(item => {
+    if (!item?.s) return;
+    const symbol = item.s;
+    
+    // Normalize symbol for the map (remove slash if present)
+    const mapSymbol = symbol.replace('/', '');
+    
+    // Update the global map for the coin list
+    allTickersMap.value[mapSymbol] = {
+      price: Number(item.c),
+      change: Number(item.P),
+    };
+
+    // Check if this update matches appropriate selected symbol
+    const currentSymbolClean = selectedSymbol.value.replace('/', '');
+    // Match exact OR match with T suffix (GBPUSD vs GBPUSDT)
+    const isMatch = mapSymbol === currentSymbolClean || mapSymbol === `${currentSymbolClean}T`;
+    
+    if (!isMatch) return;
+    
+    const now = Date.now();
+    // For the active ticker, we update more frequently or immediately
+    if (ticker.value) {
+      ticker.value.price = Number(item.c) || ticker.value.price;
+      ticker.value.priceChangePercent = Number(item.P) || ticker.value.priceChangePercent;
+      ticker.value.priceChange = Number(item.p || 0) || ticker.value.priceChange;
+      ticker.value.volume = Number(item.v) || ticker.value.volume;
+      ticker.value.highPrice = Number(item.h || item.c) || ticker.value.highPrice;
+      ticker.value.lowPrice = Number(item.l || item.c) || ticker.value.lowPrice;
+      lastTickerUpdate = now;
+
+      if (transactionMode.value === 'market' && (!orderPrice.value || lastTickerUpdate % 5 === 0)) {
+        orderPrice.value = formatPrice(ticker.value.price);
+      }
+      
+      // Force mock orderbook update for Crypto/Forex/Metals if needed
+      // Simple logic: if it ends in /USD (Forex/Metals), always regenerate to ensure liveliness
+      if (selectedSymbol.value.endsWith('/USD') || !selectedSymbol.value.includes('USDT')) {
+          generateMockOrderBook(selectedSymbol.value, ticker.value.price);
+      }
+    }
+  });
 };
 
 const connectWebSocket = () => {
+  // 1. Standard Binance WebSockets
   try {
     if (tickerWs) {
-      tickerWs.onopen = null;
-      tickerWs.onmessage = null;
-      tickerWs.onerror = null;
-      tickerWs.onclose = null;
       tickerWs.close();
       tickerWs = null;
     }
-  } catch (e) {
-    console.warn('[Spot WS] Cleanup error:', e);
-  }
-  
-  try {
     const currentSymbol = selectedSymbol.value.replace('/', '').toLowerCase();
-    // Correct URL format for combined streams: /stream?streams=stream1/stream2
-    // depth20 is a valid Binance level (12 was not)
     const wsUrl = `${BINANCE_WS_BASE}/stream?streams=!ticker@arr/${currentSymbol}@depth20@100ms`;
     tickerWs = new WebSocket(wsUrl);
     
     tickerWs.onopen = () => {
-      console.log('[Spot WS] Connected to:', wsUrl);
       wsBackoffMs = 1000;
     };
     
     tickerWs.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        
-        // Handle combined stream format
         if (data.stream === '!ticker@arr') {
             data.data.forEach(processTickerUpdate);
         } else if (data.stream?.endsWith('@depth20@100ms')) {
@@ -878,39 +1228,40 @@ const connectWebSocket = () => {
                 lastDepthUpdate = now;
                 const depthData = data.data;
                 orderBook.value = {
-                    bids: (depthData.bids || []).map(([price, quantity]) => ({
-                        price: Number(price) || 0,
-                        quantity: Number(quantity) || 0,
-                    })),
-                    asks: (depthData.asks || []).map(([price, quantity]) => ({
-                        price: Number(price) || 0,
-                        quantity: Number(quantity) || 0,
-                    })),
+                    bids: (depthData.bids || []).map(([p, q]) => ({ price: Number(p), quantity: Number(q) })),
+                    asks: (depthData.asks || []).map(([p, q]) => ({ price: Number(p), quantity: Number(q) })),
                     timestamp: now,
                 };
             }
-        } else if (Array.isArray(data)) {
-            // Fallback for single stream format
-            data.forEach(processTickerUpdate);
         }
-      } catch (e) {
-        console.error('[Spot WS] Parse error:', e);
-      }
+      } catch (e) {}
     };
     
-    tickerWs.onerror = (e) => {
-      console.error('[Spot WS] Error:', e);
-    };
-    
-    tickerWs.onclose = (e) => {
-      console.warn('[Spot WS] Closed:', e.code);
+    tickerWs.onclose = () => {
       tickerWs = null;
       scheduleReconnect();
     };
   } catch (e) {
-    console.error('[Spot WS] Setup error:', e);
     scheduleReconnect();
   }
+
+  // 2. Custom Backend Market Socket (Metals)
+  if (marketSocket) {
+      marketSocket.disconnect();
+      marketSocket = null;
+  }
+
+  const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+  const baseUrl = backendUrl.replace('/api', '');
+
+  marketSocket = io(`${baseUrl}/market`, {
+      transports: ['websocket', 'polling'],
+      secure: true,
+  });
+
+  marketSocket.on('ticker', (data) => {
+      processTickerUpdate(data);
+  });
 };
 
 const scheduleReconnect = () => {
@@ -923,8 +1274,12 @@ const scheduleReconnect = () => {
 };
 
 onMounted(() => {
-  loadMarketData();
-  loadCoinList();
+  // Fire all requests in parallel to speed up initial load
+  Promise.all([
+    loadMarketData(),
+    loadCoinList()
+  ]).catch(err => console.error('[Spot] Parallel load error:', err));
+  
   connectWebSocket();
   
   // ancillary data refresh interval
@@ -964,15 +1319,78 @@ onUnmounted(() => {
   
   try {
     if (tickerWs) {
-      tickerWs.onopen = null;
-      tickerWs.onmessage = null;
-      tickerWs.onerror = null;
-      tickerWs.onclose = null;
       tickerWs.close();
       tickerWs = null;
+    }
+    if (marketSocket) {
+      marketSocket.disconnect();
+      marketSocket = null;
     }
   } catch {
     // Ignore cleanup errors
   }
 });
 </script>
+
+<style scoped>
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+  opacity: 0;
+}
+
+.modal-fade-enter-active .modal-content-anim {
+  animation: modal-slide-in 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-fade-leave-active .modal-content-anim {
+  animation: modal-slide-in 0.3s cubic-bezier(0.4, 0, 0.2, 1) reverse;
+}
+
+@keyframes modal-slide-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* For desktop centered modal */
+@media (min-width: 768px) {
+  @keyframes modal-slide-in {
+    from {
+      transform: scale(0.95) translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  .modal-fade-enter-active .modal-content-anim,
+  .modal-fade-leave-active .modal-content-anim {
+    transition: all 0.3s ease;
+    animation: none;
+  }
+  
+  .modal-fade-enter-from .modal-content-anim,
+  .modal-fade-leave-to .modal-content-anim {
+    transform: scale(0.95) translateY(20px);
+    opacity: 0;
+  }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+</style>

@@ -155,20 +155,28 @@
           <div class="grid grid-cols-3 gap-2 md:gap-3">
             <div
               v-for="(ticker, index) in top3Tickers"
-              :key="ticker?.symbol || index"
+              :key="ticker?.originalSymbol || index"
               class="glass-card rounded-lg p-3 cursor-pointer hover:border-blue-500/50 transition-colors relative overflow-hidden group"
-              @click="selectSymbol(ticker.symbol)"
+              @click="ticker && selectSymbol(ticker.originalSymbol || ticker.symbol)"
             >
               <!-- Decorative Background Overlay -->
               <img src="/background shadow.png" alt="" class="absolute top-0 right-0 w-14 h-14 md:w-24 md:h-24 object-contain opacity-10 pointer-events-none group-hover:scale-110 transition-transform duration-700" />
               
-              <div class="flex flex-col items-start text-left relative z-10">
-                <img
-                  :src="getCoinLogo(ticker.symbol)"
-                  :alt="ticker.symbol"
-                  class="w-10 h-10 md:w-12 md:h-12 rounded-full mb-2"
-                  @error="handleImageError"
-                />
+              <div v-if="ticker" class="flex flex-col items-start text-left relative z-10">
+                <div class="relative w-12 h-12 md:w-14 md:h-14 mb-3">
+                  <!-- Quote Currency (Bottom Left) - UNDER -->
+                  <img
+                    :src="getQuoteLogo(ticker.symbol)"
+                    class="w-8 h-8 md:w-10 md:h-10 rounded-full absolute bottom-0 left-0 z-0 border border-white/20 opacity-95 brightness-110"
+                  />
+                  <!-- Base Currency (Top Right) - ON TOP -->
+                  <img
+                    :src="getCoinLogo(ticker.symbol)"
+                    :alt="ticker.symbol"
+                    class="w-8 h-8 md:w-10 md:h-10 rounded-full absolute top-0 right-0 z-10 border border-white/30 shadow-xl brightness-110"
+                    @error="handleImageError"
+                  />
+                </div>
                 <div class="text-xs md:text-sm font-semibold text-white mb-1">{{ ticker.symbol }}</div>
                 <!-- Top 3: percentage -->
                 <span
@@ -209,12 +217,17 @@
                   class="h-3 bg-white/10 rounded w-20 animate-pulse"
                 ></div>
               </div>
+              <div v-else class="animate-pulse flex flex-col items-start gap-2 relative z-10 w-full">
+                  <div class="w-10 h-10 rounded-full bg-white/10"></div>
+                  <div class="h-4 bg-white/10 rounded w-3/4"></div>
+                  <div class="h-6 bg-white/10 rounded w-1/2"></div>
+              </div>
             </div>
           </div>
         </div>
         
         <!-- Quick Menu Items -->
-        <div class="px-3 md:px-4 mb-3">
+        <div class="px-3 md:px-4 mb-4">
           <div class="grid grid-cols-4 gap-2 md:gap-3">
             <div
               v-for="(menu, index) in quickMenus"
@@ -232,9 +245,11 @@
             </div>
           </div>
         </div>
+
+
         
         <!-- Quick Recharge Section -->
-        <div class="px-3 md:px-4 mb-3">
+        <div class="px-3 md:px-4 mb-4">
           <div
             @click="$router.push('/deposit')"
             class="glass-card rounded-lg p-4 cursor-pointer hover:border-blue-500/50 transition-colors flex items-center justify-between"
@@ -256,26 +271,115 @@
             </svg>
           </div>
         </div>
-        
-        <div class="p-3 md:p-8">
-          <!-- Market Tickers - Always visible, only price/volume/% update -->
+
+        <!-- Category Switcher (Refined Size & Spacing) -->
+        <div class="px-3 md:px-4 mb-2 flex justify-center">
+          <div class="glass-card-no-hover rounded-full p-1 flex relative w-[280px]">
+            <!-- Sliding Indicator -->
+            <div 
+              class="absolute top-1 bottom-1 transition-all duration-300 ease-out bg-white/10 rounded-full"
+              :style="{
+                width: 'calc(25% - 2px)',
+                left: activeCategory === 'hot' ? '1%' : activeCategory === 'crypto' ? '26%' : activeCategory === 'metals' ? '51%' : '76%'
+              }"
+            ></div>
+            
+            <button 
+              @click="activeCategory = 'hot'"
+              class="flex-1 py-1.5 relative z-10 text-[10px] font-bold uppercase transition-colors duration-200"
+              :class="activeCategory === 'hot' ? 'text-white' : 'text-white/40'"
+            >
+              Hot
+            </button>
+            <button 
+              @click="activeCategory = 'crypto'"
+              class="flex-1 py-1.5 relative z-10 text-[10px] font-bold uppercase transition-colors duration-200"
+              :class="activeCategory === 'crypto' ? 'text-white' : 'text-white/40'"
+            >
+              Crypto
+            </button>
+            <button 
+              @click="activeCategory = 'metals'"
+              class="flex-1 py-1.5 relative z-10 text-[10px] font-bold uppercase transition-colors duration-200"
+              :class="activeCategory === 'metals' ? 'text-white' : 'text-white/40'"
+            >
+              Metals
+            </button>
+            <button 
+              @click="activeCategory = 'forex'"
+              class="flex-1 py-1.5 relative z-10 text-[10px] font-bold uppercase transition-colors duration-200"
+              :class="activeCategory === 'forex' ? 'text-white' : 'text-white/40'"
+            >
+              Forex
+            </button>
+          </div>
+        </div>
+
+        <div class="px-3 md:px-8 pt-1 md:pt-4 pb-8">
+          <!-- SKELETON LOADER -->
+          <div v-if="isInitialLoading">
+            <!-- Mobile Skeleton -->
+            <div class="flex flex-col gap-2 md:hidden mb-6">
+              <div v-for="i in 6" :key="i" class="glass-card rounded-lg p-3 animate-pulse">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2.5 flex-1 min-w-0">
+                    <div class="w-11 h-11 rounded-full bg-white/10 flex-shrink-0"></div>
+                    <div class="flex flex-col gap-2">
+                       <div class="h-4 bg-white/10 rounded w-16"></div>
+                       <div class="h-3 bg-white/10 rounded w-20"></div>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-3 flex-shrink-0">
+                    <div class="h-5 bg-white/10 rounded w-20"></div>
+                    <div class="h-6 bg-white/10 rounded-full w-16"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Desktop Skeleton -->
+            <div class="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <div v-for="i in 8" :key="i" class="glass-card rounded-xl p-4 animate-pulse">
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center gap-2">
+                    <div class="w-12 h-12 rounded-full bg-white/10 flex-shrink-0"></div>
+                    <div class="h-4 bg-white/10 rounded w-16"></div>
+                  </div>
+                  <div class="h-6 bg-white/10 rounded-full w-16"></div>
+                </div>
+                <div class="h-8 bg-white/10 rounded w-32 mb-2"></div>
+                <div class="h-3 bg-white/10 rounded w-24"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Market Tickers - Always visible once loaded -->
+          <div v-else>
             <!-- Mobile: Compact horizontal cards -->
             <div class="flex flex-col gap-2 md:hidden mb-6">
               <div
                 v-for="ticker in tickers"
-                :key="ticker.symbol"
+                :key="ticker.originalSymbol || ticker.symbol"
                 class="glass-card rounded-lg p-3 cursor-pointer active:scale-[0.98] transition-transform"
-                @click="selectSymbol(ticker.symbol)"
+                @click="selectSymbol(ticker.originalSymbol || ticker.symbol)"
               >
                 <div class="flex items-center justify-between">
                   <!-- Left: Logo and Name -->
                   <div class="flex items-center gap-2.5 flex-1 min-w-0">
-                    <img
-                      :src="getCoinLogo(ticker.symbol)"
-                      :alt="ticker.symbol"
-                      class="w-9 h-9 md:w-10 md:h-10 rounded-full flex-shrink-0"
-                      @error="handleImageError"
-                    />
+                    <div class="relative w-11 h-11 md:w-12 md:h-12 flex-shrink-0">
+                      <!-- Quote Currency (Bottom Left) - UNDER -->
+                      <img
+                        :src="getQuoteLogo(ticker.symbol)"
+                        class="w-7 h-7 md:w-8 md:h-8 rounded-full absolute bottom-0 left-0 z-0 border border-white/20 opacity-95 brightness-110"
+                      />
+                      <!-- Base Currency (Top Right) - ON TOP -->
+                      <img
+                        :src="getCoinLogo(ticker.symbol)"
+                        :alt="ticker.symbol"
+                        class="w-7 h-7 md:w-8 md:h-8 rounded-full absolute top-0 right-0 z-10 border border-white/30 shadow-lg brightness-110"
+                        @error="handleImageError"
+                      />
+                    </div>
                     <div class="flex flex-col min-w-0">
                       <span class="text-sm font-semibold text-white truncate">{{ ticker.symbol.split('/')[0] }}</span>
                       <span class="text-xs text-white/60">{{ $t('home.volume') }} {{ formatVolume(ticker.volume) }}</span>
@@ -326,18 +430,26 @@
             <div class="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <div
               v-for="ticker in tickers"
-              :key="ticker.symbol"
+              :key="ticker.originalSymbol || ticker.symbol"
               class="glass-card rounded-xl p-4 cursor-pointer"
-              @click="selectSymbol(ticker.symbol)"
+              @click="selectSymbol(ticker.originalSymbol || ticker.symbol)"
             >
               <div class="flex items-center justify-between mb-3">
                 <div class="flex items-center gap-2">
-                  <img
-                    :src="getCoinLogo(ticker.symbol)"
-                    :alt="ticker.symbol"
-                    class="w-10 h-10 rounded-full ring-2 ring-white/20"
-                    @error="handleImageError"
-                  />
+                  <div class="relative w-12 h-12 flex-shrink-0">
+                    <!-- Quote Currency (Bottom Left) - UNDER -->
+                    <img
+                      :src="getQuoteLogo(ticker.symbol)"
+                      class="w-8 h-8 rounded-full absolute bottom-0 left-0 z-0 border border-white/20 opacity-95 brightness-110"
+                    />
+                    <!-- Base Currency (Top Right) - ON TOP -->
+                    <img
+                      :src="getCoinLogo(ticker.symbol)"
+                      :alt="ticker.symbol"
+                      class="w-8 h-8 rounded-full absolute top-0 right-0 z-10 border border-white/30 shadow-xl brightness-110"
+                      @error="handleImageError"
+                    />
+                  </div>
                   <span class="text-sm font-semibold text-white">{{ ticker.symbol }}</span>
                 </div>
                 <span
@@ -378,6 +490,7 @@
               ></div>
             </div>
           </div>
+          </div>
         </div>
       </main>
     </div>
@@ -402,45 +515,124 @@ const { languages, currentLanguage, showLanguageMenu, getCurrentFlag, changeLang
 const isMobile = computed(() => window.innerWidth < 768);
 const languageSelectorRef = ref(null);
 
-// Fixed symbol list - single source of truth
-const SYMBOLS = [
-  'BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'XRPUSDT',
-  'ADAUSDT', 'DOGEUSDT', 'LTCUSDT', 'ETCUSDT',
-  'BCHUSDT', 'DOTUSDT', 'NEOUSDT', 'IOTAUSDT', 'LUNAUSDT'
-];
-
 // WebSocket URL
 const BINANCE_WS_URL = 'wss://stream.binance.com:9443/ws/!ticker@arr';
 
 // Reactive tickerMap - single source of truth, NEVER cleared
 const tickerMap = reactive({});
 
-// Track initial load state (used for skeletons; prices come from DB/backend)
+// Track initial load state
 const isInitialLoading = ref(true);
 
-// Initialize ALL symbols as placeholders - cards NEVER disappear
-SYMBOLS.forEach((symbol) => {
-  tickerMap[symbol] = reactive({
-    symbol: symbol.replace('USDT', '/USDT'),
-    price: 0,
-    change: 0,
-    volume: 0,
-    isPlaceholder: true
+const initializeTickerMap = (symbols) => {
+  symbols.forEach((symbol) => {
+    if (!tickerMap[symbol]) {
+      // Default formatting: BTCUSDT -> BTC/USDT, EURUSD -> EUR/USD
+      let displaySymbol = symbol;
+      if (symbol.includes('USDT')) {
+        // Special case for metals display naming handled in 'tickers' computed if needed,
+        // but here we just establish the base reactive object.
+        displaySymbol = symbol.replace('USDT', '/USDT');
+      } else if (symbol.length === 6) {
+        displaySymbol = `${symbol.slice(0, 3)}/${symbol.slice(3)}`;
+      }
+      
+      tickerMap[symbol] = reactive({
+        symbol: displaySymbol,
+        originalSymbol: symbol,
+        price: 0,
+        change: 0,
+        volume: 0,
+        isPlaceholder: true
+      });
+    }
   });
-});
+};
 
-// Computed tickers - ALWAYS returns all symbols in fixed order
-// This array of references will now be COMPLETELY STABLE.
+const activeCategory = ref('hot');
+const cryptoList = ref([
+  'BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'XRPUSDT', 'ADAUSDT', 'DOGEUSDT', 
+  'LTCUSDT', 'ETCUSDT', 'BCHUSDT', 'DOTUSDT', 'NEOUSDT', 'IOTAUSDT', 'LUNAUSDT'
+]);
+const metalsList = ref(['XAUUSDT', 'XAGUSDT', 'XPTUSDT', 'XPDUSDT']);
+const forexList = ref([
+  'AUDUSD', 'BRLUSD', 'CADUSD', 'CHFUSD', 'CNYUSD', 'CZKUSD', 'DKKUSD',
+  'EURUSD', 'GBPUSD', 'HKDUSD', 'HUFUSD', 'IDRUSD', 'ILSUSD', 'INRUSD', 'ISKUSD',
+  'JPYUSD', 'KRWUSD', 'MXNUSD', 'MYRUSD', 'NOKUSD', 'NZDUSD', 'PHPUSD', 'PLNUSD',
+  'RONUSD', 'SEKUSD', 'SGDUSD', 'THBUSD', 'TRYUSD', 'USDUSD', 'ZARUSD'
+]);
+const SYMBOLS = ref([]);
+
+// Computed tickers - Filtered based on active category with specific display formatting
 const tickers = computed(() => {
-  return SYMBOLS.map(symbol => tickerMap[symbol]);
+  if (activeCategory.value === 'hot') {
+    const hotKeys = ['BTCUSDT', 'ETHUSDT', 'XRPUSDT', 'XAUUSDT', 'XAGUSDT', 'GBPUSD', 'EURUSD'];
+    return hotKeys.map(k => {
+      const t = tickerMap[k];
+      if (!t) return null;
+      // Pair formatting for Hot page
+      let displaySymbol = k;
+      if (k.includes('USDT')) {
+        if (['XAUUSDT', 'XAGUSDT'].includes(k)) {
+          displaySymbol = k.replace('USDT', '/USD');
+        } else {
+          displaySymbol = k.replace('USDT', '/USDT');
+        }
+      } else if (k.length === 6) {
+        displaySymbol = `${k.slice(0, 3)}/${k.slice(3)}`;
+      }
+      return { ...t, symbol: displaySymbol };
+    }).filter(Boolean);
+  }
+  
+  if (activeCategory.value === 'crypto') {
+    return cryptoList.value.map(k => {
+      const t = tickerMap[k];
+      if (!t) return null;
+      return { ...t, symbol: k.replace('USDT', '/USDT') };
+    }).filter(Boolean);
+  }
+  
+  if (activeCategory.value === 'metals') {
+    return metalsList.value.map(k => {
+      const t = tickerMap[k];
+      if (!t) return null;
+      // User specifically wants XAU/USD for metals
+      return { ...t, symbol: k.replace('USDT', '/USD') };
+    }).filter(Boolean);
+  }
+  
+  if (activeCategory.value === 'forex') {
+    return forexList.value.map(k => {
+      const t = tickerMap[k];
+      if (!t) return null;
+      // User wants {CODE}/USD
+      return { ...t, symbol: `${k.slice(0, 3)}/${k.slice(3)}` };
+    }).filter(Boolean);
+  }
+  
+  return [];
 });
 
 // Top 3 tickers for featured section
 const top3Tickers = computed(() => {
-  const targetSymbols = ['BTC/USDT', 'ETH/USDT', 'XRP/USDT'];
-  return targetSymbols.map(symbol => {
-    const symbolKey = symbol.replace('/', '');
-    return tickerMap[symbolKey] || null;
+  const targetSymbols = ['BTCUSDT', 'XAUUSDT', 'EURUSD'];
+  return targetSymbols.map(k => {
+    const t = tickerMap[k];
+    if (!t) return null;
+    
+    let displaySymbol = k;
+    if (k === 'BTCUSDT') {
+      displaySymbol = 'BTC/USDT';
+    } else if (k === 'XAUUSDT') {
+      displaySymbol = 'XAU/USD';
+    } else if (k === 'EURUSD') {
+      displaySymbol = 'EUR/USD';
+    } else if (k.includes('USDT')) {
+      displaySymbol = k.replace('USDT', '/USDT');
+    }
+    
+    return { ...t, symbol: displaySymbol };
   });
 });
 
@@ -615,8 +807,10 @@ const selectSymbol = (symbol) => {
 };
 
 const formatPrice = (price) => {
-  if (price >= 1) return price.toFixed(2);
-  if (price >= 0.01) return price.toFixed(4);
+  if (price === 0) return '0.00';
+  if (price >= 1000) return price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  if (price >= 1) return price.toFixed(4);
+  if (price >= 0.0001) return price.toFixed(6);
   return price.toFixed(8);
 };
 
@@ -626,28 +820,38 @@ const formatVolume = (volume) => {
   if (volume >= 1e3) return (volume / 1e3).toFixed(2) + 'K';
   return volume.toFixed(2);
 };
+let pollMetals = null;
 
 const getCoinLogo = (symbol) => {
-  const baseCurrency = symbol.split('/')[0];
-  return getCoinLogoUrl(baseCurrency) || `https://via.placeholder.com/32?text=${baseCurrency}`;
+  const base = symbol.split('/')[0];
+  return getCoinLogoUrl(base);
+};
+
+const getQuoteLogo = (symbol) => {
+  const quote = symbol.split('/')[1] || 'USD';
+  return getCoinLogoUrl(quote);
 };
 
 const handleImageError = (event) => {
-  const symbol = event.target.alt.split('/')[0];
-  event.target.src = `https://via.placeholder.com/32?text=${symbol}`;
+  const symbol = event.target.alt ? event.target.alt.split('/')[0] : 'Coin';
+  event.target.src = `https://ui-avatars.com/api/?name=${symbol}&background=random&color=fff&rounded=true`;
 };
 
-// Load initial prices from backend (DB-backed snapshots) so we never show 0.00000
+// Load initial prices from backend and discover all available symbols
 const loadInitialTickers = async () => {
   try {
     const response = await api.get('/market/ticker/24h');
     const data = Array.isArray(response.data) ? response.data : [];
 
-    data.forEach((t) => {
-      const symbol = t.symbol;
-      if (!SYMBOLS.includes(symbol)) return;
+    const allSymbols = data.map(t => t.symbol);
+    initializeTickerMap(allSymbols);
+    // Ensure our hardcoded list symbols are also initialized if they weren't in the data
+    initializeTickerMap([...cryptoList.value, ...metalsList.value, ...forexList.value]);
+    
+    SYMBOLS.value = allSymbols;
 
-      const ticker = tickerMap[symbol];
+    data.forEach((t) => {
+      const ticker = tickerMap[t.symbol];
       if (!ticker) return;
 
       const price = Number.parseFloat(t.price ?? t.lastPrice);
@@ -670,8 +874,11 @@ const loadInitialTickers = async () => {
   }
 };
 
+import { io } from 'socket.io-client';
+
 // WebSocket state management
 let tickerWs = null;
+let marketSocket = null; // Custom backend socket for Metals
 let wsReconnectTimer = null;
 let wsBackoffMs = 1000;
 const MAX_BACKOFF_MS = 30000;
@@ -702,6 +909,47 @@ const processTickerUpdate = (tickerData) => {
     ticker.volume = volume;
     ticker.isPlaceholder = false;
   }
+};
+
+// Connect to backend market socket
+const connectMarketSocket = () => {
+    // Determine backend URL
+    const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+    // Remove /api if present to get base URL
+    const baseUrl = backendUrl.replace('/api', '');
+
+    marketSocket = io(`${baseUrl}/market`, {
+        transports: ['websocket', 'polling'],
+        secure: true,
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000
+    });
+
+    marketSocket.on('connect', () => {
+        console.log('[MarketWS] Connected to backend market stream');
+    });
+
+    marketSocket.on('ticker', (data) => {
+        if (Array.isArray(data)) {
+            data.forEach(update => {
+                const symbol = update.s;
+                if (!symbol) return;
+                
+                const ticker = tickerMap[symbol];
+                if (ticker) {
+                    ticker.price = parseFloat(update.c);
+                    ticker.change = parseFloat(update.P);
+                    ticker.volume = parseFloat(update.v);
+                    ticker.isPlaceholder = false;
+                }
+            });
+        }
+    });
+
+    marketSocket.on('connect_error', (err) => {
+        console.warn('[MarketWS] Connection error:', err.message);
+    });
 };
 
 // WebSocket connection management
@@ -770,25 +1018,14 @@ const scheduleReconnect = () => {
 let clickOutsideHandler = null;
 
 onMounted(async () => {
-  console.log('[Home] Mounted. Initializing tickers...');
-  // Double check initialization
-  SYMBOLS.forEach((symbol) => {
-    if (!tickerMap[symbol]) {
-      tickerMap[symbol] = reactive({
-        symbol: symbol.replace('USDT', '/USDT'),
-        price: 0,
-        change: 0,
-        volume: 0,
-        isPlaceholder: true
-      });
-    }
-  });
-  console.log('[Home] tickerMap size:', Object.keys(tickerMap).length);
-
-  // First load last-known prices from backend (DB snapshots / Binance)
+  console.log('[Home] Mounted. Initializing dynamic tickers...');
+  
+  // First load all symbols and last-known prices from backend
   await loadInitialTickers();
   
-  connectWebSocket();
+  connectWebSocket(); // Binance
+  connectMarketSocket(); // Backend Metals & Forex
+  
   startAutoSlide();
   
   currentNotice.value = getRandomNotice();
@@ -797,17 +1034,46 @@ onMounted(async () => {
   }, 12000);
   
   clickOutsideHandler = (event) => {
-    if (languageSelectorRef.value && !languageSelectorRef.value.contains(event.target)) {
+    if (showLanguageMenu.value && languageSelectorRef.value && !languageSelectorRef.value.contains(event.target)) {
       showLanguageMenu.value = false;
     }
   };
-  
-  setTimeout(() => {
-    document.addEventListener('click', clickOutsideHandler);
-  }, 100);
+  document.addEventListener('click', clickOutsideHandler);
+
+  // Poll backend for non-WS assets (Metals) - KEEP as backup or for initial sync
+  // Reduced frequency since we have WS now
+    pollMetals = setInterval(async () => {
+        try {
+            const response = await api.get('/market/ticker/24h');
+            if (response.data && Array.isArray(response.data)) {
+                response.data.forEach(t => {
+                   const symbol = t.symbol;
+                   if (['XAUUSDT', 'XAGUSDT', 'XPTUSDT', 'XPDUSDT'].includes(symbol)) {
+                       const ticker = tickerMap[symbol];
+                       if (ticker) {
+                           // Only update if distinct difference (prevent jitter fighting)
+                           const newPrice = parseFloat(t.price);
+                           if (Math.abs(ticker.price - newPrice) / newPrice > 0.001) {
+                               ticker.price = newPrice;
+                               ticker.change = parseFloat(t.priceChangePercent);
+                               ticker.volume = parseFloat(t.volume);
+                               ticker.isPlaceholder = false;
+                           }
+                       }
+                   }
+                });
+            }
+        } catch (e) {
+            // silent
+        }
+    }, 5000);
 });
 
-onUnmounted(() => {
+  onUnmounted(() => {
+  if (marketSocket) {
+      marketSocket.disconnect();
+      marketSocket = null;
+  }
   if (wsReconnectTimer) {
     clearTimeout(wsReconnectTimer);
   }
@@ -832,8 +1098,13 @@ onUnmounted(() => {
     clearInterval(noticeInterval);
   }
   
+  if (pollMetals) {
+      clearInterval(pollMetals);
+  }
+  
   if (clickOutsideHandler) {
     document.removeEventListener('click', clickOutsideHandler);
   }
 });
 </script>
+
