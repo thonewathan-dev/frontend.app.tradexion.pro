@@ -4,26 +4,26 @@
       <!-- Left: Featured coin card -->
       <button
         type="button"
-        class="glass-card-no-hover rounded-2xl border border-white/10 p-5 text-left w-full hover:bg-white/5 transition-colors"
+        class="glass-card-no-hover rounded-2xl border border-gray-200 p-5 text-left w-full hover:bg-gray-50 transition-colors"
         @click="goHome"
       >
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-white/5 border border-white/15 flex items-center justify-center overflow-hidden">
+            <div class="w-10 h-10 rounded-full bg-gray-50 border border-white/15 flex items-center justify-center overflow-hidden">
               <img
                 v-if="featuredLogo"
                 :src="featuredLogo"
                 :alt="featured.symbol"
                 class="w-6 h-6 object-contain"
               />
-              <span v-else class="text-white font-bold text-sm">₿</span>
+              <span v-else class="text-gray-900 font-bold text-sm">₿</span>
             </div>
             <div>
-              <div class="text-base font-bold text-white leading-tight">{{ featured.symbol }}</div>
-              <div class="text-xs text-white/60">{{ featured.name }}</div>
+              <div class="text-base font-bold text-gray-900 leading-tight">{{ featured.symbol }}</div>
+              <div class="text-xs text-gray-900/60">{{ featured.name }}</div>
             </div>
           </div>
-          <div class="text-white/60 text-lg">›</div>
+          <div class="text-gray-900/60 text-lg">›</div>
         </div>
 
         <!-- Sparkline -->
@@ -54,23 +54,23 @@
             <div :class="featured.change < 0 ? 'text-red-300' : 'text-emerald-300'" class="text-2xl font-extrabold">
               {{ formatChange(featured.change) }}
             </div>
-            <div class="text-xs text-white/50 mt-0.5">Price</div>
+            <div class="text-xs text-gray-900/50 mt-0.5">Price</div>
           </div>
           <div class="text-right">
-            <div class="text-white font-bold text-lg">{{ formatPrice(featured.price) }}</div>
+            <div class="text-gray-900 font-bold text-lg">{{ formatPrice(featured.price) }}</div>
           </div>
         </div>
       </button>
 
       <!-- Right: Market list card -->
-      <div class="glass-card-no-hover rounded-2xl border border-white/10 overflow-hidden">
+      <div class="glass-card-no-hover rounded-2xl border border-gray-200 overflow-hidden">
         <div class="px-5 pt-4 pb-3">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-6 text-sm font-semibold">
               <button
                 type="button"
                 class="pb-2 border-b-2 transition-colors"
-                :class="activeTab === 'spot' ? 'border-white text-white' : 'border-transparent text-white/50 hover:text-white/80'"
+                :class="activeTab === 'spot' ? 'border-white text-gray-900' : 'border-transparent text-gray-900/50 hover:text-gray-900/80'"
                 @click="activeTab = 'spot'"
               >
                 Spot
@@ -78,7 +78,7 @@
               <button
                 type="button"
                 class="pb-2 border-b-2 transition-colors"
-                :class="activeTab === 'futures' ? 'border-white text-white' : 'border-transparent text-white/50 hover:text-white/80'"
+                :class="activeTab === 'futures' ? 'border-white text-gray-900' : 'border-transparent text-gray-900/50 hover:text-gray-900/80'"
                 @click="activeTab = 'futures'"
               >
                 Futures
@@ -86,7 +86,7 @@
               <button
                 type="button"
                 class="pb-2 border-b-2 transition-colors"
-                :class="activeTab === 'new' ? 'border-white text-white' : 'border-transparent text-white/50 hover:text-white/80'"
+                :class="activeTab === 'new' ? 'border-white text-gray-900' : 'border-transparent text-gray-900/50 hover:text-gray-900/80'"
                 @click="activeTab = 'new'"
               >
                 New
@@ -95,10 +95,10 @@
 
             <button
               type="button"
-              class="text-xs text-white/50 font-semibold hover:text-white/80 transition-colors"
+              class="text-xs text-gray-900/50 font-semibold hover:text-gray-900/80 transition-colors"
               @click="goHome"
             >
-              View All <span class="text-white/40">›</span>
+              View All <span class="text-gray-900/40">›</span>
             </button>
           </div>
         </div>
@@ -107,7 +107,7 @@
           <div
             v-for="item in tabItems"
             :key="item.symbol"
-            class="px-5 py-3 flex items-center justify-between hover:bg-white/5 transition-colors"
+            class="px-5 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors"
           >
             <div class="flex items-center gap-3 min-w-0">
               <div
@@ -120,16 +120,16 @@
                   :alt="item.symbol"
                   class="w-5 h-5 object-contain"
                 />
-                <span v-else class="text-white text-xs font-bold">{{ item.badge }}</span>
+                <span v-else class="text-gray-900 text-xs font-bold">{{ item.badge }}</span>
               </div>
               <div class="min-w-0">
-                <div class="text-sm font-bold text-white leading-tight">{{ item.symbol }}</div>
-                <div class="text-xs text-white/60 truncate">{{ item.name }}</div>
+                <div class="text-sm font-bold text-gray-900 leading-tight">{{ item.symbol }}</div>
+                <div class="text-xs text-gray-900/60 truncate">{{ item.name }}</div>
               </div>
             </div>
 
             <div class="flex items-center gap-6">
-              <div class="text-sm font-bold text-white tabular-nums">{{ formatPrice(item.price) }}</div>
+              <div class="text-sm font-bold text-gray-900 tabular-nums">{{ formatPrice(item.price) }}</div>
               <div
                 class="text-sm font-bold tabular-nums w-16 text-right"
                 :class="item.change < 0 ? 'text-red-300' : 'text-emerald-300'"
@@ -140,7 +140,7 @@
           </div>
         </div>
 
-        <div class="px-5 py-3 text-xs text-white/40">
+        <div class="px-5 py-3 text-xs text-gray-900/40">
           Market data is illustrative on auth pages.
         </div>
       </div>
@@ -296,7 +296,7 @@ const tabItems = computed(() => {
           return null;
         }
       })(),
-      color: 'bg-white/5 border-white/15',
+      color: 'bg-gray-50 border-white/15',
     }));
 
   if (activeTab.value === 'spot') {

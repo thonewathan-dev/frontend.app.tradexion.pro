@@ -5,17 +5,17 @@
       <DesktopNav v-if="!isMobile" />
       <main class="flex-1 pb-16 md:pb-0">
         <!-- Header -->
-        <div class="glass-card-no-hover border-b border-white/10 px-4 py-3">
+        <div class="glass-card-no-hover border-b border-gray-200 px-4 py-3">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <button @click="$router.back()" class="p-1.5 hover:bg-white/10 rounded-lg transition-colors">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <button @click="$router.back()" class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+                <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
-              <h1 class="text-lg font-bold text-white">{{ t('deposit.title') }}</h1>
+              <h1 class="text-lg font-bold text-gray-900">{{ t('deposit.title') }}</h1>
             </div>
-            <button @click="showHistory = true" class="text-sm text-white/70 hover:text-white transition-colors">
+            <button @click="showHistory = true" class="text-sm text-gray-900/70 hover:text-gray-900 transition-colors">
               {{ t('deposit.history') }}
             </button>
           </div>
@@ -25,10 +25,10 @@
           <!-- Currency Selection -->
           <div class="mb-4">
             <div class="flex items-center justify-between mb-2">
-              <span class="text-white font-medium">{{ selectedCurrency }}</span>
+              <span class="text-gray-900 font-medium">{{ selectedCurrency }}</span>
               <button
                 @click="showCurrencySelector = true"
-                class="flex items-center gap-1 text-sm text-white/70 hover:text-white transition-colors"
+                class="flex items-center gap-1 text-sm text-gray-900/70 hover:text-gray-900 transition-colors"
               >
                 {{ t('deposit.selectCurrency') }}
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -49,7 +49,7 @@
                   'flex-1 py-2 px-4 rounded-lg font-medium transition-colors',
                   selectedNetwork === network
                     ? 'bg-blue-500/30 text-blue-200 border border-blue-500/50'
-                    : 'glass-input text-white/70 hover:bg-white/10'
+                    : 'glass-input text-gray-900/70 hover:bg-gray-100'
                 ]"
               >
                 {{ network }}
@@ -58,31 +58,31 @@
           </div>
 
           <!-- QR Code and Address -->
-          <div class="rounded-xl p-4 mb-3 text-center bg-white/5 border border-white/10 min-h-[230px] flex flex-col items-center justify-center">
+          <div class="rounded-xl p-4 mb-3 text-center bg-gray-50 border border-gray-200 min-h-[230px] flex flex-col items-center justify-center">
             <!-- Loading state -->
             <div v-if="depositAddressLoading" class="flex flex-col items-center gap-3 w-full">
-              <div class="w-32 h-32 rounded-lg bg-white/10 animate-pulse" />
-              <div class="h-3 w-40 bg-white/10 rounded-full animate-pulse" />
-              <div class="h-3 w-56 bg-white/10 rounded-full animate-pulse" />
+              <div class="w-32 h-32 rounded-lg bg-gray-100 animate-pulse" />
+              <div class="h-3 w-40 bg-gray-100 rounded-full animate-pulse" />
+              <div class="h-3 w-56 bg-gray-100 rounded-full animate-pulse" />
             </div>
 
             <!-- Loaded state -->
             <template v-else-if="depositAddress">
               <div class="mb-4">
-                <div class="inline-block p-3 bg-white rounded-lg relative">
+                <div class="inline-block p-3 bg-[#fafafa] rounded-lg relative">
                   <img :src="qrCodeUrl" alt="QR Code" class="w-40 h-40" />
                   <!-- Coin Logo Overlay -->
                   <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div class="w-10 h-10 bg-white rounded-full p-1.5 flex items-center justify-center shadow-lg">
+                    <div class="w-10 h-10 bg-[#fafafa] rounded-full p-1.5 flex items-center justify-center shadow-lg">
                       <img :src="coinLogo" :alt="selectedCurrency" class="w-full h-full object-contain" />
                     </div>
                   </div>
                 </div>
               </div>
               <div class="mb-2">
-                <p class="text-white/70 text-xs mb-1.5">{{ t('deposit.depositAddress') }}</p>
+                <p class="text-gray-900/70 text-xs mb-1.5">{{ t('deposit.depositAddress') }}</p>
                 <div class="flex items-center gap-2 justify-center">
-                  <p class="text-white font-mono text-xs break-all">{{ depositAddress }}</p>
+                  <p class="text-gray-900 font-mono text-xs break-all">{{ depositAddress }}</p>
                   <button
                     @click="copyAddress"
                     class="px-3 py-1 bg-blue-500/30 text-blue-200 rounded-lg text-xs transition-colors"
@@ -94,15 +94,15 @@
             </template>
 
             <!-- No address state -->
-            <p v-else class="text-xs text-white/60">
+            <p v-else class="text-xs text-gray-900/60">
               {{ t('deposit.noAddressAvailable') || 'Deposit address not available for this currency/network.' }}
             </p>
           </div>
 
           <!-- Deposit Form -->
-          <div class="rounded-xl p-3 space-y-3 bg-white/5 border border-white/10">
+          <div class="rounded-xl p-3 space-y-3 bg-gray-50 border border-gray-200">
             <div>
-              <label class="block text-xs text-white/70 mb-1.5">{{ t('deposit.rechargeQuantity') }}</label>
+              <label class="block text-xs text-gray-900/70 mb-1.5">{{ t('deposit.rechargeQuantity') }}</label>
               <div class="flex items-center gap-2">
                 <input
                   v-model="depositAmount"
@@ -111,12 +111,12 @@
                   class="flex-1 px-3 py-2 glass-input rounded-lg focus:outline-none text-sm"
                   placeholder="0.00"
                 />
-                <span class="text-white/70 text-xs">{{ selectedCurrency }}</span>
+                <span class="text-gray-900/70 text-xs">{{ selectedCurrency }}</span>
               </div>
             </div>
 
             <div>
-              <label class="block text-xs text-white/70 mb-1.5">{{ t('deposit.transferScreenshot') }}</label>
+              <label class="block text-xs text-gray-900/70 mb-1.5">{{ t('deposit.transferScreenshot') }}</label>
               <input
                 type="file"
                 accept="image/*"
@@ -140,12 +140,12 @@
             <button
               @click="handleSubmit"
               :disabled="loading || !depositAmount || (selectedCurrency !== 'BANK' && !screenshotFile)"
-              class="w-full py-2.5 bg-blue-500/40 border border-blue-500/60 rounded-lg font-medium text-sm text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              class="w-full py-2.5 bg-blue-500/40 border border-blue-500/60 rounded-lg font-medium text-sm text-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {{ loading ? t('common.processing') : t('deposit.submitButton') }}
             </button>
 
-            <p class="text-[11px] text-white/60 text-center leading-snug">
+            <p class="text-[11px] text-gray-900/60 text-center leading-snug">
               {{ t('deposit.waitForReview') }}
             </p>
           </div>
@@ -160,9 +160,9 @@
       @click.self="showCurrencySelector = false"
     >
       <div class="glass-card rounded-t-xl md:rounded-xl w-full max-w-md max-h-[80vh] overflow-y-auto animate-slide-up">
-        <div class="sticky top-0 glass-card-no-hover border-b border-white/10 p-4 flex justify-between items-center">
-          <h2 class="text-lg font-bold text-white">{{ t('deposit.selectCurrency') }}</h2>
-          <button @click="showCurrencySelector = false" class="text-white/70 hover:text-white">
+        <div class="sticky top-0 glass-card-no-hover border-b border-gray-200 p-4 flex justify-between items-center">
+          <h2 class="text-lg font-bold text-gray-900">{{ t('deposit.selectCurrency') }}</h2>
+          <button @click="showCurrencySelector = false" class="text-gray-900/70 hover:text-gray-900">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -173,9 +173,9 @@
             v-for="currency in currencies"
             :key="currency.value"
             @click="selectCurrency(currency.value)"
-            class="w-full flex items-center justify-between p-4 border-b border-white/10 last:border-b-0 hover:bg-white/5 transition-colors"
+            class="w-full flex items-center justify-between p-4 border-b border-gray-200 last:border-b-0 hover:bg-gray-50 transition-colors"
           >
-            <span class="text-white font-medium">{{ currency.label }}</span>
+            <span class="text-gray-900 font-medium">{{ currency.label }}</span>
             <svg
               v-if="selectedCurrency === currency.value"
               class="w-5 h-5 text-blue-400"
@@ -197,9 +197,9 @@
       @click.self="showHistory = false"
     >
       <div class="glass-card rounded-t-xl md:rounded-xl w-full max-w-md max-h-[80vh] overflow-y-auto animate-slide-up">
-        <div class="sticky top-0 glass-card-no-hover border-b border-white/10 p-4 flex justify-between items-center">
-          <h2 class="text-lg font-bold text-white">Recharge record</h2>
-          <button @click="showHistory = false" class="text-white/70 hover:text-white">
+        <div class="sticky top-0 glass-card-no-hover border-b border-gray-200 p-4 flex justify-between items-center">
+          <h2 class="text-lg font-bold text-gray-900">Recharge record</h2>
+          <button @click="showHistory = false" class="text-gray-900/70 hover:text-gray-900">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -209,12 +209,12 @@
           <div
             v-for="deposit in depositHistory"
             :key="deposit.id"
-            class="p-4 border-b border-white/10 last:border-b-0"
+            class="p-4 border-b border-gray-200 last:border-b-0"
           >
             <div class="flex justify-between items-start mb-2">
               <div>
-                <div class="text-white font-medium">{{ deposit.currency }} - {{ formatBalance(deposit.amount) }}</div>
-                <div class="text-white/60 text-sm">{{ formatDate(deposit.created_at) }}</div>
+                <div class="text-gray-900 font-medium">{{ deposit.currency }} - {{ formatBalance(deposit.amount) }}</div>
+                <div class="text-gray-900/60 text-sm">{{ formatDate(deposit.created_at) }}</div>
               </div>
               <span
                 :class="[
@@ -228,7 +228,7 @@
               </span>
             </div>
           </div>
-          <div v-if="depositHistory.length === 0" class="text-center text-white/60 py-8">
+          <div v-if="depositHistory.length === 0" class="text-center text-gray-900/60 py-8">
             {{ t('deposit.noRecords') }}
           </div>
         </div>

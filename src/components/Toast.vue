@@ -8,7 +8,7 @@
       <div
         v-for="toast in toasts"
         :key="toast.id"
-        class="glass-card rounded-lg shadow-2xl border border-white/10 w-full max-w-[600px] mx-auto pointer-events-auto animate-slide-down"
+        class="glass-card rounded-lg shadow-2xl border border-gray-200 w-full max-w-[600px] mx-auto pointer-events-auto animate-slide-down"
         :class="{
           'bg-green-500/10 border-green-500/30': toast.type === 'success',
           'bg-red-500/10 border-red-500/30': toast.type === 'error',
@@ -75,9 +75,9 @@
           <!-- Close button (optional, small X) -->
           <button
             @click="removeToast(toast.id)"
-            class="p-1 hover:bg-white/10 rounded transition-colors flex-shrink-0"
+            class="p-1 hover:bg-gray-100 rounded transition-colors flex-shrink-0"
           >
-            <svg class="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 text-gray-900/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>

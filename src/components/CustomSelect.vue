@@ -6,9 +6,9 @@
       class="w-full px-4 py-2 glass-input rounded-lg focus:outline-none flex items-center justify-between text-left"
       :class="{ 'ring-2 ring-blue-400/50': isOpen }"
     >
-      <span class="text-white">{{ displayValue }}</span>
+      <span class="text-gray-900">{{ displayValue }}</span>
       <svg
-        class="w-5 h-5 text-white/60 transition-transform"
+        class="w-5 h-5 text-gray-900/60 transition-transform"
         :class="{ 'rotate-180': isOpen }"
         fill="none"
         stroke="currentColor"
@@ -21,7 +21,7 @@
     <transition name="dropdown">
       <div
         v-if="isOpen"
-        class="absolute z-50 w-full mt-2 bg-gray-800/95 backdrop-blur-md border border-white/20 rounded-lg overflow-hidden shadow-2xl"
+        class="absolute z-50 w-full mt-2 bg-white/95 backdrop-blur-md border border-gray-300 rounded-lg overflow-hidden shadow-2xl"
       >
         <div class="max-h-60 overflow-y-auto">
           <button
@@ -29,7 +29,7 @@
             :key="option.value"
             @click="selectOption(option)"
             type="button"
-            class="w-full px-4 py-3 text-left text-white transition-colors"
+            class="w-full px-4 py-3 text-left text-gray-900 transition-colors"
             :class="{
               'bg-blue-500/50 text-blue-200': modelValue === option.value,
               'bg-gray-700/50 hover:bg-gray-700/70': modelValue !== option.value

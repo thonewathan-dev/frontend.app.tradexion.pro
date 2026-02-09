@@ -7,12 +7,12 @@
       class="fixed bottom-20 right-4 md:bottom-6 md:right-6 w-14 h-14 bg-blue-500 hover:bg-blue-600 rounded-full shadow-lg flex items-center justify-center z-50 transition-all"
       :class="{ 'animate-pulse': hasUnread }"
     >
-      <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
       </svg>
       <span
         v-if="hasUnread"
-        class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-xs text-white font-bold"
+        class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-xs text-gray-900 font-bold"
       >
         !
       </span>
@@ -24,7 +24,7 @@
       class="fixed bottom-20 right-4 md:bottom-6 md:right-6 w-[calc(100vw-2rem)] md:w-96 h-[calc(100vh-8rem)] md:h-[600px] glass-card rounded-xl shadow-2xl flex flex-col z-50"
     >
       <!-- Header -->
-      <div class="glass-card-no-hover border-b border-white/10 px-4 py-3 flex items-center justify-between">
+      <div class="glass-card-no-hover border-b border-gray-200 px-4 py-3 flex items-center justify-between">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center">
             <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -32,17 +32,17 @@
             </svg>
           </div>
           <div>
-            <h3 class="text-white font-semibold text-sm">Customer Support</h3>
-            <p class="text-white/60 text-xs" :class="{ 'text-green-400': isConnected, 'text-red-400': !isConnected }">
+            <h3 class="text-gray-900 font-semibold text-sm">Customer Support</h3>
+            <p class="text-gray-900/60 text-xs" :class="{ 'text-green-400': isConnected, 'text-red-400': !isConnected }">
               {{ isConnected ? 'Online' : 'Connecting...' }}
             </p>
           </div>
         </div>
         <button
           @click="closeChat"
-          class="p-2 hover:bg-white/10 rounded-lg transition-colors"
+          class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
         >
-          <svg class="w-5 h-5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-5 h-5 text-gray-900/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
@@ -51,7 +51,7 @@
       <!-- Messages -->
       <div ref="messagesContainer" class="flex-1 overflow-y-auto p-4 space-y-3">
         <div v-if="messages.length === 0" class="text-center py-8">
-          <p class="text-white/60 text-sm">No messages yet. Start a conversation!</p>
+          <p class="text-gray-900/60 text-sm">No messages yet. Start a conversation!</p>
         </div>
         <div
           v-for="message in messages"
@@ -62,8 +62,8 @@
           <div
             class="max-w-[75%] rounded-lg px-4 py-2"
             :class="(message.sender_role === 'user' || message.sender_id === authStore.user?.id)
-              ? 'bg-blue-500 text-white' 
-              : 'bg-white/10 text-white'"
+              ? 'bg-blue-500 text-gray-900' 
+              : 'bg-gray-100 text-gray-900'"
           >
             <p class="text-sm whitespace-pre-wrap">{{ message.message }}</p>
             <p class="text-xs mt-1 opacity-70">
@@ -74,19 +74,19 @@
       </div>
 
       <!-- Input -->
-      <div class="border-t border-white/10 p-4">
+      <div class="border-t border-gray-200 p-4">
         <form @submit.prevent="handleSend" class="flex gap-2">
           <input
             v-model="messageInput"
             type="text"
             placeholder="Type your message..."
-            class="flex-1 px-4 py-2 glass-input rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-sm"
+            class="flex-1 px-4 py-2 glass-input rounded-lg text-gray-900 placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-sm"
             :disabled="!isConnected"
           />
           <button
             type="submit"
             :disabled="!messageInput.trim() || loading"
-            class="px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-white font-medium text-sm transition-colors"
+            class="px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-gray-900 font-medium text-sm transition-colors"
           >
             {{ loading ? 'Sending...' : 'Send' }}
           </button>

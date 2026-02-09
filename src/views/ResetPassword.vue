@@ -1,15 +1,15 @@
 <template>
-  <div class="min-h-[100dvh] overflow-hidden text-white flex flex-col">
+  <div class="min-h-[100dvh] overflow-hidden text-gray-900 flex flex-col">
     <!-- Top bar -->
-    <div class="sticky top-0 z-10 glass-card-no-hover border-b border-white/10">
+    <div class="sticky top-0 z-10 glass-card-no-hover border-b border-gray-200">
       <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
         <div class="flex items-center gap-2">
           <img :src="logoMarkUrl" alt="TradeXion" class="w-7 h-7 object-contain" />
-          <span class="font-semibold tracking-tight text-white">TradeXion</span>
+          <span class="font-semibold tracking-tight text-gray-900">TradeXion</span>
         </div>
         <router-link
           to="/login"
-          class="px-4 py-1.5 rounded-full text-sm font-semibold glass-button-no-hover text-white border border-white/20 hover:border-white/30 transition-colors"
+          class="px-4 py-1.5 rounded-full text-sm font-semibold glass-button-no-hover text-gray-900 border border-gray-300 hover:border-white/30 transition-colors"
         >
           Log In
         </router-link>
@@ -25,33 +25,33 @@
 
         <!-- Right: Reset password form -->
         <div class="min-w-0">
-          <h1 class="text-2xl md:text-3xl font-bold tracking-tight mb-3 text-white">Reset Password</h1>
+          <h1 class="text-2xl md:text-3xl font-bold tracking-tight mb-3 text-gray-900">Reset Password</h1>
 
           <!-- Card -->
           <div class="glass-card-no-hover rounded-xl border border-white/12 p-3">
             <!-- Step 1: Verify Code -->
             <form v-if="step === 'code'" @submit.prevent="handleVerifyCode" class="space-y-2.5">
               <div class="text-center mb-2">
-                <p class="text-white/80 text-sm mb-1">Code sent to</p>
-                <p class="text-white text-sm font-semibold">{{ email }}</p>
+                <p class="text-gray-900/80 text-sm mb-1">Code sent to</p>
+                <p class="text-gray-900 text-sm font-semibold">{{ email }}</p>
               </div>
 
-              <label class="block text-xs text-white/80 font-medium text-center">Verification Code</label>
+              <label class="block text-xs text-gray-900/80 font-medium text-center">Verification Code</label>
               <input
                 v-model.trim="code"
                 type="text"
                 required
                 maxlength="6"
-                class="w-full px-3 py-3 glass-input rounded-lg text-white text-center text-2xl tracking-[0.4em] font-bold focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+                class="w-full px-3 py-3 glass-input rounded-lg text-gray-900 text-center text-2xl tracking-[0.4em] font-bold focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
                 placeholder="000000"
                 autocomplete="one-time-code"
               />
-              <p class="text-xs text-white/50 mt-1.5 text-center">Enter the 6-digit code sent to your email</p>
+              <p class="text-xs text-gray-900/50 mt-1.5 text-center">Enter the 6-digit code sent to your email</p>
 
               <button
                 type="submit"
                 :disabled="loading || !code || code.length !== 6"
-                class="w-full py-2.5 text-sm rounded-full font-semibold glass-button-no-hover text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-white/20"
+                class="w-full py-2.5 text-sm rounded-full font-semibold glass-button-no-hover text-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-gray-300"
               >
                 {{ loading ? 'Verifying...' : 'Verify Code' }}
               </button>
@@ -60,7 +60,7 @@
                 type="button"
                 @click="handleResendCode"
                 :disabled="loading || resendingCode"
-                class="w-full py-2.5 text-sm rounded-full font-semibold border border-white/15 text-white/90 hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                class="w-full py-2.5 text-sm rounded-full font-semibold border border-white/15 text-gray-900/90 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {{ resendingCode ? 'Sending...' : 'Resend Code' }}
               </button>
@@ -71,38 +71,38 @@
               <div class="flex items-center gap-2 mb-1.5">
                 <button
                   type="button"
-                  class="p-1 hover:bg-white/10 rounded-lg transition-colors"
+                  class="p-1 hover:bg-gray-100 rounded-lg transition-colors"
                   @click="step = 'code'"
                   aria-label="Back"
                 >
-                  <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                   </svg>
                 </button>
-                <div class="flex-1 text-center text-xs font-semibold text-white truncate px-2">New Password</div>
+                <div class="flex-1 text-center text-xs font-semibold text-gray-900 truncate px-2">New Password</div>
                 <div class="w-7"></div>
               </div>
 
-              <label class="block text-xs text-white/80 font-medium">New Password</label>
+              <label class="block text-xs text-gray-900/80 font-medium">New Password</label>
               <input
                 v-model="newPassword"
                 type="password"
                 required
                 minlength="8"
                 autocomplete="new-password"
-                class="w-full px-3 py-2.5 text-sm glass-input rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+                class="w-full px-3 py-2.5 text-sm glass-input rounded-lg text-gray-900 placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
                 placeholder="Enter new password"
               />
-              <p class="text-xs text-white/50">Password must be at least 8 characters long</p>
+              <p class="text-xs text-gray-900/50">Password must be at least 8 characters long</p>
 
-              <label class="block text-xs text-white/80 font-medium">Confirm New Password</label>
+              <label class="block text-xs text-gray-900/80 font-medium">Confirm New Password</label>
               <input
                 v-model="confirmPassword"
                 type="password"
                 required
                 minlength="8"
                 autocomplete="new-password"
-                class="w-full px-3 py-2.5 text-sm glass-input rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+                class="w-full px-3 py-2.5 text-sm glass-input rounded-lg text-gray-900 placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
                 placeholder="Confirm new password"
               />
               <p v-if="confirmPassword && newPassword !== confirmPassword" class="text-xs text-red-400">Passwords do not match</p>
@@ -110,15 +110,15 @@
               <button
                 type="submit"
                 :disabled="loading || !newPassword || !confirmPassword || newPassword.length < 8 || newPassword !== confirmPassword"
-                class="w-full py-2.5 text-sm rounded-full font-semibold glass-button-no-hover text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-white/20"
+                class="w-full py-2.5 text-sm rounded-full font-semibold glass-button-no-hover text-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-gray-300"
               >
                 {{ loading ? 'Resetting...' : 'Reset Password' }}
               </button>
             </form>
           </div>
 
-          <div class="mt-4 text-center text-xs text-white/70">
-            <router-link to="/login" class="font-semibold text-white hover:text-white/80">Back to Log In</router-link>
+          <div class="mt-4 text-center text-xs text-gray-900/70">
+            <router-link to="/login" class="font-semibold text-gray-900 hover:text-gray-900/80">Back to Log In</router-link>
           </div>
         </div>
       </div>

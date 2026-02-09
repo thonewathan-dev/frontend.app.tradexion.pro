@@ -5,14 +5,14 @@
       <DesktopNav v-if="!isMobile" />
       <main class="flex-1 pb-16 md:pb-0">
         <!-- Header -->
-        <div class="glass-card-no-hover border-b border-white/10 px-4 py-3">
+        <div class="bg-[#fafafa] border-b border-gray-200 px-4 py-3">
           <div class="flex items-center justify-between">
-            <h1 class="text-xl font-bold text-white">{{ t('staking.title') }}</h1>
+            <h1 class="text-xl font-bold text-gray-900">{{ t('staking.title') }}</h1>
             <button
               @click="showRecords = true"
-              class="p-2 hover:bg-white/10 rounded-lg transition-colors"
+              class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </button>
@@ -28,26 +28,26 @@
               class="glass-card rounded-xl p-6"
             >
               <!-- Title -->
-              <div class="text-white font-semibold text-lg mb-4">
+              <div class="text-gray-900 font-semibold text-lg mb-4">
                 {{ t('staking.lockUpToEarn') }} {{ option.days }}{{ t('staking.day') }}
               </div>
               
               <!-- Number of Deposits -->
               <div class="mb-3">
-                <div class="text-white/70 text-sm mb-1">{{ t('staking.numberOfDeposits') }}</div>
-                <div class="text-white font-medium">{{ formatAmount(option.minDeposit) }} USDT</div>
+                <div class="text-gray-900/70 text-sm mb-1">{{ t('staking.numberOfDeposits') }}</div>
+                <div class="text-gray-900 font-medium">{{ formatAmount(option.minDeposit) }} USDT</div>
               </div>
               
               <!-- Total Revenue -->
               <div class="mb-4">
-                <div class="text-white/70 text-sm mb-1">{{ t('staking.totalRevenue') }}:</div>
-                <div class="text-white font-medium">{{ formatAmount(option.totalRevenue) }} USDT</div>
+                <div class="text-gray-900/70 text-sm mb-1">{{ t('staking.totalRevenue') }}:</div>
+                <div class="text-gray-900 font-medium">{{ formatAmount(option.totalRevenue) }} USDT</div>
               </div>
               
               <!-- BUY Button -->
               <button
                 @click="handleBuy(option)"
-                class="w-full py-3 bg-teal-500/20 hover:bg-teal-500/30 border border-teal-500/50 rounded-lg font-medium text-white transition-all active:scale-[0.98]"
+                class="w-full py-3 bg-teal-500/20 hover:bg-teal-500/30 border border-teal-500/50 rounded-lg font-medium text-gray-900 transition-all active:scale-[0.98]"
               >
                 {{ t('staking.buy') }}
               </button>
@@ -64,13 +64,13 @@
       @click.self="closeReminder"
     >
       <div class="glass-card rounded-xl w-full max-w-md p-6 animate-slide-up">
-        <h2 class="text-xl font-bold text-white mb-4">{{ t('staking.kindlyReminder') }}</h2>
-        <p class="text-white/80 text-sm leading-relaxed mb-6">
+        <h2 class="text-xl font-bold text-gray-900 mb-4">{{ t('staking.kindlyReminder') }}</h2>
+        <p class="text-gray-900/80 text-sm leading-relaxed mb-6">
           {{ t('staking.reminderText') }}
         </p>
         <button
           @click="closeReminder"
-          class="w-full py-3 bg-teal-500/20 hover:bg-teal-500/30 border border-teal-500/50 rounded-lg font-medium text-white transition-all active:scale-[0.98]"
+          class="w-full py-3 bg-teal-500/20 hover:bg-teal-500/30 border border-teal-500/50 rounded-lg font-medium text-gray-900 transition-all active:scale-[0.98]"
         >
           {{ t('staking.sure') }}
         </button>
@@ -84,28 +84,28 @@
       @click.self="showRecords = false"
     >
       <div class="glass-card rounded-t-xl md:rounded-xl w-full max-w-md max-h-[90vh] overflow-y-auto animate-slide-up">
-        <div class="sticky top-0 glass-card-no-hover border-b border-white/10 p-4 flex justify-between items-center">
-          <h2 class="text-lg font-bold text-white">{{ t('staking.records') }}</h2>
-          <button @click="showRecords = false" class="text-white/70 hover:text-white">
+        <div class="sticky top-0 bg-[#fafafa] border-b border-gray-200 p-4 flex justify-between items-center">
+          <h2 class="text-lg font-bold text-gray-900">{{ t('staking.records') }}</h2>
+          <button @click="showRecords = false" class="text-gray-900/70 hover:text-gray-900">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
         <div class="p-4">
-          <div v-if="stakingRecords.length === 0" class="text-center py-8 text-white/60">
+          <div v-if="stakingRecords.length === 0" class="text-center py-8 text-gray-900/60">
             {{ t('staking.noRecords') }}
           </div>
           <div v-else class="space-y-3">
             <div
               v-for="record in stakingRecords"
               :key="record.id"
-              class="glass-card-no-hover rounded-lg p-4 border border-white/10"
+              class="glass-card-no-hover rounded-lg p-4 border border-gray-200"
             >
               <div class="flex justify-between items-start mb-2">
                 <div>
-                  <div class="text-white font-medium">{{ record.days }} Day Staking</div>
-                  <div class="text-white/60 text-sm">{{ formatDate(record.createdAt) }}</div>
+                  <div class="text-gray-900 font-medium">{{ record.days }} Day Staking</div>
+                  <div class="text-gray-900/60 text-sm">{{ formatDate(record.createdAt) }}</div>
                 </div>
                 <div
                   :class="[
@@ -118,7 +118,7 @@
                   {{ record.status }}
                 </div>
               </div>
-              <div class="text-white/80 text-sm">
+              <div class="text-gray-900/80 text-sm">
                 {{ t('staking.amountLabel') }}: {{ formatAmount(record.amount) }} USDT
               </div>
             </div>
@@ -134,9 +134,9 @@
       @click.self="showBuyModal = false"
     >
       <div class="glass-card rounded-t-xl md:rounded-xl w-full max-w-md animate-slide-up">
-        <div class="sticky top-0 glass-card-no-hover border-b border-white/10 p-4 flex justify-between items-center">
-          <h2 class="text-lg font-bold text-white">{{ t('staking.stakeUSDT') }}</h2>
-          <button @click="showBuyModal = false" class="text-white/70 hover:text-white">
+        <div class="sticky top-0 bg-[#fafafa] border-b border-gray-200 p-4 flex justify-between items-center">
+          <h2 class="text-lg font-bold text-gray-900">{{ t('staking.stakeUSDT') }}</h2>
+          <button @click="showBuyModal = false" class="text-gray-900/70 hover:text-gray-900">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -144,31 +144,31 @@
         </div>
         <div class="p-4 space-y-4">
           <div>
-            <div class="text-white/70 text-sm mb-2">{{ t('staking.lockPeriod') }}</div>
-            <div class="text-white font-medium">{{ selectedOption?.days }} {{ t('staking.days') }}</div>
+            <div class="text-gray-900/70 text-sm mb-2">{{ t('staking.lockPeriod') }}</div>
+            <div class="text-gray-900 font-medium">{{ selectedOption?.days }} {{ t('staking.days') }}</div>
           </div>
           <div>
-            <div class="text-white/70 text-sm mb-2">{{ t('staking.minDeposit') }}</div>
-            <div class="text-white font-medium">{{ formatAmount(selectedOption?.minDeposit || 0) }} USDT</div>
+            <div class="text-gray-900/70 text-sm mb-2">{{ t('staking.minDeposit') }}</div>
+            <div class="text-gray-900 font-medium">{{ formatAmount(selectedOption?.minDeposit || 0) }} USDT</div>
           </div>
           <div>
-            <label class="block text-sm text-white/70 mb-2">{{ t('staking.amount') }}</label>
+            <label class="block text-sm text-gray-900/70 mb-2">{{ t('staking.amount') }}</label>
             <input
               v-model="stakeAmount"
               type="number"
               step="0.00000001"
               :min="selectedOption?.minDeposit || 0"
-              class="w-full px-4 py-2 glass-input rounded-lg focus:outline-none text-white"
+              class="w-full px-4 py-2 glass-input rounded-lg focus:outline-none text-gray-900"
               placeholder="0.00000000"
             />
-            <div class="text-xs text-white/50 mt-1">
+            <div class="text-xs text-gray-900/50 mt-1">
               {{ t('staking.minimum') }}: {{ formatAmount(selectedOption?.minDeposit || 0) }} USDT
             </div>
           </div>
           <button
             @click="handleConfirmStake"
             :disabled="loading || !isValidAmount"
-            class="w-full py-3 bg-teal-500/20 hover:bg-teal-500/30 border border-teal-500/50 rounded-lg font-medium text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
+            class="w-full py-3 bg-teal-500/20 hover:bg-teal-500/30 border border-teal-500/50 rounded-lg font-medium text-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
           >
             {{ loading ? t('common.processing') : t('staking.confirmStake') }}
           </button>

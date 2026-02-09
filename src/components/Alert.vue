@@ -6,9 +6,9 @@
         class="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
         @click.self="close"
       >
-        <div class="glass-card rounded-lg w-full max-w-sm shadow-2xl border border-white/10 animate-slide-up">
+        <div class="glass-card rounded-lg w-full max-w-sm shadow-2xl border border-gray-200 animate-slide-up">
           <!-- Header -->
-          <div class="flex items-center justify-between p-4 border-b border-white/10">
+          <div class="flex items-center justify-between p-4 border-b border-gray-200">
             <div class="flex items-center gap-3">
               <!-- Icon based on type -->
               <div
@@ -67,9 +67,9 @@
             </div>
             <button
               @click="close"
-              class="p-1 hover:bg-white/10 rounded-full transition-colors"
+              class="p-1 hover:bg-gray-100 rounded-full transition-colors"
             >
-              <svg class="w-5 h-5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 text-gray-900/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -77,7 +77,7 @@
           
           <!-- Message -->
           <div class="p-4">
-            <p class="text-white/90 text-sm leading-relaxed">{{ message }}</p>
+            <p class="text-gray-900/90 text-sm leading-relaxed">{{ message }}</p>
           </div>
           
           <!-- Actions -->

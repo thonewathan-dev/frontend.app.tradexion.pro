@@ -1,15 +1,15 @@
 <template>
-  <div class="min-h-[100dvh] overflow-hidden text-white flex flex-col">
+  <div class="min-h-[100dvh] overflow-hidden text-gray-900 flex flex-col">
     <!-- Top bar (same as Login) -->
-    <div class="sticky top-0 z-10 glass-card-no-hover border-b border-white/10">
+    <div class="sticky top-0 z-10 glass-card-no-hover border-b border-gray-200">
       <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
         <div class="flex items-center gap-2">
           <img :src="logoMarkUrl" alt="TradeXion" class="w-7 h-7 object-contain" />
-          <span class="font-semibold tracking-tight text-white">TradeXion</span>
+          <span class="font-semibold tracking-tight text-gray-900">TradeXion</span>
         </div>
         <router-link
           to="/login"
-          class="px-4 py-1.5 rounded-full text-sm font-semibold glass-button-no-hover text-white border border-white/20 hover:border-white/30 transition-colors"
+          class="px-4 py-1.5 rounded-full text-sm font-semibold glass-button-no-hover text-gray-900 border border-gray-300 hover:border-white/30 transition-colors"
         >
           Log In
         </router-link>
@@ -32,7 +32,7 @@
         <button
           type="button"
           class="pb-2 border-b-2 transition-colors"
-          :class="registerMode === 'email' ? 'border-white text-white' : 'border-transparent text-white/50 hover:text-white/80'"
+          :class="registerMode === 'email' ? 'border-white text-gray-900' : 'border-transparent text-gray-900/50 hover:text-gray-900/80'"
           @click="setMode('email')"
         >
           Email
@@ -40,7 +40,7 @@
         <button
           type="button"
           class="pb-2 border-b-2 transition-colors"
-          :class="registerMode === 'phone' ? 'border-white text-white' : 'border-transparent text-white/50 hover:text-white/80'"
+          :class="registerMode === 'phone' ? 'border-white text-gray-900' : 'border-transparent text-gray-900/50 hover:text-gray-900/80'"
           @click="setMode('phone')"
         >
           Phone
@@ -54,28 +54,28 @@
         <!-- Verification screen (kept, just restyled) -->
         <form v-if="showVerification" @submit.prevent="handleVerify" class="space-y-3">
           <div class="text-center mb-2">
-            <p class="text-white/80 text-sm mb-1">{{ t('auth.sentCodeTo') }}</p>
-            <p class="text-white text-sm font-semibold">{{ email }}</p>
+            <p class="text-gray-900/80 text-sm mb-1">{{ t('auth.sentCodeTo') }}</p>
+            <p class="text-gray-900 text-sm font-semibold">{{ email }}</p>
           </div>
 
           <div>
-            <label class="block text-xs text-white/80 mb-2 font-medium text-center">{{ t('auth.verificationCode') }}</label>
+            <label class="block text-xs text-gray-900/80 mb-2 font-medium text-center">{{ t('auth.verificationCode') }}</label>
             <input
               v-model="code"
               type="text"
               required
               maxlength="6"
-              class="w-full px-3 py-3 glass-input rounded-lg text-white text-center text-2xl tracking-[0.4em] font-bold focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+              class="w-full px-3 py-3 glass-input rounded-lg text-gray-900 text-center text-2xl tracking-[0.4em] font-bold focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
               placeholder="000000"
               autocomplete="one-time-code"
             />
-            <p class="text-xs text-white/50 mt-1.5 text-center">{{ t('auth.enterCode') }}</p>
+            <p class="text-xs text-gray-900/50 mt-1.5 text-center">{{ t('auth.enterCode') }}</p>
           </div>
 
           <button
             type="submit"
             :disabled="loading"
-            class="w-full py-2.5 text-sm rounded-full font-semibold glass-button-no-hover text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-white/20"
+            class="w-full py-2.5 text-sm rounded-full font-semibold glass-button-no-hover text-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-gray-300"
           >
             {{ loading ? t('auth.verifying') : t('auth.verifyEmail') }}
           </button>
@@ -84,7 +84,7 @@
             type="button"
             @click="handleResendCode"
             :disabled="loading || resendingCode"
-            class="w-full py-2.5 text-sm rounded-full font-semibold border border-white/15 text-white/90 hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            class="w-full py-2.5 text-sm rounded-full font-semibold border border-white/15 text-gray-900/90 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {{ resendingCode ? 'Sending...' : 'Resend Code' }}
           </button>
@@ -92,7 +92,7 @@
           <button
             type="button"
             @click="showVerification = false"
-            class="w-full py-2.5 text-sm rounded-full font-semibold border border-white/15 text-white/90 hover:bg-white/10 transition-colors"
+            class="w-full py-2.5 text-sm rounded-full font-semibold border border-white/15 text-gray-900/90 hover:bg-gray-100 transition-colors"
           >
             {{ t('auth.back') }}
           </button>
@@ -104,20 +104,20 @@
           <form v-if="registerMode === 'email'" @submit.prevent="onPrimaryAction" class="space-y-2.5">
             <!-- Step 1: email only -->
             <div v-if="step === 'identifier'" class="space-y-2.5">
-              <label class="block text-xs text-white/80 font-medium">Email</label>
+              <label class="block text-xs text-gray-900/80 font-medium">Email</label>
               <input
                 v-model.trim="email"
                 type="email"
                 required
                 autocomplete="email"
-                class="w-full px-3 py-2.5 text-sm glass-input rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+                class="w-full px-3 py-2.5 text-sm glass-input rounded-lg text-gray-900 placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
                 placeholder="Enter email address"
               />
 
               <button
                 type="submit"
                 :disabled="loading || !canGoNext"
-                class="w-full py-2.5 text-sm rounded-full font-semibold glass-button-no-hover text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-white/20"
+                class="w-full py-2.5 text-sm rounded-full font-semibold glass-button-no-hover text-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-gray-300"
               >
                 Next
               </button>
@@ -128,48 +128,48 @@
               <div class="flex items-center gap-2 mb-1.5">
                 <button
                   type="button"
-                  class="p-1 hover:bg-white/10 rounded-lg transition-colors"
+                  class="p-1 hover:bg-gray-100 rounded-lg transition-colors"
                   @click="backToIdentifier"
                   aria-label="Back"
                 >
-                  <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                   </svg>
                 </button>
-                <div class="flex-1 text-center text-xs font-semibold text-white truncate px-2">Create Account</div>
+                <div class="flex-1 text-center text-xs font-semibold text-gray-900 truncate px-2">Create Account</div>
                 <div class="w-7"></div>
               </div>
 
-              <label class="block text-xs text-white/80 font-medium">Email</label>
+              <label class="block text-xs text-gray-900/80 font-medium">Email</label>
               <input
                 :value="email"
                 type="email"
                 autocomplete="email"
                 readonly
-                class="w-full px-3 py-2.5 text-sm rounded-lg border border-white/10 bg-white/5 text-white/80 placeholder-white/40 focus:outline-none"
+                class="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 bg-gray-50 text-gray-900/80 placeholder-white/40 focus:outline-none"
               />
 
-              <label class="block text-xs text-white/80 font-medium">Invite Code <span class="text-red-400">*</span></label>
+              <label class="block text-xs text-gray-900/80 font-medium">Invite Code <span class="text-red-400">*</span></label>
               <input
                 v-model.trim="inviteCode"
                 type="text"
                 required
-                class="w-full px-3 py-2.5 text-sm glass-input rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+                class="w-full px-3 py-2.5 text-sm glass-input rounded-lg text-gray-900 placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
                 placeholder="Enter invite code"
               />
-              <p class="text-xs text-white/50">Invite code is required to register</p>
+              <p class="text-xs text-gray-900/50">Invite code is required to register</p>
 
-              <label class="block text-xs text-white/80 font-medium">Password</label>
+              <label class="block text-xs text-gray-900/80 font-medium">Password</label>
               <input
                 v-model="password"
                 type="password"
                 required
                 minlength="6"
                 autocomplete="new-password"
-                class="w-full px-3 py-2.5 text-sm glass-input rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+                class="w-full px-3 py-2.5 text-sm glass-input rounded-lg text-gray-900 placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
                 placeholder="Password"
               />
-              <p class="text-xs text-white/50">{{ t('auth.minimumChars') }}</p>
+              <p class="text-xs text-gray-900/50">{{ t('auth.minimumChars') }}</p>
 
               <!-- Turnstile only on submit step -->
               <div class="flex justify-center pt-1">
@@ -179,7 +179,7 @@
               <button
                 type="submit"
                 :disabled="loading || !turnstileToken || !password || !inviteCode.trim() || !acceptTerms"
-                class="w-full py-2.5 text-sm rounded-full font-semibold glass-button-no-hover text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-white/20"
+                class="w-full py-2.5 text-sm rounded-full font-semibold glass-button-no-hover text-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-gray-300"
               >
                 {{ loading ? t('auth.registering') : 'Create Account' }}
               </button>
@@ -188,34 +188,34 @@
 
           <!-- PHONE MODE (UI only for now) -->
           <form v-else @submit.prevent="handlePhoneRegister" class="space-y-2.5">
-            <label class="block text-xs text-white/80 font-medium">Phone</label>
-            <div class="flex items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm focus-within:ring-2 focus-within:ring-white/20 focus-within:border-white/25">
-              <div class="text-white/70 text-sm font-semibold">+ </div>
+            <label class="block text-xs text-gray-900/80 font-medium">Phone</label>
+            <div class="flex items-center gap-2 rounded-lg border border-white/15 bg-gray-50 px-3 py-2 text-sm focus-within:ring-2 focus-within:ring-white/20 focus-within:border-white/25">
+              <div class="text-gray-900/70 text-sm font-semibold">+ </div>
               <input
                 v-model.trim="phone"
                 type="tel"
                 inputmode="tel"
                 autocomplete="tel"
-                class="flex-1 bg-transparent outline-none text-sm text-white placeholder-white/40"
+                class="flex-1 bg-transparent outline-none text-sm text-gray-900 placeholder-white/40"
                 placeholder="Enter phone number"
                 required
               />
             </div>
 
-              <label class="block text-xs text-white/80 font-medium">Invite Code <span class="text-red-400">*</span></label>
+              <label class="block text-xs text-gray-900/80 font-medium">Invite Code <span class="text-red-400">*</span></label>
               <input
                 v-model.trim="inviteCode"
                 type="text"
                 required
-                class="w-full px-3 py-2.5 text-sm glass-input rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+                class="w-full px-3 py-2.5 text-sm glass-input rounded-lg text-gray-900 placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
                 placeholder="Enter invite code"
               />
-              <p class="text-xs text-white/50">Invite code is required to register</p>
+              <p class="text-xs text-gray-900/50">Invite code is required to register</p>
 
             <button
               type="submit"
               :disabled="loading || !phone || !inviteCode.trim()"
-              class="w-full py-2.5 text-sm rounded-full font-semibold glass-button-no-hover text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-white/20"
+              class="w-full py-2.5 text-sm rounded-full font-semibold glass-button-no-hover text-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-gray-300"
             >
               Next
             </button>
@@ -225,9 +225,9 @@
 
       <!-- Divider -->
       <div class="my-3 flex items-center gap-3">
-        <div class="h-px flex-1 bg-white/15"></div>
-        <div class="text-xs text-white/60">Or</div>
-        <div class="h-px flex-1 bg-white/15"></div>
+        <div class="h-px flex-1 bg-[#fafafa]/15"></div>
+        <div class="text-xs text-gray-900/60">Or</div>
+        <div class="h-px flex-1 bg-[#fafafa]/15"></div>
       </div>
 
       <!-- Terms and Privacy Checkbox (before Google login) -->
@@ -236,7 +236,7 @@
           type="button"
           @click="acceptTerms = !acceptTerms"
           class="relative flex-shrink-0 w-5 h-5 rounded border-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/20"
-          :class="acceptTerms ? 'bg-white border-white' : 'bg-transparent border-white/30 hover:border-white/50'"
+          :class="acceptTerms ? 'bg-[#fafafa] border-white' : 'bg-transparent border-white/30 hover:border-gray-1000'"
         >
           <transition
             enter-active-class="transition-all duration-200"
@@ -260,12 +260,12 @@
         </button>
         <label
           @click="acceptTerms = !acceptTerms"
-          class="text-xs text-white/70 leading-relaxed cursor-pointer flex-1"
+          class="text-xs text-gray-900/70 leading-relaxed cursor-pointer flex-1"
         >
           I agree to the 
-          <router-link to="/terms-of-service" class="text-white font-semibold underline hover:text-white/80">Terms of Service</router-link>
+          <router-link to="/terms-of-service" class="text-gray-900 font-semibold underline hover:text-gray-900/80">Terms of Service</router-link>
           and 
-          <router-link to="/privacy-policy" class="text-white font-semibold underline hover:text-white/80">Privacy Policy</router-link>
+          <router-link to="/privacy-policy" class="text-gray-900 font-semibold underline hover:text-gray-900/80">Privacy Policy</router-link>
         </label>
       </div>
 
@@ -274,7 +274,7 @@
         type="button"
         @click="loginWithGoogle"
         :disabled="!acceptTerms"
-        class="w-full py-2.5 text-sm rounded-lg glass-card-no-hover border border-white/12 hover:border-white/20 transition-colors flex items-center justify-center gap-2 font-semibold text-white disabled:opacity-50 disabled:cursor-not-allowed"
+        class="w-full py-2.5 text-sm rounded-lg glass-card-no-hover border border-white/12 hover:border-gray-300 transition-colors flex items-center justify-center gap-2 font-semibold text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <svg class="w-4 h-4" viewBox="0 0 24 24">
           <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -285,9 +285,9 @@
         Continue with Google
       </button>
 
-      <div class="mt-3 mb-4 mb-safe text-center text-xs text-white/70">
+      <div class="mt-3 mb-4 mb-safe text-center text-xs text-gray-900/70">
         Already have an account?
-        <router-link to="/login" class="font-semibold text-white hover:text-white/80 ml-1">Log In</router-link>
+        <router-link to="/login" class="font-semibold text-gray-900 hover:text-gray-900/80 ml-1">Log In</router-link>
       </div>
         </div>
       </div>

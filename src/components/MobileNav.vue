@@ -1,5 +1,5 @@
 <template>
-  <nav class="fixed bottom-0 left-0 right-0 glass-dark z-50 md:hidden border-t border-white/10">
+  <nav class="fixed bottom-0 left-0 right-0 glass-dark z-50 md:hidden border-t border-gray-200">
     <div class="flex justify-around items-center h-16">
       <router-link
         v-for="item in navItems"
@@ -7,7 +7,7 @@
         :to="item.path"
         :class="[
           'flex flex-col items-center justify-center flex-1 h-full transition-colors',
-          isActive(item.path) ? 'text-white' : 'text-white/60 hover:text-white'
+          isActive(item.path) ? 'text-binance-yellow' : 'text-gray-500 hover:text-gray-900'
         ]"
       >
         <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">

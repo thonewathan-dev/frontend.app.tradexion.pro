@@ -5,15 +5,15 @@
       <DesktopNav v-if="!isMobile" />
       <main class="flex-1 pb-16 md:pb-0">
         <!-- Header -->
-        <div class="glass-card-no-hover border-b border-white/10 px-4 py-3">
+        <div class="glass-card-no-hover border-b border-gray-200 px-4 py-3">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <button @click="$router.back()" class="p-1.5 hover:bg-white/10 rounded-lg transition-colors">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <button @click="$router.back()" class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+                <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
-              <h1 class="text-lg font-bold text-white">Transfer</h1>
+              <h1 class="text-lg font-bold text-gray-900">Transfer</h1>
             </div>
           </div>
         </div>
@@ -21,7 +21,7 @@
         <div class="p-4 space-y-4">
           <!-- From Account -->
           <div>
-            <label class="block text-xs text-white/70 mb-1.5">From</label>
+            <label class="block text-xs text-gray-900/70 mb-1.5">From</label>
             <div class="flex gap-2">
               <button
                 v-for="option in fromOptions"
@@ -31,7 +31,7 @@
                   'flex-1 py-2.5 px-3 rounded-lg text-sm font-medium border transition-colors',
                   transferFrom === option.value
                     ? 'bg-teal-500/20 text-teal-300 border-teal-400/60'
-                    : 'bg-white/5 text-white/70 border-white/10 hover:bg-white/10'
+                    : 'bg-gray-50 text-gray-900/70 border-gray-200 hover:bg-gray-100'
                 ]"
               >
                 {{ option.label }}
@@ -41,19 +41,19 @@
 
           <!-- To Account (auto-set based on From) -->
           <div>
-            <label class="block text-xs text-white/70 mb-1.5">To</label>
-            <div class="px-4 py-3 glass-input rounded-lg text-white/90">
+            <label class="block text-xs text-gray-900/70 mb-1.5">To</label>
+            <div class="px-4 py-3 glass-input rounded-lg text-gray-900/90">
               {{ transferTo === 'spot' ? 'Spot account' : 'Contract account' }}
             </div>
-            <p class="text-xs text-white/50 mt-1.5">Automatically set based on source account</p>
+            <p class="text-xs text-gray-900/50 mt-1.5">Automatically set based on source account</p>
           </div>
 
           <!-- Currency Selection -->
           <div>
-            <label class="block text-xs text-white/70 mb-1.5">Currency</label>
+            <label class="block text-xs text-gray-900/70 mb-1.5">Currency</label>
             <button
               @click="showCurrencyPopup = true"
-              class="w-full px-4 py-3 glass-input rounded-lg flex items-center justify-between hover:bg-white/10 transition-colors"
+              class="w-full px-4 py-3 glass-input rounded-lg flex items-center justify-between hover:bg-gray-100 transition-colors"
             >
               <div class="flex items-center gap-3">
                 <img
@@ -64,18 +64,18 @@
                 />
                 <div
                   v-else
-                  class="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-[11px] text-white/70"
+                  class="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-[11px] text-gray-900/70"
                 >
                   {{ transferCurrency }}
                 </div>
                 <div class="text-left">
-                  <div class="text-sm font-medium text-white">{{ transferCurrency }}</div>
-                  <div class="text-[11px] text-white/60">
+                  <div class="text-sm font-medium text-gray-900">{{ transferCurrency }}</div>
+                  <div class="text-[11px] text-gray-900/60">
                     Available: {{ formatBalance(getAvailableFor(transferCurrency)) }} {{ transferCurrency }}
                   </div>
                 </div>
               </div>
-              <svg class="w-5 h-5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 text-gray-900/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
             </button>
@@ -84,17 +84,17 @@
           <!-- Amount Input -->
           <div>
             <div class="flex items-center justify-between mb-1.5">
-              <label class="block text-xs text-white/70">Amount</label>
+              <label class="block text-xs text-gray-900/70">Amount</label>
               <div class="flex items-center gap-2">
-                <span class="text-xs text-white/50">
+                <span class="text-xs text-gray-900/50">
                   Available:
-                  <span class="text-white font-medium">
+                  <span class="text-gray-900 font-medium">
                     {{ formatBalance(availableTransferAmount) }} {{ transferCurrency }}
                   </span>
                 </span>
                 <button
                   @click="setMaxAmount"
-                  class="px-2 py-0.5 text-xs glass-button rounded text-white hover:bg-white/20 transition-colors"
+                  class="px-2 py-0.5 text-xs glass-button rounded text-gray-900 hover:bg-gray-200 transition-colors"
                 >
                   Max
                 </button>
@@ -104,7 +104,7 @@
               v-model="transferAmount"
               type="number"
               step="0.00000001"
-              class="w-full px-4 py-3 glass-input rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/50 text-white placeholder-white/50"
+              class="w-full px-4 py-3 glass-input rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/50 text-gray-900 placeholder-white/50"
               placeholder="Enter amount"
             />
           </div>
@@ -113,7 +113,7 @@
           <button
             @click="handleTransfer"
             :disabled="loading"
-            class="w-full py-3 glass-button rounded-lg text-sm font-medium text-white hover:bg-white/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            class="w-full py-3 glass-button rounded-lg text-sm font-medium text-gray-900 hover:bg-[#fafafa]/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {{ loading ? 'Processing...' : 'Transfer' }}
           </button>
@@ -126,9 +126,9 @@
           @click.self="showCurrencyPopup = false"
         >
           <div class="glass-card rounded-t-lg md:rounded-lg w-full max-w-md animate-slide-up max-h-[80vh] overflow-y-auto">
-            <div class="sticky top-0 glass-card-no-hover border-b border-white/10 p-3 flex justify-between items-center">
-              <h2 class="text-base font-bold text-white">Select Currency</h2>
-              <button @click="showCurrencyPopup = false" class="text-white/70 hover:text-white">
+            <div class="sticky top-0 glass-card-no-hover border-b border-gray-200 p-3 flex justify-between items-center">
+              <h2 class="text-base font-bold text-gray-900">Select Currency</h2>
+              <button @click="showCurrencyPopup = false" class="text-gray-900/70 hover:text-gray-900">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -143,7 +143,7 @@
                   'w-full px-4 py-3 rounded-lg flex items-center justify-between transition-colors',
                   transferCurrency === c
                     ? 'bg-teal-500/20 border border-teal-400/60'
-                    : 'bg-white/5 border border-white/10 hover:bg-white/10'
+                    : 'bg-gray-50 border border-gray-200 hover:bg-gray-100'
                 ]"
               >
                 <div class="flex items-center gap-3">
@@ -155,13 +155,13 @@
                   />
                   <div
                     v-else
-                    class="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-xs text-white/70"
+                    class="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-xs text-gray-900/70"
                   >
                     {{ c }}
                   </div>
                   <div class="text-left">
-                    <div class="text-sm font-medium text-white">{{ c }}</div>
-                    <div class="text-[11px] text-white/60">
+                    <div class="text-sm font-medium text-gray-900">{{ c }}</div>
+                    <div class="text-[11px] text-gray-900/60">
                       Available: {{ formatBalance(getAvailableFor(c)) }} {{ c }}
                     </div>
                   </div>

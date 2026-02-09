@@ -5,70 +5,70 @@
       <DesktopNav v-if="!isMobile" />
       <main class="flex-1 pb-16 md:pb-0">
         <!-- Header -->
-        <div class="glass-card-no-hover border-b border-white/10 px-4 py-3">
+        <div class="bg-[#fafafa] border-b border-gray-200 px-4 py-3">
           <div class="flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 glass rounded-full flex items-center justify-center">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                </svg>
-              </div>
-              <div>
-                <div class="text-sm font-medium text-white">{{ formatEmail(user?.email) }}</div>
-                <div class="text-xs text-white/60">ID: {{ user?.id || 'N/A' }}</div>
-              </div>
-            </div>
-            <button class="px-2 py-0.5 bg-white/10 border border-white/20 rounded-full text-[10px] font-medium text-white hover:bg-white/20 transition-colors">
-              Credit score: {{ parseFloat(user?.credited_score || 100).toFixed(0) }}
+            <h1 class="text-xl font-bold text-gray-900">{{ t('assets.title') }}</h1>
+            <button
+              @click="$router.push('/records')"
+              class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
             </button>
+          </div>
+          <!-- Tabs -->
+          <div class="flex space-x-6 mt-4">
+            <button class="text-gray-900 font-bold border-b-2 border-blue-500 pb-1">Asset</button>
+            <button class="text-gray-500 font-medium pb-1">Spot</button>
+            <button class="text-gray-500 font-medium pb-1">Futures</button>
           </div>
         </div>
 
         <div class="p-3 space-y-3">
           <!-- Asset Center -->
-          <div class="glass-card-no-hover rounded-xl p-5 relative overflow-hidden usdt-card-bg group">
-            <!-- Decorative Background Overlay -->
-            <img src="/background shadow.png" alt="" class="absolute top-0 right-0 w-24 h-24 md:w-48 md:h-48 object-contain opacity-10 pointer-events-none group-hover:scale-105 transition-transform duration-700" />
+          <div class="glass-card-no-hover rounded-xl p-5 relative overflow-hidden group">
+            <!-- Decorative Background Overlay - Inverted for White Theme -->
+            <img src="/background shadow.png" alt="" class="absolute top-0 right-0 w-24 h-24 md:w-48 md:h-48 object-contain pointer-events-none group-hover:scale-105 transition-transform duration-700 invert opacity-20" />
             
             <div class="relative z-10">
               <div class="flex items-center justify-between mb-2">
-                <div class="text-white/60 text-xs font-medium flex items-center gap-2">
+                <div class="text-gray-900/60 text-xs font-medium flex items-center gap-2">
                   <div class="w-1.5 h-1.5 rounded-full bg-blue-400"></div>
                   Asset Center (USDT)
                 </div>
                 <button
                   type="button"
-                  class="p-1 rounded-full hover:bg-white/10 transition-colors"
+                  class="p-1 rounded-full hover:bg-gray-100 transition-colors"
                   @click="handleAssetInfo"
                 >
-                  <svg class="w-4 h-4 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 1010 10A10.011 10.011 0 0012 2z" />
                   </svg>
                 </button>
               </div>
               
-              <div class="text-white text-3xl font-bold mb-4 tracking-tight">
-                <span v-if="!hasLoadedWallets" class="inline-block h-8 w-32 rounded bg-white/10 animate-pulse" />
+              <div class="text-gray-900 text-3xl font-bold mb-4 tracking-tight">
+                <span v-if="!hasLoadedWallets" class="inline-block h-8 w-32 rounded bg-gray-100 animate-pulse" />
                 <span v-else class="flex items-baseline gap-1">
-                  <span class="text-xl text-white/60 font-medium">≈</span>{{ formatBalance(totalBalance) }}
-                  <span class="text-sm text-white/40 font-normal ml-1">USDT</span>
+                  <span class="text-xl text-gray-900/60 font-medium">≈</span>{{ formatBalance(totalBalance) }}
+                  <span class="text-sm text-gray-500 font-normal ml-1">USDT</span>
                 </span>
               </div>
 
-              <div class="flex items-center justify-between py-2.5 px-3 bg-black/20 backdrop-blur-md rounded-xl border border-white/5">
+              <div class="flex items-center justify-between py-2.5 px-3 bg-gray-100 rounded-xl border border-gray-200">
                 <div class="flex-1 text-center">
-                  <div class="text-white/50 text-[10px] uppercase tracking-wider mb-1">Contract account</div>
-                  <div class="text-white text-base font-bold">
-                    <span v-if="!hasLoadedWallets" class="inline-block h-4 w-16 rounded bg-white/10 animate-pulse" />
+                  <div class="text-gray-900/50 text-[10px] uppercase tracking-wider mb-1">Contract account</div>
+                  <div class="text-gray-900 text-base font-bold">
+                    <span v-if="!hasLoadedWallets" class="inline-block h-4 w-16 rounded bg-gray-100 animate-pulse" />
                     <span v-else>{{ formatBalance(contractBalance) }}</span>
                   </div>
                 </div>
-                <div class="w-px h-6 bg-white/10"></div>
+                <div class="w-px h-6 bg-gray-100"></div>
                 <div class="flex-1 text-center">
-                  <div class="text-white/50 text-[10px] uppercase tracking-wider mb-1">Spot account</div>
-                  <div class="text-white text-base font-bold">
-                    <span v-if="!hasLoadedWallets" class="inline-block h-4 w-16 rounded bg-white/10 animate-pulse" />
+                  <div class="text-gray-900/50 text-[10px] uppercase tracking-wider mb-1">Spot account</div>
+                  <div class="text-gray-900 text-base font-bold">
+                    <span v-if="!hasLoadedWallets" class="inline-block h-4 w-16 rounded bg-gray-100 animate-pulse" />
                     <span v-else>{{ formatBalance(spotBalance) }}</span>
                   </div>
                 </div>
@@ -84,21 +84,21 @@
                 class="flex-1 flex flex-col items-center gap-1.5 transition-all hover:scale-105 active:scale-95"
               >
                 <img :src="depositIcon" alt="Deposit" class="w-8 h-8 object-contain" />
-                <span class="text-white text-xs font-medium">Deposit</span>
+                <span class="text-gray-900 text-xs font-medium">Deposit</span>
               </button>
               <button
                 @click="router.push('/withdraw')"
                 class="flex-1 flex flex-col items-center gap-1.5 transition-all hover:scale-105 active:scale-95"
               >
                 <img :src="withdrawIcon" alt="Withdraw" class="w-8 h-8 object-contain" />
-                <span class="text-white text-xs font-medium">Withdraw</span>
+                <span class="text-gray-900 text-xs font-medium">Withdraw</span>
               </button>
               <button
                 @click="router.push('/transfer')"
                 class="flex-1 flex flex-col items-center gap-1.5 transition-all hover:scale-105 active:scale-95"
               >
                 <img :src="transferIcon" alt="Transfer" class="w-8 h-8 object-contain" />
-                <span class="text-white text-xs font-medium">Transfer</span>
+                <span class="text-gray-900 text-xs font-medium">Transfer</span>
               </button>
             </div>
           </div>
@@ -108,44 +108,44 @@
             <!-- Card 1: Accounts -->
             <div class="glass-card-no-hover rounded-lg overflow-hidden">
               <button
-                class="w-full flex items-center justify-between px-3 py-3 border-b border-white/10 transition-colors hover:bg-white/5"
+                class="w-full flex items-center justify-between px-3 py-3 border-b border-gray-200 transition-colors hover:bg-gray-50"
                 @click="router.push('/flash-exchange')"
               >
                 <div class="flex items-center gap-3">
-                  <svg class="w-5 h-5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-5 h-5 text-gray-900/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                   </svg>
-                  <span class="text-white text-sm font-medium">Flash Exchange</span>
+                  <span class="text-gray-900 text-sm font-medium">Flash Exchange</span>
                 </div>
-                <svg class="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 text-gray-900/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
               </button>
               <button
-                class="w-full flex items-center justify-between px-3 py-3 border-b border-white/10 transition-colors hover:bg-white/5"
+                class="w-full flex items-center justify-between px-3 py-3 border-b border-gray-200 transition-colors hover:bg-gray-50"
                 @click="router.push('/spot-account')"
               >
                 <div class="flex items-center gap-3">
-                  <svg class="w-5 h-5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-5 h-5 text-gray-900/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
-                  <span class="text-white text-sm font-medium">Spot account</span>
+                  <span class="text-gray-900 text-sm font-medium">Spot account</span>
                 </div>
-                <svg class="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 text-gray-900/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
               </button>
               <button
-                class="w-full flex items-center justify-between px-3 py-3 transition-colors hover:bg-white/5"
+                class="w-full flex items-center justify-between px-3 py-3 transition-colors hover:bg-gray-50"
                 @click="router.push('/contract-account')"
               >
                 <div class="flex items-center gap-3">
-                  <svg class="w-5 h-5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-5 h-5 text-gray-900/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
-                  <span class="text-white text-sm font-medium">Contract account</span>
+                  <span class="text-gray-900 text-sm font-medium">Contract account</span>
               </div>
-              <svg class="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 text-gray-900/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
               </svg>
               </button>
@@ -154,44 +154,44 @@
             <!-- Card 2: Services -->
             <div class="glass-card-no-hover rounded-lg overflow-hidden">
               <button
-                class="w-full flex items-center justify-between px-3 py-3 border-b border-white/10 transition-colors hover:bg-white/5"
+                class="w-full flex items-center justify-between px-3 py-3 border-b border-gray-200 transition-colors hover:bg-gray-50"
                 @click="handleInviteFriends"
               >
                 <div class="flex items-center gap-3">
-                  <svg class="w-5 h-5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-5 h-5 text-gray-900/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                   </svg>
-                  <span class="text-white text-sm font-medium">Invite friends</span>
+                  <span class="text-gray-900 text-sm font-medium">Invite friends</span>
           </div>
-                <svg class="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 text-gray-900/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
               </button>
               <button
-                class="w-full flex items-center justify-between px-3 py-3 border-b border-white/10 transition-colors hover:bg-white/5"
+                class="w-full flex items-center justify-between px-3 py-3 border-b border-gray-200 transition-colors hover:bg-gray-50"
                 @click="router.push('/about-tradexion')"
               >
                 <div class="flex items-center gap-3">
-                  <svg class="w-5 h-5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-5 h-5 text-gray-900/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <span class="text-white text-sm font-medium">About TradeXion</span>
+                  <span class="text-gray-900 text-sm font-medium">About TradeXion</span>
                 </div>
-                <svg class="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 text-gray-900/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
               </button>
               <button
-                class="w-full flex items-center justify-between px-3 py-3 transition-colors hover:bg-white/5"
+                class="w-full flex items-center justify-between px-3 py-3 transition-colors hover:bg-gray-50"
                 @click="router.push('/chat')"
               >
                 <div class="flex items-center gap-3">
-                  <svg class="w-5 h-5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-5 h-5 text-gray-900/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
-                  <span class="text-white text-sm font-medium">Complaint suggestion</span>
+                  <span class="text-gray-900 text-sm font-medium">Complaint suggestion</span>
               </div>
-              <svg class="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 text-gray-900/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
               </svg>
               </button>
@@ -200,44 +200,44 @@
             <!-- Card 3: Settings -->
             <div class="glass-card-no-hover rounded-lg overflow-hidden">
               <button
-                class="w-full flex items-center justify-between px-3 py-3 border-b border-white/10 transition-colors hover:bg-white/5"
+                class="w-full flex items-center justify-between px-3 py-3 border-b border-gray-200 transition-colors hover:bg-gray-50"
                 @click="handleClientDownload"
               >
                 <div class="flex items-center gap-3">
-                  <svg class="w-5 h-5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-5 h-5 text-gray-900/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
-                  <span class="text-white text-sm font-medium">Client Download</span>
+                  <span class="text-gray-900 text-sm font-medium">Client Download</span>
                 </div>
-                <svg class="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 text-gray-900/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
               </button>
               <button
-                class="w-full flex items-center justify-between px-3 py-3 border-b border-white/10 transition-colors hover:bg-white/5"
+                class="w-full flex items-center justify-between px-3 py-3 border-b border-gray-200 transition-colors hover:bg-gray-50"
                 @click="router.push('/change-password')"
               >
                 <div class="flex items-center gap-3">
-                  <svg class="w-5 h-5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-5 h-5 text-gray-900/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                   </svg>
-                  <span class="text-white text-sm font-medium">Modify the password</span>
+                  <span class="text-gray-900 text-sm font-medium">Modify the password</span>
               </div>
-              <svg class="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 text-gray-900/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
           </button>
           <button
-                class="w-full flex items-center justify-between px-3 py-3 transition-colors hover:bg-white/5"
+                class="w-full flex items-center justify-between px-3 py-3 transition-colors hover:bg-gray-50"
                 @click="router.push('/chat')"
               >
                 <div class="flex items-center gap-3">
-                  <svg class="w-5 h-5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-5 h-5 text-gray-900/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10a6 6 0 00-12 0v3H5a2 2 0 00-2 2v1a2 2 0 002 2h3v-4H8v-4a4 4 0 118 0v4h-1v4h3a2 2 0 002-2v-1a2 2 0 00-2-2h-1v-3z" />
                   </svg>
-                  <span class="text-white text-sm font-medium">Customer Services</span>
+                  <span class="text-gray-900 text-sm font-medium">Customer Services</span>
         </div>
-                <svg class="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 text-gray-900/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
           </button>
@@ -252,7 +252,7 @@
                 <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
-                <span class="text-white text-sm font-medium">Log out</span>
+                <span class="text-gray-900 text-sm font-medium">Log out</span>
               </div>
             </button>
           </div>
@@ -267,14 +267,14 @@
       class="fixed inset-0 z-[9999] flex items-center justify-center p-2 md:p-4 bg-black/80 backdrop-blur-sm"
       @click.self="showDownloadModal = false"
     >
-      <div class="glass-card rounded-lg p-3 md:p-4 max-w-[90%] md:max-w-sm w-full shadow-2xl border border-white/10 animate-slide-up max-h-[75vh] md:max-h-[85vh] overflow-y-auto">
+      <div class="glass-card rounded-lg p-3 md:p-4 max-w-[90%] md:max-w-sm w-full shadow-2xl border border-gray-200 animate-slide-up max-h-[75vh] md:max-h-[85vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-2 md:mb-4">
-          <h2 class="text-white font-semibold text-sm md:text-base">Download TradeXion App</h2>
+          <h2 class="text-gray-900 font-semibold text-sm md:text-base">Download TradeXion App</h2>
           <button
             @click="showDownloadModal = false"
             class="p-1 md:p-1.5 rounded"
           >
-            <svg class="w-3.5 h-3.5 md:w-4 md:h-4 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-900/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -288,36 +288,36 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <div>
-                <p class="text-white font-medium text-xs md:text-sm">App Installed</p>
-                <p class="text-white/70 text-[10px] md:text-xs">TradeXion is already installed on your device</p>
+                <p class="text-gray-900 font-medium text-xs md:text-sm">App Installed</p>
+                <p class="text-gray-900/70 text-[10px] md:text-xs">TradeXion is already installed on your device</p>
               </div>
             </div>
           </div>
 
           <!-- Android/Desktop Install -->
           <div v-if="!isIOSDevice && !isAppInstalled" class="space-y-1.5 md:space-y-2">
-            <div class="p-2 md:p-3 bg-white/5 rounded border border-white/10">
+            <div class="p-2 md:p-3 bg-gray-50 rounded border border-gray-200">
               <div class="flex items-start gap-1.5 md:gap-2 mb-2 md:mb-3">
                 <img src="/icon-192.png" alt="TradeXion" class="w-10 h-10 md:w-12 md:h-12 rounded-lg flex-shrink-0" />
                 <div class="flex-1 min-w-0">
-                  <h3 class="text-white font-semibold text-xs md:text-sm">TradeXion</h3>
-                  <p class="text-white/70 text-[10px] md:text-xs">Professional Trading Platform</p>
+                  <h3 class="text-gray-900 font-semibold text-xs md:text-sm">TradeXion</h3>
+                  <p class="text-gray-900/70 text-[10px] md:text-xs">Professional Trading Platform</p>
                 </div>
               </div>
               <button
                 v-if="deferredPrompt"
                 @click="handleInstall"
-                class="w-full px-2.5 py-1.5 md:px-3 md:py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded font-medium text-xs md:text-sm shadow-lg"
+                class="w-full px-2.5 py-1.5 md:px-3 md:py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-gray-900 rounded font-medium text-xs md:text-sm shadow-lg"
               >
                 Install App
               </button>
-              <div v-else class="p-1.5 md:p-2 bg-white/5 rounded">
-                <p class="text-white/70 text-[10px] md:text-xs text-center">
+              <div v-else class="p-1.5 md:p-2 bg-gray-50 rounded">
+                <p class="text-gray-900/70 text-[10px] md:text-xs text-center">
                   Install option will appear automatically. Make sure you're using Chrome or Edge browser.
                 </p>
               </div>
             </div>
-            <div class="text-[10px] md:text-xs text-white/60 text-center space-y-0.5">
+            <div class="text-[10px] md:text-xs text-gray-900/60 text-center space-y-0.5">
               <p>For the best experience, install TradeXion as an app</p>
               <p>Works offline • Faster loading • App-like experience</p>
             </div>
@@ -325,12 +325,12 @@
 
           <!-- iOS Install Instructions -->
           <div v-if="isIOSDevice && !isAppInstalled" class="space-y-2 md:space-y-3">
-            <div class="p-2 md:p-3 bg-white/5 rounded border border-white/10">
+            <div class="p-2 md:p-3 bg-gray-50 rounded border border-gray-200">
               <div class="flex items-start gap-1.5 md:gap-2 mb-2 md:mb-3">
                 <img src="/icon-192.png" alt="TradeXion" class="w-10 h-10 md:w-12 md:h-12 rounded-lg flex-shrink-0" />
                 <div class="flex-1 min-w-0">
-                  <h3 class="text-white font-semibold text-xs md:text-sm">TradeXion</h3>
-                  <p class="text-white/70 text-[10px] md:text-xs">Professional Trading Platform</p>
+                  <h3 class="text-gray-900 font-semibold text-xs md:text-sm">TradeXion</h3>
+                  <p class="text-gray-900/70 text-[10px] md:text-xs">Professional Trading Platform</p>
                 </div>
               </div>
               
@@ -340,8 +340,8 @@
                     <span class="text-blue-400 font-bold text-[10px] md:text-xs">1</span>
                   </div>
                   <div class="flex-1">
-                    <p class="text-white text-[10px] md:text-xs">Tap the <span class="font-semibold">Share</span> button</p>
-                    <p class="text-white/60 text-[9px] md:text-[10px] mt-0.5">Located at the bottom of Safari</p>
+                    <p class="text-gray-900 text-[10px] md:text-xs">Tap the <span class="font-semibold">Share</span> button</p>
+                    <p class="text-gray-900/60 text-[9px] md:text-[10px] mt-0.5">Located at the bottom of Safari</p>
                   </div>
                 </div>
                 
@@ -350,8 +350,8 @@
                     <span class="text-blue-400 font-bold text-[10px] md:text-xs">2</span>
                   </div>
                   <div class="flex-1">
-                    <p class="text-white text-[10px] md:text-xs">Select <span class="font-semibold">"Add to Home Screen"</span></p>
-                    <p class="text-white/60 text-[9px] md:text-[10px] mt-0.5">Scroll down if needed</p>
+                    <p class="text-gray-900 text-[10px] md:text-xs">Select <span class="font-semibold">"Add to Home Screen"</span></p>
+                    <p class="text-gray-900/60 text-[9px] md:text-[10px] mt-0.5">Scroll down if needed</p>
                   </div>
                 </div>
                 
@@ -360,8 +360,8 @@
                     <span class="text-blue-400 font-bold text-[10px] md:text-xs">3</span>
                   </div>
                   <div class="flex-1">
-                    <p class="text-white text-[10px] md:text-xs">Tap <span class="font-semibold">"Add"</span></p>
-                    <p class="text-white/60 text-[9px] md:text-[10px] mt-0.5">The app will appear on your home screen</p>
+                    <p class="text-gray-900 text-[10px] md:text-xs">Tap <span class="font-semibold">"Add"</span></p>
+                    <p class="text-gray-900/60 text-[9px] md:text-[10px] mt-0.5">The app will appear on your home screen</p>
                   </div>
                 </div>
               </div>
@@ -369,8 +369,8 @@
           </div>
 
           <!-- Platform Info -->
-          <div class="pt-1.5 md:pt-2 border-t border-white/10">
-            <p class="text-white/60 text-[9px] md:text-[10px] text-center">
+          <div class="pt-1.5 md:pt-2 border-t border-gray-200">
+            <p class="text-gray-900/60 text-[9px] md:text-[10px] text-center">
               <span v-if="isIOSDevice">iOS Safari detected</span>
               <span v-else-if="isAndroidDevice">Android detected</span>
               <span v-else>Desktop browser detected</span>
@@ -385,6 +385,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '../stores/auth';
 import { useAlert } from '../composables/useAlert';
 import MobileNav from '../components/MobileNav.vue';
@@ -399,6 +400,7 @@ const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
 const { showSuccess, showError, showWarning, showInfo } = useAlert();
+const { t } = useI18n();
 
 const isMobile = computed(() => window.innerWidth < 768);
 const user = computed(() => authStore.user);
@@ -746,8 +748,5 @@ onUnmounted(() => {
   animation: slide-up 0.3s ease-out;
 }
 
-.usdt-card-bg {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
+/* usdt-card-bg style removed for white theme */
 </style>

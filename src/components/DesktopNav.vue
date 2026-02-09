@@ -1,6 +1,6 @@
 <template>
-  <nav class="hidden md:flex md:flex-col md:w-64 glass-dark border-r border-white/10 min-h-screen">
-    <div class="p-4 border-b border-white/10">
+  <nav class="hidden md:flex md:flex-col md:w-64 glass-dark border-r border-gray-200 min-h-screen">
+    <div class="p-4 border-b border-gray-200">
       <h1 class="text-xl font-bold gradient-text">TradeXion</h1>
     </div>
     <div class="flex-1 p-4">
@@ -11,8 +11,8 @@
         :class="[
           'flex items-center px-4 py-3 mb-2 rounded-lg transition-colors',
           isActive(item.path) 
-            ? 'bg-white/10 text-white' 
-            : 'text-white/70 hover:bg-white/10 hover:text-white'
+            ? 'bg-yellow-50 text-binance-yellow font-bold' 
+            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
         ]"
       >
         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -25,10 +25,10 @@
         <span>{{ item.label }}</span>
       </router-link>
     </div>
-    <div class="p-4 border-t border-white/10">
+    <div class="p-4 border-t border-gray-200">
       <button
         @click="handleLogout"
-        class="flex items-center w-full px-4 py-3 mt-2 rounded-lg text-white/70 hover:bg-red-500/20 hover:text-red-300 transition-colors"
+        class="flex items-center w-full px-4 py-3 mt-2 rounded-lg text-gray-900/70 hover:bg-red-500/20 hover:text-red-300 transition-colors"
       >
         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

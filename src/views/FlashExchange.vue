@@ -5,18 +5,18 @@
       <DesktopNav v-if="!isMobile" />
       <main class="flex-1 pb-16 md:pb-0">
         <!-- Header -->
-        <div class="glass-card-no-hover border-b border-white/10 px-4 py-3">
+        <div class="glass-card-no-hover border-b border-gray-200 px-4 py-3">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <button @click="$router.back()" class="p-1.5 hover:bg-white/10 rounded-lg transition-colors">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <button @click="$router.back()" class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+                <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
-              <h1 class="text-lg font-bold text-white">{{ t('flashExchange.title') }}</h1>
+              <h1 class="text-lg font-bold text-gray-900">{{ t('flashExchange.title') }}</h1>
             </div>
-            <button @click="showHistory = true" class="p-1.5 hover:bg-white/10 rounded-lg transition-colors">
-              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button @click="showHistory = true" class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+              <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </button>
@@ -25,17 +25,17 @@
 
         <!-- Account type toggle -->
         <div class="px-4 pt-3 pb-1 flex justify-end">
-          <div class="inline-flex rounded-full bg-white/10 p-0.5 text-xs">
+          <div class="inline-flex rounded-full bg-gray-100 p-0.5 text-xs">
             <button
               class="px-3 py-1 rounded-full transition-colors"
-              :class="accountType === 'spot' ? 'bg-white text-[#0b1020] font-semibold' : 'text-white/70'"
+              :class="accountType === 'spot' ? 'bg-[#fafafa] text-[#0b1020] font-semibold' : 'text-gray-900/70'"
               @click="setAccountType('spot')"
             >
               Spot
             </button>
             <button
               class="px-3 py-1 rounded-full transition-colors"
-              :class="accountType === 'contract' ? 'bg-white text-[#0b1020] font-semibold' : 'text-white/70'"
+              :class="accountType === 'contract' ? 'bg-[#fafafa] text-[#0b1020] font-semibold' : 'text-gray-900/70'"
               @click="setAccountType('contract')"
             >
               Contract
@@ -48,10 +48,10 @@
           <div>
             <!-- Row 1: From label | Wallet balance -->
             <div class="flex items-center justify-between mb-2">
-              <span class="text-xs text-white/60">{{ t('flashExchange.from') }}</span>
-              <span class="text-xs text-white/60">
+              <span class="text-xs text-gray-900/60">{{ t('flashExchange.from') }}</span>
+              <span class="text-xs text-gray-900/60">
                 <template v-if="walletsLoading">
-                  <span class="inline-block h-3 w-24 rounded bg-white/10 animate-pulse"></span>
+                  <span class="inline-block h-3 w-24 rounded bg-gray-100 animate-pulse"></span>
                 </template>
                 <template v-else>
                   Wallets {{ formatWalletBalance(fromBalance) }} {{ fromCurrency }}
@@ -65,9 +65,9 @@
                 class="flex items-center gap-2"
               >
                 <img :src="coinLogo(fromCurrency)" :alt="fromCurrency" class="w-7 h-7 object-contain flex-shrink-0" />
-                <span class="text-white font-semibold text-lg flex items-center gap-1">
+                <span class="text-gray-900 font-semibold text-lg flex items-center gap-1">
                   {{ fromCurrency }}
-                  <svg class="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-4 h-4 text-gray-900/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                   </svg>
                 </span>
@@ -78,7 +78,7 @@
                   type="number"
                   step="0.00000001"
                   @input="activeInput = 'from'"
-                  class="w-full max-w-[180px] bg-transparent border-b border-white/20 px-2 py-2 focus:outline-none text-white text-xl font-semibold text-right"
+                  class="w-full max-w-[180px] bg-transparent border-b border-gray-300 px-2 py-2 focus:outline-none text-gray-900 text-xl font-semibold text-right"
                   placeholder="0.00000000"
                 />
                 <button
@@ -95,9 +95,9 @@
           <div class="flex justify-center py-2">
             <button
               @click="swapCurrencies"
-              class="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-lg flex items-center justify-center transition-colors"
+              class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center justify-center transition-colors"
             >
-              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
               </svg>
             </button>
@@ -107,7 +107,7 @@
           <div>
             <!-- Row 1: To label | (empty right) -->
             <div class="flex items-center justify-between mb-2">
-              <span class="text-xs text-white/60">{{ t('flashExchange.to') }}</span>
+              <span class="text-xs text-gray-900/60">{{ t('flashExchange.to') }}</span>
               <span class="text-xs text-transparent select-none">.</span>
             </div>
             <!-- Row 2: Coin selector | Auto output amount (editable) -->
@@ -117,9 +117,9 @@
                 class="flex items-center gap-2"
               >
                 <img :src="coinLogo(toCurrency)" :alt="toCurrency" class="w-7 h-7 object-contain flex-shrink-0" />
-                <span class="text-white font-semibold text-lg flex items-center gap-1">
+                <span class="text-gray-900 font-semibold text-lg flex items-center gap-1">
                   {{ toCurrency }}
-                  <svg class="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-4 h-4 text-gray-900/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                   </svg>
                 </span>
@@ -130,16 +130,16 @@
                   type="number"
                   step="0.00000001"
                   @input="activeInput = 'to'"
-                  class="w-full max-w-[180px] bg-transparent border-b border-white/20 px-2 py-2 focus:outline-none text-white text-xl font-semibold text-right"
+                  class="w-full max-w-[180px] bg-transparent border-b border-gray-300 px-2 py-2 focus:outline-none text-gray-900 text-xl font-semibold text-right"
                   placeholder="0.00000000"
                 />
               </div>
             </div>
             <!-- Row 3: Real-time price line -->
-            <div class="flex items-center justify-end gap-2 text-sm text-white/60">
+            <div class="flex items-center justify-end gap-2 text-sm text-gray-900/60">
               <svg
                 v-if="priceLoading"
-                class="w-4 h-4 animate-spin text-white/60"
+                class="w-4 h-4 animate-spin text-gray-900/60"
                 fill="none"
                 viewBox="0 0 24 24"
               >
@@ -158,7 +158,7 @@
           <button
             @click="handleExchange"
             :disabled="loading || !fromAmount || parseFloat(fromAmount) <= 0"
-            class="w-full mt-6 py-3 rounded-lg font-semibold text-base transition-all disabled:opacity-50 disabled:cursor-not-allowed glass-button-no-hover text-white"
+            class="w-full mt-6 py-3 rounded-lg font-semibold text-base transition-all disabled:opacity-50 disabled:cursor-not-allowed glass-button-no-hover text-gray-900"
           >
             {{ loading ? t('common.processing') : 'Preview' }}
           </button>
@@ -173,12 +173,12 @@
       @click.self="closePreview"
     >
       <div
-        class="w-full min-h-[50vh] max-h-[85vh] bg-black/95 rounded-t-2xl px-6 pt-6 pb-8 space-y-6 shadow-lg border-t border-white/10 animate-slide-up"
+        class="w-full min-h-[50vh] max-h-[85vh] bg-black/95 rounded-t-2xl px-6 pt-6 pb-8 space-y-6 shadow-lg border-t border-gray-200 animate-slide-up"
       >
         <div class="flex items-center justify-between mb-4">
-          <h2 class="text-base font-semibold text-white">Confirm Order</h2>
+          <h2 class="text-base font-semibold text-gray-900">Confirm Order</h2>
           <button
-            class="p-1 rounded-full hover:bg-white/10 text-white/70"
+            class="p-1 rounded-full hover:bg-gray-100 text-gray-900/70"
             @click="closePreview"
             :disabled="loading"
           >
@@ -188,9 +188,9 @@
           </button>
         </div>
 
-        <div class="space-y-6 text-sm text-white/80">
+        <div class="space-y-6 text-sm text-gray-900/80">
           <div>
-            <div class="text-xs text-white/60 mb-1.5">From</div>
+            <div class="text-xs text-gray-900/60 mb-1.5">From</div>
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
                 <img :src="coinLogo(fromCurrency)" :alt="fromCurrency" class="w-7 h-7 object-contain" />
@@ -198,13 +198,13 @@
               </div>
               <span class="font-semibold text-base">{{ fromAmount || '0' }}</span>
             </div>
-            <div class="mt-2 text-xs text-white/60">
+            <div class="mt-2 text-xs text-gray-900/60">
               {{ rateLabel }}
             </div>
           </div>
 
           <div class="pt-1">
-            <div class="text-xs text-white/60 mb-1.5">To</div>
+            <div class="text-xs text-gray-900/60 mb-1.5">To</div>
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
                 <img :src="coinLogo(toCurrency)" :alt="toCurrency" class="w-7 h-7 object-contain" />
@@ -215,21 +215,21 @@
           </div>
 
           <!-- Type & Fee -->
-          <div class="pt-2 space-y-2 border-t border-white/10 mt-1 pt-3">
-            <div class="flex items-center justify-between text-xs text-white/70">
+          <div class="pt-2 space-y-2 border-t border-gray-200 mt-1 pt-3">
+            <div class="flex items-center justify-between text-xs text-gray-900/70">
               <span>Type</span>
-              <span class="font-medium text-white">Instant</span>
+              <span class="font-medium text-gray-900">Instant</span>
             </div>
-            <div class="flex items-center justify-between text-xs text-white/70">
+            <div class="flex items-center justify-between text-xs text-gray-900/70">
               <span>Transaction Fees</span>
-              <span class="font-medium text-white">0 USDT</span>
+              <span class="font-medium text-gray-900">0 USDT</span>
             </div>
           </div>
         </div>
 
         <div class="pt-4">
           <button
-            class="w-full py-3.5 rounded-lg glass-button-no-hover text-base font-semibold text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            class="w-full py-3.5 rounded-lg glass-button-no-hover text-base font-semibold text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             @click="confirmExchange"
             :disabled="loading || isUpdatingPrice"
           >
@@ -254,9 +254,9 @@
       @click.self="showFromCurrencySelector = false"
     >
       <div class="glass-card rounded-t-xl md:rounded-xl w-full max-w-md max-h-[80vh] overflow-y-auto animate-slide-up">
-        <div class="sticky top-0 glass-card-no-hover border-b border-white/10 p-4 flex justify-between items-center">
-          <h2 class="text-lg font-bold text-white">Select currency</h2>
-          <button @click="showFromCurrencySelector = false" class="text-white/70 hover:text-white">
+        <div class="sticky top-0 glass-card-no-hover border-b border-gray-200 p-4 flex justify-between items-center">
+          <h2 class="text-lg font-bold text-gray-900">Select currency</h2>
+          <button @click="showFromCurrencySelector = false" class="text-gray-900/70 hover:text-gray-900">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -267,13 +267,13 @@
             v-for="currency in availableCurrencies"
             :key="currency"
             @click="selectFromCurrency(currency)"
-            class="w-full flex items-center p-4 border-b border-white/10 last:border-b-0 hover:bg-white/5 transition-colors"
+            class="w-full flex items-center p-4 border-b border-gray-200 last:border-b-0 hover:bg-gray-50 transition-colors"
           >
             <div class="flex items-center gap-3">
               <img :src="coinLogo(currency)" :alt="currency" class="w-6 h-6 object-contain" />
               <div class="flex flex-col gap-0.5">
-                <span class="text-white font-medium text-left">{{ currency }}</span>
-                <span class="text-[11px] text-white/60 text-left">
+                <span class="text-gray-900 font-medium text-left">{{ currency }}</span>
+                <span class="text-[11px] text-gray-900/60 text-left">
                   Wallet: {{ formatWalletBalance(walletBalance(currency)) }} {{ currency }}
                 </span>
               </div>
@@ -299,9 +299,9 @@
       @click.self="showToCurrencySelector = false"
     >
       <div class="glass-card rounded-t-xl md:rounded-xl w-full max-w-md max-h-[80vh] overflow-y-auto animate-slide-up">
-        <div class="sticky top-0 glass-card-no-hover border-b border-white/10 p-4 flex justify-between items-center">
-          <h2 class="text-lg font-bold text-white">Select currency</h2>
-          <button @click="showToCurrencySelector = false" class="text-white/70 hover:text-white">
+        <div class="sticky top-0 glass-card-no-hover border-b border-gray-200 p-4 flex justify-between items-center">
+          <h2 class="text-lg font-bold text-gray-900">Select currency</h2>
+          <button @click="showToCurrencySelector = false" class="text-gray-900/70 hover:text-gray-900">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -312,13 +312,13 @@
             v-for="currency in availableCurrencies.filter(c => c !== fromCurrency)"
             :key="currency"
             @click="selectToCurrency(currency)"
-            class="w-full flex items-center p-4 border-b border-white/10 last:border-b-0 hover:bg-white/5 transition-colors"
+            class="w-full flex items-center p-4 border-b border-gray-200 last:border-b-0 hover:bg-gray-50 transition-colors"
           >
             <div class="flex items-center gap-3">
               <img :src="coinLogo(currency)" :alt="currency" class="w-6 h-6 object-contain" />
               <div class="flex flex-col gap-0.5">
-                <span class="text-white font-medium text-left">{{ currency }}</span>
-                <span class="text-[11px] text-white/60 text-left">
+                <span class="text-gray-900 font-medium text-left">{{ currency }}</span>
+                <span class="text-[11px] text-gray-900/60 text-left">
                   Wallet: {{ formatWalletBalance(walletBalance(currency)) }} {{ currency }}
                 </span>
               </div>
@@ -344,9 +344,9 @@
       @click.self="showHistory = false"
     >
       <div class="glass-card rounded-t-xl md:rounded-xl w-full max-w-md max-h-[80vh] overflow-y-auto animate-slide-up">
-        <div class="sticky top-0 glass-card-no-hover border-b border-white/10 p-4 flex justify-between items-center">
-          <h2 class="text-lg font-bold text-white">{{ t('flashExchange.history') }}</h2>
-          <button @click="showHistory = false" class="text-white/70 hover:text-white">
+        <div class="sticky top-0 glass-card-no-hover border-b border-gray-200 p-4 flex justify-between items-center">
+          <h2 class="text-lg font-bold text-gray-900">{{ t('flashExchange.history') }}</h2>
+          <button @click="showHistory = false" class="text-gray-900/70 hover:text-gray-900">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -356,23 +356,23 @@
           <div
             v-for="exchange in exchangeHistory"
             :key="exchange.id"
-            class="p-4 border-b border-white/10 last:border-b-0"
+            class="p-4 border-b border-gray-200 last:border-b-0"
           >
             <div class="flex justify-between items-start mb-2">
               <div>
-                <div class="text-white font-medium">{{ exchange.from_currency || exchange.fromCurrency }} → {{ exchange.to_currency || exchange.toCurrency }}</div>
-                <div class="text-white/60 text-sm">{{ formatDate(exchange.created_at) }}</div>
+                <div class="text-gray-900 font-medium">{{ exchange.from_currency || exchange.fromCurrency }} → {{ exchange.to_currency || exchange.toCurrency }}</div>
+                <div class="text-gray-900/60 text-sm">{{ formatDate(exchange.created_at) }}</div>
               </div>
               <span class="px-2 py-1 rounded text-xs bg-green-500/20 text-green-300">
                 Completed
               </span>
             </div>
-            <div class="text-white/70 text-sm">
+            <div class="text-gray-900/70 text-sm">
               {{ formatBalance(exchange.amount_from) }} {{ exchange.from_currency || exchange.fromCurrency }} =
               {{ formatBalance(exchange.amount_to) }} {{ exchange.to_currency || exchange.toCurrency }}
             </div>
           </div>
-          <div v-if="exchangeHistory.length === 0" class="text-center text-white/60 py-8">
+          <div v-if="exchangeHistory.length === 0" class="text-center text-gray-900/60 py-8">
             {{ t('flashExchange.noHistory') }}
           </div>
         </div>

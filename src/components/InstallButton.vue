@@ -4,24 +4,24 @@
     v-if="showInstallButton && !isIOSDevice && !isInstalled"
     class="fixed bottom-4 left-4 right-4 z-[9999] md:left-auto md:right-4 md:w-80"
   >
-    <div class="glass-card rounded-xl p-4 shadow-2xl border border-white/10 animate-slide-up">
+    <div class="glass-card rounded-xl p-4 shadow-2xl border border-gray-200 animate-slide-up">
       <div class="flex items-start gap-3">
         <div class="flex-shrink-0">
           <img src="/icon-192.png" alt="TradeXion" class="w-12 h-12 rounded-lg" />
         </div>
         <div class="flex-1 min-w-0">
-          <h3 class="text-white font-semibold text-sm mb-1">Install TradeXion</h3>
-          <p class="text-white/70 text-xs mb-3">Get the full app experience with offline access</p>
+          <h3 class="text-gray-900 font-semibold text-sm mb-1">Install TradeXion</h3>
+          <p class="text-gray-900/70 text-xs mb-3">Get the full app experience with offline access</p>
           <div class="flex gap-2">
             <button
               @click="handleInstall"
-              class="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-medium text-sm hover:from-blue-600 hover:to-purple-700 transition-all shadow-lg"
+              class="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-gray-900 rounded-lg font-medium text-sm hover:from-blue-600 hover:to-purple-700 transition-all shadow-lg"
             >
               Install App
             </button>
             <button
               @click="dismissInstall"
-              class="px-4 py-2 bg-white/10 text-white/70 rounded-lg text-sm hover:bg-white/20 transition-colors"
+              class="px-4 py-2 bg-gray-100 text-gray-900/70 rounded-lg text-sm hover:bg-gray-200 transition-colors"
             >
               Later
             </button>
@@ -37,11 +37,11 @@
     class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
     @click.self="dismissIOSInstructions"
   >
-    <div class="glass-card rounded-2xl p-6 max-w-sm w-full shadow-2xl border border-white/10 animate-slide-up">
+    <div class="glass-card rounded-2xl p-6 max-w-sm w-full shadow-2xl border border-gray-200 animate-slide-up">
       <div class="text-center mb-6">
         <img src="/icon-192.png" alt="TradeXion" class="w-20 h-20 rounded-2xl mx-auto mb-4" />
-        <h2 class="text-white font-bold text-xl mb-2">Add to Home Screen</h2>
-        <p class="text-white/70 text-sm">Install TradeXion for the best experience</p>
+        <h2 class="text-gray-900 font-bold text-xl mb-2">Add to Home Screen</h2>
+        <p class="text-gray-900/70 text-sm">Install TradeXion for the best experience</p>
       </div>
       
       <div class="space-y-4 mb-6">
@@ -50,8 +50,8 @@
             <span class="text-blue-400 font-bold text-sm">1</span>
           </div>
           <div class="flex-1">
-            <p class="text-white text-sm">Tap the <span class="font-semibold">Share</span> button</p>
-            <p class="text-white/60 text-xs mt-1">Located at the bottom of Safari</p>
+            <p class="text-gray-900 text-sm">Tap the <span class="font-semibold">Share</span> button</p>
+            <p class="text-gray-900/60 text-xs mt-1">Located at the bottom of Safari</p>
           </div>
         </div>
         
@@ -60,8 +60,8 @@
             <span class="text-blue-400 font-bold text-sm">2</span>
           </div>
           <div class="flex-1">
-            <p class="text-white text-sm">Select <span class="font-semibold">"Add to Home Screen"</span></p>
-            <p class="text-white/60 text-xs mt-1">Scroll down if needed</p>
+            <p class="text-gray-900 text-sm">Select <span class="font-semibold">"Add to Home Screen"</span></p>
+            <p class="text-gray-900/60 text-xs mt-1">Scroll down if needed</p>
           </div>
         </div>
         
@@ -70,15 +70,15 @@
             <span class="text-blue-400 font-bold text-sm">3</span>
           </div>
           <div class="flex-1">
-            <p class="text-white text-sm">Tap <span class="font-semibold">"Add"</span></p>
-            <p class="text-white/60 text-xs mt-1">The app will appear on your home screen</p>
+            <p class="text-gray-900 text-sm">Tap <span class="font-semibold">"Add"</span></p>
+            <p class="text-gray-900/60 text-xs mt-1">The app will appear on your home screen</p>
           </div>
         </div>
       </div>
       
       <button
         @click="dismissIOSInstructions"
-        class="w-full px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-purple-700 transition-all shadow-lg"
+        class="w-full px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-gray-900 rounded-lg font-semibold hover:from-blue-600 hover:to-purple-700 transition-all shadow-lg"
       >
         Got it!
       </button>

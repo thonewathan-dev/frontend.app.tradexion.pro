@@ -6,15 +6,15 @@
 
       <main class="flex-1 pb-4 md:pb-0">
         <!-- Header (aligned like Spot/Contract/Exchange) -->
-        <div class="glass-card-no-hover border-b border-white/10 px-4 py-3 mb-4">
+        <div class="glass-card-no-hover border-b border-gray-200 px-4 py-3 mb-4">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <button @click="$router.back()" class="p-1.5 hover:bg-white/10 rounded-lg transition-colors">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <button @click="$router.back()" class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+                <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
-              <h1 class="text-lg font-bold text-white">About TradeXion</h1>
+              <h1 class="text-lg font-bold text-gray-900">About TradeXion</h1>
             </div>
           </div>
         </div>
@@ -28,8 +28,8 @@
           />
 
           <!-- Content (no glass container, just text on background) -->
-          <div class="space-y-4 text-sm text-white/80 leading-relaxed">
-            <p class="text-base font-semibold text-white">
+          <div class="space-y-4 text-sm text-gray-900/80 leading-relaxed">
+            <p class="text-base font-semibold text-gray-900">
               TradeXion Exchange was established by a group of blockchain enthusiasts with a goal of providing complete
               financial services for the currencies of the future. We are dedicated to delivering safe, convenient, and
               diversified services to meet all crypto needs, including trading, investing, purchasing, staking, borrowing, and more.
@@ -73,7 +73,7 @@
               across many fields and help cultivate the soil and foundation for the next wave of practical blockchain adoption.
             </p>
 
-            <p class="pt-2 border-t border-white/10 mt-2">
+            <p class="pt-2 border-t border-gray-200 mt-2">
               Follow us and stay close to the investment trends of the blockchain era:
               <a
                 href="https://www.tradexion.pro/"

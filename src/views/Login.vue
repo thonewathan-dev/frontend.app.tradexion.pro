@@ -1,15 +1,15 @@
 <template>
-  <div class="min-h-[100dvh] overflow-hidden text-white flex flex-col">
+  <div class="min-h-[100dvh] overflow-hidden text-gray-900 flex flex-col">
     <!-- Top bar -->
-    <div class="sticky top-0 z-10 glass-card-no-hover border-b border-white/10">
+    <div class="sticky top-0 z-10 glass-card-no-hover border-b border-gray-200">
       <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
         <div class="flex items-center gap-2">
           <img :src="logoMarkUrl" alt="TradeXion" class="w-7 h-7 object-contain" />
-          <span class="font-semibold tracking-tight text-white">TradeXion</span>
+          <span class="font-semibold tracking-tight text-gray-900">TradeXion</span>
         </div>
         <router-link
           to="/register"
-          class="px-4 py-1.5 rounded-full text-sm font-semibold glass-button-no-hover text-white border border-white/20 hover:border-white/30 transition-colors"
+          class="px-4 py-1.5 rounded-full text-sm font-semibold glass-button-no-hover text-gray-900 border border-gray-300 hover:border-white/30 transition-colors"
         >
           {{ t('auth.register') }}
         </router-link>
@@ -25,14 +25,14 @@
 
         <!-- Right: login form -->
         <div class="min-w-0">
-          <h1 class="text-2xl md:text-3xl font-bold tracking-tight mb-3 text-white">Log In</h1>
+          <h1 class="text-2xl md:text-3xl font-bold tracking-tight mb-3 text-gray-900">Log In</h1>
 
       <!-- Tabs -->
       <div class="flex gap-6 text-sm font-semibold mb-3">
         <button
           type="button"
           class="pb-2 border-b-2 transition-colors"
-          :class="loginMode === 'email' ? 'border-white text-white' : 'border-transparent text-white/50 hover:text-white/80'"
+          :class="loginMode === 'email' ? 'border-white text-gray-900' : 'border-transparent text-gray-900/50 hover:text-gray-900/80'"
           @click="setMode('email')"
         >
           Email
@@ -40,7 +40,7 @@
         <button
           type="button"
           class="pb-2 border-b-2 transition-colors"
-          :class="loginMode === 'phone' ? 'border-white text-white' : 'border-transparent text-white/50 hover:text-white/80'"
+          :class="loginMode === 'phone' ? 'border-white text-gray-900' : 'border-transparent text-gray-900/50 hover:text-gray-900/80'"
           @click="setMode('phone')"
         >
           Phone
@@ -55,12 +55,12 @@
         <form v-if="loginMode === 'email'" @submit.prevent="onPrimaryAction" class="space-y-2.5">
           <!-- Step 1: identifier -->
           <div v-if="step === 'identifier'" class="space-y-2.5">
-            <label class="block text-xs text-white/80 font-medium">Email</label>
+            <label class="block text-xs text-gray-900/80 font-medium">Email</label>
             <input
               v-model.trim="email"
               type="email"
               autocomplete="email"
-              class="w-full px-3 py-2.5 text-sm glass-input rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+              class="w-full px-3 py-2.5 text-sm glass-input rounded-lg text-gray-900 placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
               placeholder="Email"
               required
             />
@@ -68,7 +68,7 @@
             <button
               type="submit"
               :disabled="loading || !canGoNext"
-              class="w-full py-2.5 text-sm rounded-full font-semibold glass-button-no-hover text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-white/20"
+              class="w-full py-2.5 text-sm rounded-full font-semibold glass-button-no-hover text-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-gray-300"
             >
               Next
             </button>
@@ -79,39 +79,39 @@
             <div class="flex items-center gap-2 mb-1.5">
               <button
                 type="button"
-                class="p-1 hover:bg-white/10 rounded-lg transition-colors"
+                class="p-1 hover:bg-gray-100 rounded-lg transition-colors"
                 @click="backToIdentifier"
                 aria-label="Back"
               >
-                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                 </svg>
               </button>
-              <div class="flex-1 text-center text-xs font-semibold text-white truncate px-2">Log In</div>
+              <div class="flex-1 text-center text-xs font-semibold text-gray-900 truncate px-2">Log In</div>
               <div class="w-7"></div>
             </div>
 
-            <label class="block text-xs text-white/80 font-medium">Email</label>
+            <label class="block text-xs text-gray-900/80 font-medium">Email</label>
             <input
               :value="email"
               type="email"
               autocomplete="email"
               readonly
-              class="w-full px-3 py-2.5 text-sm rounded-lg border border-white/10 bg-white/5 text-white/80 placeholder-white/40 focus:outline-none"
+              class="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 bg-gray-50 text-gray-900/80 placeholder-white/40 focus:outline-none"
             />
 
-            <label class="block text-xs text-white/80 font-medium">Password</label>
+            <label class="block text-xs text-gray-900/80 font-medium">Password</label>
             <input
               v-model="password"
               type="password"
               autocomplete="current-password"
-              class="w-full px-3 py-2.5 text-sm glass-input rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+              class="w-full px-3 py-2.5 text-sm glass-input rounded-lg text-gray-900 placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
               placeholder="Password"
               required
             />
 
             <div class="flex justify-end">
-              <router-link to="/forgot-password" class="text-xs font-semibold text-white/80 hover:text-white">
+              <router-link to="/forgot-password" class="text-xs font-semibold text-gray-900/80 hover:text-gray-900">
                 Forgot password
               </router-link>
             </div>
@@ -124,7 +124,7 @@
             <button
               type="submit"
               :disabled="loading || !turnstileToken || !password"
-              class="w-full py-2.5 text-sm rounded-full font-semibold glass-button-no-hover text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-white/20"
+              class="w-full py-2.5 text-sm rounded-full font-semibold glass-button-no-hover text-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-gray-300"
             >
               {{ loading ? t('auth.loggingIn') : 'Log In' }}
             </button>
@@ -133,15 +133,15 @@
 
         <!-- PHONE MODE -->
         <form v-else @submit.prevent="handlePhoneLogin" class="space-y-2.5">
-          <label class="block text-xs text-white/80 font-medium">Phone</label>
-          <div class="flex items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm focus-within:ring-2 focus-within:ring-white/20 focus-within:border-white/25">
-            <div class="text-white/70 text-sm font-semibold">+</div>
+          <label class="block text-xs text-gray-900/80 font-medium">Phone</label>
+          <div class="flex items-center gap-2 rounded-lg border border-white/15 bg-gray-50 px-3 py-2 text-sm focus-within:ring-2 focus-within:ring-white/20 focus-within:border-white/25">
+            <div class="text-gray-900/70 text-sm font-semibold">+</div>
             <input
               v-model.trim="phone"
               type="tel"
               inputmode="tel"
               autocomplete="tel"
-              class="flex-1 bg-transparent outline-none text-sm text-white placeholder-white/40"
+              class="flex-1 bg-transparent outline-none text-sm text-gray-900 placeholder-white/40"
               placeholder="Enter phone number"
               required
             />
@@ -150,7 +150,7 @@
           <button
             type="submit"
             :disabled="loading || !phone"
-            class="w-full py-2.5 text-sm rounded-full font-semibold glass-button-no-hover text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-white/20"
+            class="w-full py-2.5 text-sm rounded-full font-semibold glass-button-no-hover text-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-gray-300"
           >
             Next
           </button>
@@ -159,16 +159,16 @@
 
       <!-- Divider -->
       <div class="my-3 flex items-center gap-3">
-        <div class="h-px flex-1 bg-white/15"></div>
-        <div class="text-xs text-white/60">Or</div>
-        <div class="h-px flex-1 bg-white/15"></div>
+        <div class="h-px flex-1 bg-[#fafafa]/15"></div>
+        <div class="text-xs text-gray-900/60">Or</div>
+        <div class="h-px flex-1 bg-[#fafafa]/15"></div>
       </div>
 
       <!-- Google button -->
       <button
         type="button"
         @click="loginWithGoogle"
-        class="w-full py-2.5 text-sm rounded-lg glass-card-no-hover border border-white/12 hover:border-white/20 transition-colors flex items-center justify-center gap-2 font-semibold text-white"
+        class="w-full py-2.5 text-sm rounded-lg glass-card-no-hover border border-white/12 hover:border-gray-300 transition-colors flex items-center justify-center gap-2 font-semibold text-gray-900"
       >
         <svg class="w-4 h-4" viewBox="0 0 24 24">
           <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -179,8 +179,8 @@
         Continue with Google
       </button>
 
-      <div class="mt-3 mb-4 mb-safe text-center text-xs text-white/70">
-        <router-link to="/register" class="font-semibold text-white hover:text-white/80">Create a TradeXion Account</router-link>
+      <div class="mt-3 mb-4 mb-safe text-center text-xs text-gray-900/70">
+        <router-link to="/register" class="font-semibold text-gray-900 hover:text-gray-900/80">Create a TradeXion Account</router-link>
       </div>
         </div>
       </div>
@@ -192,20 +192,20 @@
     <div v-if="showInvalidUserModal" class="fixed inset-0 z-50 flex items-center justify-center px-4">
       <div class="absolute inset-0 bg-black/40" @click="showInvalidUserModal = false"></div>
       <div class="relative w-full max-w-sm glass-card-no-hover rounded-xl border border-white/12 p-4">
-        <div class="text-sm text-white/80 leading-relaxed">
+        <div class="text-sm text-gray-900/80 leading-relaxed">
           We can't find this account. Please click "Confirm" to sign up and log in now.
         </div>
         <div class="mt-4 flex gap-3">
           <button
             type="button"
-            class="flex-1 py-2.5 rounded-full border border-white/15 text-white/80 font-semibold hover:bg-white/10"
+            class="flex-1 py-2.5 rounded-full border border-white/15 text-gray-900/80 font-semibold hover:bg-gray-100"
             @click="showInvalidUserModal = false"
           >
             Cancel
           </button>
           <button
             type="button"
-            class="flex-1 py-2.5 rounded-full glass-button-no-hover text-white font-semibold border border-white/20"
+            class="flex-1 py-2.5 rounded-full glass-button-no-hover text-gray-900 font-semibold border border-gray-300"
             @click="goRegisterFromModal"
           >
             Confirm

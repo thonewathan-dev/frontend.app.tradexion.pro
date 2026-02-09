@@ -1,21 +1,21 @@
 <template>
   <div class="fixed inset-0 bg-dark flex flex-col overflow-hidden">
     <!-- Header - Fixed at top -->
-    <div class="glass-card-no-hover border-b border-white/10 px-4 py-3 flex-shrink-0 z-10">
+    <div class="glass-card-no-hover border-b border-gray-200 px-4 py-3 flex-shrink-0 z-10">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
           <button
             @click="router.back()"
-            class="p-2 hover:bg-white/10 rounded-lg transition-colors"
+            class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
           >
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
           <img :src="logoUrl" alt="TradeXion" class="w-8 h-8 object-contain" />
           <div>
-            <h3 class="text-white font-semibold text-sm">Customer Support</h3>
-            <p class="text-white/60 text-xs" :class="{ 'text-green-400': isConnected, 'text-red-400': !isConnected }">
+            <h3 class="text-gray-900 font-semibold text-sm">Customer Support</h3>
+            <p class="text-gray-900/60 text-xs" :class="{ 'text-green-400': isConnected, 'text-red-400': !isConnected }">
               {{ isConnected ? 'Online' : 'Connecting...' }}
             </p>
           </div>
@@ -41,8 +41,8 @@
         <div class="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mb-3">
           <img :src="logoUrl" alt="TradeXion" class="w-10 h-10 object-contain" />
         </div>
-        <h3 class="text-white text-base font-semibold mb-1.5">Welcome to Customer Support</h3>
-        <p class="text-white/60 text-xs text-center max-w-sm mb-4">
+        <h3 class="text-gray-900 text-base font-semibold mb-1.5">Welcome to Customer Support</h3>
+        <p class="text-gray-900/60 text-xs text-center max-w-sm mb-4">
           Hi! I'm your support assistant. How can I help you today?
         </p>
         
@@ -52,17 +52,17 @@
             v-for="option in botMenuOptions"
             :key="option.id"
             @click="handleBotMenuClick(option)"
-            class="w-full text-left px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+            class="w-full text-left px-3 py-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
           >
             <div class="flex items-center gap-2.5">
               <div :class="option.iconBg" class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">
                 <component :is="option.iconComponent" class="w-4 h-4" />
               </div>
               <div class="flex-1">
-                <div class="text-white text-xs font-medium">{{ option.label }}</div>
-                <div class="text-white/50 text-[10px]">{{ option.description }}</div>
+                <div class="text-gray-900 text-xs font-medium">{{ option.label }}</div>
+                <div class="text-gray-900/50 text-[10px]">{{ option.description }}</div>
               </div>
-              <svg class="w-3 h-3 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-3 h-3 text-gray-900/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
               </svg>
             </div>
@@ -71,7 +71,7 @@
       </div>
       <div v-if="loading && messages.length === 0" class="flex flex-col items-center justify-center h-full py-12">
         <span class="loader"></span>
-        <p class="text-white/60 text-sm mt-4">Loading messages...</p>
+        <p class="text-gray-900/60 text-sm mt-4">Loading messages...</p>
       </div>
       <div
         v-for="message in messages"
@@ -82,13 +82,13 @@
         <!-- Profile Icon with Logo (only for admin messages, on the LEFT) -->
         <div
           v-if="message.sender_role === 'admin' && message.sender_id !== authStore.user?.id"
-          class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0"
+          class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0"
         >
           <img :src="logoUrl" alt="Admin" class="w-6 h-6 object-contain" />
         </div>
         
         <div
-          class="max-w-[75%] rounded-xl px-4 py-2.5 shadow-sm transition-all duration-200 bg-white/10 backdrop-blur-sm border border-white/20 text-white"
+          class="max-w-[75%] rounded-xl px-4 py-2.5 shadow-sm transition-all duration-200 bg-gray-100 backdrop-blur-sm border border-gray-300 text-gray-900"
           :class="(message.sender_role === 'user' || message.sender_id === authStore.user?.id)
             ? 'animate-message-sent' 
             : 'animate-message-received'"
@@ -124,7 +124,7 @@
     <!-- Image Preview Before Sending -->
     <div
       v-if="imagePreview && imagePreview.preview"
-      class="border-t border-white/10 bg-dark/90 backdrop-blur-sm flex-shrink-0 px-4 py-3"
+      class="border-t border-gray-200 bg-dark/90 backdrop-blur-sm flex-shrink-0 px-4 py-3"
     >
       <div class="flex items-center gap-3">
         <div class="relative">
@@ -133,19 +133,19 @@
             @click="cancelImagePreview"
             class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center transition-colors"
           >
-            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
         <div class="flex-1">
-          <p class="text-white text-sm font-medium">Image ready to send</p>
-          <p class="text-white/60 text-xs">Click send to upload and send</p>
+          <p class="text-gray-900 text-sm font-medium">Image ready to send</p>
+          <p class="text-gray-900/60 text-xs">Click send to upload and send</p>
         </div>
         <button
           @click="sendImagePreview"
           :disabled="uploadingImage || loading"
-          class="px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:opacity-50 rounded-lg text-white text-sm font-medium transition-colors"
+          class="px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:opacity-50 rounded-lg text-gray-900 text-sm font-medium transition-colors"
         >
           {{ uploadingImage ? 'Uploading...' : 'Send' }}
         </button>
@@ -153,7 +153,7 @@
     </div>
 
     <!-- Input Area - Fixed at bottom (when chat is active) -->
-    <div v-if="!chatEnded" class="border-t border-white/10 bg-dark/90 backdrop-blur-sm flex-shrink-0 z-10">
+    <div v-if="!chatEnded" class="border-t border-gray-200 bg-dark/90 backdrop-blur-sm flex-shrink-0 z-10">
       <div class="px-4 py-3">
         <form @submit.prevent="() => handleSend()" class="flex items-end gap-3">
           <div class="flex-1 relative">
@@ -161,7 +161,7 @@
               v-model="messageInput"
               type="text"
               placeholder="Type your message..."
-              class="w-full px-4 py-3 pr-12 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-white/30 focus:outline-none focus:border-blue-500/50 focus:bg-white/10 transition-all duration-200 text-sm backdrop-blur-sm"
+              class="w-full px-4 py-3 pr-12 bg-gray-50 border border-gray-200 rounded-2xl text-gray-900 placeholder-white/30 focus:outline-none focus:border-blue-500/50 focus:bg-gray-100 transition-all duration-200 text-sm backdrop-blur-sm"
               :disabled="loading || endingChat"
             />
             <div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
@@ -175,11 +175,11 @@
               <button
                 type="button"
                 @click="fileInput?.click()"
-                class="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
+                class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
                 title="Attach photo"
                 :disabled="loading || endingChat"
               >
-                <svg class="w-4 h-4 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 text-gray-900/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </button>
@@ -188,7 +188,7 @@
           <button
             type="submit"
             :disabled="(!messageInput.trim() && !uploadingImage) || loading || endingChat || uploadingImage"
-            class="p-2 text-white/70 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            class="p-2 text-gray-900/70 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <svg 
               v-if="!loading && !uploadingImage" 
@@ -214,7 +214,7 @@
     </div>
 
     <!-- Chat Ended Area - Fixed at bottom (replaces input when chat is ended) -->
-    <div v-else class="border-t border-white/10 bg-dark/90 backdrop-blur-sm flex-shrink-0 z-10">
+    <div v-else class="border-t border-gray-200 bg-dark/90 backdrop-blur-sm flex-shrink-0 z-10">
       <div class="px-4 py-4">
         <div class="flex flex-col items-center gap-3">
           <div class="flex items-center gap-2">
@@ -223,20 +223,20 @@
             </svg>
             <h3 class="text-yellow-400 text-sm font-semibold">Chat Ended</h3>
           </div>
-          <p class="text-white/60 text-xs text-center mb-2">
+          <p class="text-gray-900/60 text-xs text-center mb-2">
             This conversation has been ended. You can start a new chat to continue.
           </p>
           <div class="flex gap-3 w-full">
             <button
               @click="router.back()"
-              class="flex-1 px-4 py-2.5 rounded-full text-sm font-semibold glass-button-no-hover text-white border border-white/20 hover:border-white/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              class="flex-1 px-4 py-2.5 rounded-full text-sm font-semibold glass-button-no-hover text-gray-900 border border-gray-300 hover:border-white/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Back
             </button>
             <button
               @click="startNewChat"
               :disabled="loading"
-              class="flex-1 px-4 py-2.5 rounded-full text-sm font-semibold glass-button-no-hover text-white border border-white/20 hover:border-white/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              class="flex-1 px-4 py-2.5 rounded-full text-sm font-semibold glass-button-no-hover text-gray-900 border border-gray-300 hover:border-white/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {{ loading ? 'Starting...' : 'Start New Chat' }}
             </button>
@@ -254,7 +254,7 @@
       <div class="max-w-4xl max-h-[90vh] relative">
         <button
           @click="selectedImage = null"
-          class="absolute -top-10 right-0 text-white hover:text-gray-300 transition-colors"
+          class="absolute -top-10 right-0 text-gray-900 hover:text-gray-300 transition-colors"
         >
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -285,10 +285,10 @@
         </div>
 
         <!-- Title -->
-        <h3 class="text-white text-lg font-semibold text-center mb-2">End Chat?</h3>
+        <h3 class="text-gray-900 text-lg font-semibold text-center mb-2">End Chat?</h3>
         
         <!-- Message -->
-        <p class="text-white/70 text-sm text-center mb-6">
+        <p class="text-gray-900/70 text-sm text-center mb-6">
           Are you sure you want to end this chat? The chat will be marked as ended, but the conversation history will be preserved.
         </p>
 
@@ -296,14 +296,14 @@
         <div class="flex gap-3">
           <button
             @click="showEndChatModal = false"
-            class="flex-1 px-4 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white text-sm font-medium transition-all duration-200"
+            class="flex-1 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-lg text-gray-900 text-sm font-medium transition-all duration-200"
           >
             Cancel
           </button>
           <button
             @click="confirmEndChat"
             :disabled="endingChat"
-            class="flex-1 px-4 py-2.5 bg-red-500 hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-white text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2"
+            class="flex-1 px-4 py-2.5 bg-red-500 hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-gray-900 text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2"
           >
             <svg 
               v-if="endingChat" 

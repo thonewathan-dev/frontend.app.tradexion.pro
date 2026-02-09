@@ -5,13 +5,13 @@
       <DesktopNav v-if="!isMobile" />
       <main class="flex-1 pb-16 md:pb-0">
         <!-- Header with Profile and Language Selector -->
-        <div class="glass-card-no-hover border-b border-white/10 px-4 pt-safe-header pb-3 flex items-center justify-between relative z-50">
+        <div class="bg-[#fafafa] border-b border-gray-200 px-4 pt-safe-header pb-3 flex items-center justify-between relative z-50">
           <!-- Profile Icon (Left) -->
           <button
             @click="goToAssets"
-            class="w-10 h-10 glass rounded-full flex items-center justify-center hover:bg-white/10 transition-colors"
+            class="w-10 h-10 glass rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
           >
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
           </button>
@@ -34,7 +34,7 @@
               <div
                 v-if="showLanguageMenu"
                 @click.stop
-                class="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-xl overflow-hidden z-[9999] min-w-[160px] border border-gray-200"
+                class="absolute right-0 top-full mt-1 bg-[#fafafa] rounded-lg shadow-xl overflow-hidden z-[9999] min-w-[160px] border border-gray-200"
               >
                 <div class="py-1">
                   <button
@@ -109,8 +109,8 @@
                 :class="[
                   'rounded-full transition-all duration-300',
                   currentBannerIndex === index 
-                    ? 'bg-blue-400 w-6 h-1' 
-                    : 'bg-white/30 w-1 h-1 hover:bg-white/50'
+                    ? 'bg-binance-yellow w-6 h-1' 
+                    : 'bg-gray-300 w-1 h-1 hover:bg-gray-400'
                 ]"
                 :aria-label="`Go to banner ${index + 1}`"
               />
@@ -123,7 +123,7 @@
           <div class="flex items-center gap-3 px-3 md:px-4">
             <!-- Speaker Icon -->
             <div class="flex-shrink-0">
-              <svg class="w-4 h-4 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+              <svg class="w-4 h-4 text-binance-yellow" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.617.793L4.383 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.383l4.617-3.793a1 1 0 011.617.793zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clip-rule="evenodd" />
               </svg>
             </div>
@@ -132,7 +132,7 @@
               <div class="absolute inset-0 whitespace-nowrap">
                 <span 
                   :key="currentNotice"
-                  class="text-white text-sm font-medium inline-block animate-marquee"
+                  class="text-gray-900 text-sm font-medium inline-block animate-marquee"
                   :style="{ animation: 'marquee 12s linear infinite' }"
                 >
                   {{ currentNotice }}
@@ -141,8 +141,8 @@
             </div>
             <!-- Menu Icon -->
             <div class="flex-shrink-0">
-              <button class="p-1 hover:bg-white/10 rounded transition-colors">
-                <svg class="w-4 h-4 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <button class="p-1 hover:bg-gray-100 rounded transition-colors">
+                <svg class="w-4 h-4 text-gray-900/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               </button>
@@ -159,15 +159,15 @@
               class="glass-card rounded-lg p-3 cursor-pointer hover:border-blue-500/50 transition-colors relative overflow-hidden group"
               @click="ticker && selectSymbol(ticker.originalSymbol || ticker.symbol)"
             >
-              <!-- Decorative Background Overlay -->
-              <img src="/background shadow.png" alt="" class="absolute top-0 right-0 w-14 h-14 md:w-24 md:h-24 object-contain opacity-10 pointer-events-none group-hover:scale-110 transition-transform duration-700" />
+              <!-- Decorative Background Overlay - Inverted for White Theme -->
+              <img src="/background shadow.png" alt="" class="absolute top-0 right-0 w-14 h-14 md:w-24 md:h-24 object-contain pointer-events-none group-hover:scale-110 transition-transform duration-700 invert opacity-15" />
               
               <div v-if="ticker" class="flex flex-col items-start text-left relative z-10">
                 <div class="relative w-12 h-12 md:w-14 md:h-14 mb-3">
                   <!-- Quote Currency (Bottom Left) - UNDER -->
                   <img
                     :src="getQuoteLogo(ticker.symbol)"
-                    class="w-8 h-8 md:w-10 md:h-10 rounded-full absolute bottom-0 left-0 z-0 border border-white/20 opacity-95 brightness-110"
+                    class="w-8 h-8 md:w-10 md:h-10 rounded-full absolute bottom-0 left-0 z-0 border border-gray-300 opacity-95 brightness-110"
                   />
                   <!-- Base Currency (Top Right) - ON TOP -->
                   <img
@@ -177,7 +177,7 @@
                     @error="handleImageError"
                   />
                 </div>
-                <div class="text-xs md:text-sm font-semibold text-white mb-1">{{ ticker.symbol }}</div>
+                <div class="text-xs md:text-sm font-semibold text-gray-900 mb-1">{{ ticker.symbol }}</div>
                 <!-- Top 3: percentage -->
                 <span
                   v-if="!ticker.isPlaceholder"
@@ -192,35 +192,35 @@
                 </span>
                 <div
                   v-else
-                  class="h-4 bg-white/10 rounded-full w-14 mb-1 animate-pulse"
+                  class="h-4 bg-gray-100 rounded-full w-14 mb-1 animate-pulse"
                 ></div>
                 <!-- Top 3: last price -->
                 <div
                   v-if="!ticker.isPlaceholder"
-                  class="text-sm md:text-base font-bold text-white mb-0.5"
+                  class="text-sm md:text-base font-bold text-gray-900 mb-0.5"
                 >
                   ${{ formatPrice(ticker.price) }}
                 </div>
                 <div
                   v-else
-                  class="h-4 bg-white/10 rounded w-16 mb-0.5 animate-pulse"
+                  class="h-4 bg-gray-100 rounded w-16 mb-0.5 animate-pulse"
                 ></div>
                 <!-- Top 3: volume -->
                 <div
                   v-if="!ticker.isPlaceholder"
-                  class="text-xs text-white/60"
+                  class="text-xs text-gray-900/60"
                 >
                   Vol {{ formatVolume(ticker.volume) }}
               </div>
                 <div
                   v-else
-                  class="h-3 bg-white/10 rounded w-20 animate-pulse"
+                  class="h-3 bg-gray-100 rounded w-20 animate-pulse"
                 ></div>
               </div>
               <div v-else class="animate-pulse flex flex-col items-start gap-2 relative z-10 w-full">
-                  <div class="w-10 h-10 rounded-full bg-white/10"></div>
-                  <div class="h-4 bg-white/10 rounded w-3/4"></div>
-                  <div class="h-6 bg-white/10 rounded w-1/2"></div>
+                  <div class="w-10 h-10 rounded-full bg-gray-100"></div>
+                  <div class="h-4 bg-gray-100 rounded w-3/4"></div>
+                  <div class="h-6 bg-gray-100 rounded w-1/2"></div>
               </div>
             </div>
           </div>
@@ -241,7 +241,7 @@
                 class="w-10 h-10 md:w-12 md:h-12 mb-2 object-contain"
                 @error="handleImageError"
               />
-              <span class="text-xs md:text-sm font-medium text-white">{{ menu.label }}</span>
+              <span class="text-xs md:text-sm font-medium text-gray-900">{{ menu.label }}</span>
             </div>
           </div>
         </div>
@@ -262,22 +262,22 @@
                 @error="handleImageError"
               />
               <div>
-                <div class="text-white font-semibold text-sm md:text-base mb-1">Quick recharge</div>
-                <div class="text-white/60 text-xs md:text-sm">Support Coin BTC/USDT/ETH</div>
+                <div class="text-gray-900 font-semibold text-sm md:text-base mb-1">Quick recharge</div>
+                <div class="text-gray-900/60 text-xs md:text-sm">Support Coin BTC/USDT/ETH</div>
               </div>
             </div>
-            <svg class="w-5 h-5 md:w-6 md:h-6 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 md:w-6 md:h-6 text-gray-900/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
           </div>
         </div>
 
         <!-- Category Switcher (Refined Size & Spacing) -->
-        <div class="px-3 md:px-4 mb-2 flex justify-center">
+        <div class="px-3 md:px-4 mb-2 flex justify-start">
           <div class="glass-card-no-hover rounded-full p-1 flex relative w-[280px]">
             <!-- Sliding Indicator -->
             <div 
-              class="absolute top-1 bottom-1 transition-all duration-300 ease-out bg-white/10 rounded-full"
+              class="absolute top-1 bottom-1 transition-all duration-300 ease-out bg-gray-100 rounded-full"
               :style="{
                 width: 'calc(25% - 2px)',
                 left: activeCategory === 'hot' ? '1%' : activeCategory === 'crypto' ? '26%' : activeCategory === 'metals' ? '51%' : '76%'
@@ -287,28 +287,28 @@
             <button 
               @click="activeCategory = 'hot'"
               class="flex-1 py-1.5 relative z-10 text-[10px] font-bold uppercase transition-colors duration-200"
-              :class="activeCategory === 'hot' ? 'text-white' : 'text-white/40'"
+              :class="activeCategory === 'hot' ? 'text-gray-900' : 'text-gray-900/40'"
             >
               Hot
             </button>
             <button 
               @click="activeCategory = 'crypto'"
               class="flex-1 py-1.5 relative z-10 text-[10px] font-bold uppercase transition-colors duration-200"
-              :class="activeCategory === 'crypto' ? 'text-white' : 'text-white/40'"
+              :class="activeCategory === 'crypto' ? 'text-gray-900' : 'text-gray-900/40'"
             >
               Crypto
             </button>
             <button 
               @click="activeCategory = 'metals'"
               class="flex-1 py-1.5 relative z-10 text-[10px] font-bold uppercase transition-colors duration-200"
-              :class="activeCategory === 'metals' ? 'text-white' : 'text-white/40'"
+              :class="activeCategory === 'metals' ? 'text-gray-900' : 'text-gray-900/40'"
             >
               Metals
             </button>
             <button 
               @click="activeCategory = 'forex'"
               class="flex-1 py-1.5 relative z-10 text-[10px] font-bold uppercase transition-colors duration-200"
-              :class="activeCategory === 'forex' ? 'text-white' : 'text-white/40'"
+              :class="activeCategory === 'forex' ? 'text-gray-900' : 'text-gray-900/40'"
             >
               Forex
             </button>
@@ -323,15 +323,15 @@
               <div v-for="i in 6" :key="i" class="glass-card rounded-lg p-3 animate-pulse">
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2.5 flex-1 min-w-0">
-                    <div class="w-11 h-11 rounded-full bg-white/10 flex-shrink-0"></div>
+                    <div class="w-11 h-11 rounded-full bg-gray-100 flex-shrink-0"></div>
                     <div class="flex flex-col gap-2">
-                       <div class="h-4 bg-white/10 rounded w-16"></div>
-                       <div class="h-3 bg-white/10 rounded w-20"></div>
+                       <div class="h-4 bg-gray-100 rounded w-16"></div>
+                       <div class="h-3 bg-gray-100 rounded w-20"></div>
                     </div>
                   </div>
                   <div class="flex items-center gap-3 flex-shrink-0">
-                    <div class="h-5 bg-white/10 rounded w-20"></div>
-                    <div class="h-6 bg-white/10 rounded-full w-16"></div>
+                    <div class="h-5 bg-gray-100 rounded w-20"></div>
+                    <div class="h-6 bg-gray-100 rounded-full w-16"></div>
                   </div>
                 </div>
               </div>
@@ -342,13 +342,13 @@
               <div v-for="i in 8" :key="i" class="glass-card rounded-xl p-4 animate-pulse">
                 <div class="flex items-center justify-between mb-3">
                   <div class="flex items-center gap-2">
-                    <div class="w-12 h-12 rounded-full bg-white/10 flex-shrink-0"></div>
-                    <div class="h-4 bg-white/10 rounded w-16"></div>
+                    <div class="w-12 h-12 rounded-full bg-gray-100 flex-shrink-0"></div>
+                    <div class="h-4 bg-gray-100 rounded w-16"></div>
                   </div>
-                  <div class="h-6 bg-white/10 rounded-full w-16"></div>
+                  <div class="h-6 bg-gray-100 rounded-full w-16"></div>
                 </div>
-                <div class="h-8 bg-white/10 rounded w-32 mb-2"></div>
-                <div class="h-3 bg-white/10 rounded w-24"></div>
+                <div class="h-8 bg-gray-100 rounded w-32 mb-2"></div>
+                <div class="h-3 bg-gray-100 rounded w-24"></div>
               </div>
             </div>
           </div>
@@ -370,7 +370,7 @@
                       <!-- Quote Currency (Bottom Left) - UNDER -->
                       <img
                         :src="getQuoteLogo(ticker.symbol)"
-                        class="w-7 h-7 md:w-8 md:h-8 rounded-full absolute bottom-0 left-0 z-0 border border-white/20 opacity-95 brightness-110"
+                        class="w-7 h-7 md:w-8 md:h-8 rounded-full absolute bottom-0 left-0 z-0 border border-gray-300 opacity-95 brightness-110"
                       />
                       <!-- Base Currency (Top Right) - ON TOP -->
                       <img
@@ -381,8 +381,8 @@
                       />
                     </div>
                     <div class="flex flex-col min-w-0">
-                      <span class="text-sm font-semibold text-white truncate">{{ ticker.symbol.split('/')[0] }}</span>
-                      <span class="text-xs text-white/60">{{ $t('home.volume') }} {{ formatVolume(ticker.volume) }}</span>
+                      <span class="text-sm font-semibold text-gray-900 truncate">{{ ticker.symbol.split('/')[0] }}</span>
+                      <span class="text-xs text-gray-900/60">{{ $t('home.volume') }} {{ formatVolume(ticker.volume) }}</span>
                     </div>
                   </div>
                   
@@ -391,35 +391,29 @@
                     <div class="text-right">
                     <div
                       v-if="!ticker.isPlaceholder"
-                      class="text-base font-bold text-white leading-tight"
+                      class="text-base font-bold text-gray-900 leading-tight"
                     >
                       ${{ formatPrice(ticker.price) }}
                     </div>
                     <div
                       v-else
-                      class="h-4 bg-white/10 rounded w-16 animate-pulse"
+                      class="h-4 bg-gray-100 rounded w-16 animate-pulse"
                     ></div>
                     </div>
                     <span
                     v-if="!ticker.isPlaceholder"
                       :class="[
-                        'text-xs px-2 py-1 rounded-full font-medium whitespace-nowrap flex items-center gap-1',
+                        'text-xs font-semibold whitespace-nowrap flex items-center gap-0.5',
                         ticker.change >= 0 
-                          ? 'bg-green-500/20 text-green-300' 
-                          : 'bg-red-500/20 text-red-300'
+                          ? 'text-binance-green' 
+                          : 'text-binance-red'
                       ]"
                     >
-                      <svg v-if="ticker.change < 0" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                      </svg>
-                      <svg v-else class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-                      </svg>
                       {{ ticker.change >= 0 ? '+' : '' }}{{ ticker.change.toFixed(2) }}%
                     </span>
                     <div
                       v-else
-                      class="h-4 bg-white/10 rounded-full w-14 animate-pulse"
+                      class="h-4 bg-gray-100 rounded-full w-14 animate-pulse"
                     ></div>
                   </div>
                 </div>
@@ -440,7 +434,7 @@
                     <!-- Quote Currency (Bottom Left) - UNDER -->
                     <img
                       :src="getQuoteLogo(ticker.symbol)"
-                      class="w-8 h-8 rounded-full absolute bottom-0 left-0 z-0 border border-white/20 opacity-95 brightness-110"
+                      class="w-8 h-8 rounded-full absolute bottom-0 left-0 z-0 border border-gray-300 opacity-95 brightness-110"
                     />
                     <!-- Base Currency (Top Right) - ON TOP -->
                     <img
@@ -450,7 +444,7 @@
                       @error="handleImageError"
                     />
                   </div>
-                  <span class="text-sm font-semibold text-white">{{ ticker.symbol }}</span>
+                  <span class="text-sm font-semibold text-gray-900">{{ ticker.symbol }}</span>
                 </div>
                 <span
                   v-if="!ticker.isPlaceholder"
@@ -465,28 +459,28 @@
                 </span>
                 <div
                   v-else
-                  class="h-4 bg-white/10 rounded-full w-16 animate-pulse"
+                  class="h-4 bg-gray-100 rounded-full w-16 animate-pulse"
                 ></div>
               </div>
               <div
                 v-if="!ticker.isPlaceholder"
-                class="text-2xl font-bold text-white mb-1"
+                class="text-2xl font-bold text-gray-900 mb-1"
               >
                 ${{ formatPrice(ticker.price) }}
               </div>
               <div
                 v-else
-                class="h-5 bg-white/10 rounded w-24 mb-1 animate-pulse"
+                class="h-5 bg-gray-100 rounded w-24 mb-1 animate-pulse"
               ></div>
               <div
                 v-if="!ticker.isPlaceholder"
-                class="text-xs text-white/60"
+                class="text-xs text-gray-900/60"
               >
                 {{ $t('home.volume') }}: {{ formatVolume(ticker.volume) }}
               </div>
               <div
                 v-else
-                class="h-3 bg-white/10 rounded w-24 animate-pulse"
+                class="h-3 bg-gray-100 rounded w-24 animate-pulse"
               ></div>
             </div>
           </div>

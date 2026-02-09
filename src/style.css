@@ -9,14 +9,16 @@
 }
 
 :root {
-  --bg-color: #000000;
+  --bg-color: #f0f2f5;
+  /* Soft Gray background */
 }
 
 body {
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: var(--bg-color);
   background-attachment: fixed;
-  color: #ffffff;
+  color: #323233;
+  /* Dark text */
   overflow-x: hidden;
   min-height: 100vh;
 }
@@ -25,86 +27,80 @@ body {
   min-height: 100vh;
 }
 
-/* Glass Morphism */
+/* White UI Card Styles (Replacing Glass) */
 .glass {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  background: #fafafa;
+  border: 1px solid #ebedf0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .glass-dark {
-  background: rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  background: #f9fafb;
+  border: 1px solid #ebedf0;
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  background: #fafafa;
+  border: 1px solid #ebedf0;
+  box-shadow: 0 4px 12px rgba(100, 101, 102, 0.08);
+  /* Soft shadow */
   transition: all 0.3s ease;
+  border-radius: 12px;
+  /* iOS style rounded corners */
 }
 
 .glass-card:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.3);
+  background: #fafafa;
+  border-color: #dcdee0;
   transform: translateY(-2px);
-  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5);
+  box-shadow: 0 8px 20px rgba(100, 101, 102, 0.12);
 }
 
 .glass-card-no-hover {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  background: #fafafa;
+  border: 1px solid #ebedf0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border-radius: 12px;
 }
 
 .glass-input {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: white;
+  background: #f9fafb;
+  border: 1px solid #ebedf0;
+  color: #323233;
+  border-radius: 8px;
 }
 
 .glass-input:focus {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.4);
+  background: #ffffff;
+  border-color: #1989fa;
+  /* Vant Blue */
   outline: none;
 }
 
 .glass-button {
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: #fafafa;
+  border: 1px solid #ebedf0;
+  color: #323233;
   transition: all 0.3s ease;
+  font-weight: 600;
 }
 
 .glass-button:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: #f2f3f5;
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 /* Glass button without hover motion (used for auth pages) */
 .glass-button-no-hover {
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: #fafafa;
+  border: 1px solid #ebedf0;
+  color: #323233;
   transition: all 0.2s ease;
 }
 
 .glass-button-no-hover:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: #f2f3f5;
   transform: none;
   box-shadow: none;
 }

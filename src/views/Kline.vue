@@ -1,18 +1,18 @@
 <template>
   <div class="min-h-screen">
     <!-- Top Header Section -->
-    <div class="bg-gray-800/80 backdrop-blur-md border-b border-white/10 sticky top-0 z-10">
+    <div class="bg-[#fafafa]/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-10">
       <div class="px-3 py-2">
         <div class="flex items-center gap-2 mb-2">
           <button
             @click="$router.back()"
-            class="p-1.5 hover:bg-gray-700 rounded-lg transition-colors"
+            class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
           >
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <h1 class="text-base font-bold text-white flex-1 text-center">{{ selectedSymbol }}</h1>
+          <h1 class="text-base font-bold text-gray-900 flex-1 text-center">{{ selectedSymbol }}</h1>
           <div class="w-8"></div> <!-- Spacer for centering -->
         </div>
         
@@ -49,15 +49,15 @@
           <div class="text-right text-xs space-y-1">
             <div class="flex items-center justify-end gap-2">
               <span class="text-gray-400">{{ t('kline.high') }}</span>
-              <span class="text-white font-medium">{{ formatPrice(ticker?.highPrice || 0) }}</span>
+              <span class="text-gray-900 font-medium">{{ formatPrice(ticker?.highPrice || 0) }}</span>
             </div>
             <div class="flex items-center justify-end gap-2">
               <span class="text-gray-400">{{ t('kline.low') }}</span>
-              <span class="text-white font-medium">{{ formatPrice(ticker?.lowPrice || 0) }}</span>
+              <span class="text-gray-900 font-medium">{{ formatPrice(ticker?.lowPrice || 0) }}</span>
             </div>
             <div class="flex items-center justify-end gap-2">
               <span class="text-gray-400">{{ t('kline.volume24h') }}</span>
-              <span class="text-white font-medium">{{ formatVolume(ticker?.volume || 0) }}</span>
+              <span class="text-gray-900 font-medium">{{ formatVolume(ticker?.volume || 0) }}</span>
             </div>
           </div>
         </div>
@@ -67,7 +67,7 @@
     <main class="pb-20">
         <div class="px-4">
           <!-- Timeframe Selection -->
-          <div class="flex gap-4 overflow-x-auto scrollbar-hide border-b border-white/10">
+          <div class="flex gap-4 overflow-x-auto scrollbar-hide border-b border-gray-200">
             <button
               v-for="interval in intervals"
               :key="interval"
@@ -99,17 +99,17 @@
 
         <!-- Market Trades -->
         <div v-if="isLoading" class="glass-card-no-hover rounded-none md:rounded-xl p-4 mb-4 mx-0 md:mx-4">
-          <div class="h-6 bg-white/10 rounded w-32 mb-3 animate-pulse"></div>
+          <div class="h-6 bg-gray-100 rounded w-32 mb-3 animate-pulse"></div>
           <div class="space-y-2">
             <SkeletonLoader v-for="i in 10" :key="i" type="table-row" />
           </div>
         </div>
         <div v-else class="glass-card-no-hover rounded-none md:rounded-xl p-4 mb-4 mx-0 md:mx-4">
-            <h3 class="font-bold text-white mb-3">{{ t('kline.marketTrades') }}</h3>
+            <h3 class="font-bold text-gray-900 mb-3">{{ t('kline.marketTrades') }}</h3>
             <div class="overflow-x-auto">
               <table class="w-full text-sm">
                 <thead>
-                  <tr class="text-gray-400 border-b border-white/10">
+                  <tr class="text-gray-400 border-b border-gray-200">
                     <th class="text-left py-2 px-2">{{ t('kline.time') }}</th>
                     <th class="text-left py-2 px-2">Direction</th>
                     <th class="text-left py-2 px-2">{{ t('kline.price') }}</th>
@@ -120,7 +120,7 @@
                   <tr
                     v-for="trade in recentTrades.slice(0, 20)"
                     :key="trade.id"
-                    class="border-b border-white/5"
+                    class="border-b border-gray-100"
                   >
                     <td class="py-2 px-2 text-gray-300">{{ formatTime(trade.time) }}</td>
                     <td 
@@ -155,17 +155,17 @@
       </main>
 
       <!-- Fixed Bottom Navigation Buttons -->
-      <div class="fixed bottom-0 left-0 right-0 bg-gray-800/80 backdrop-blur-md border-t border-white/10 px-3 py-2 z-20">
+      <div class="fixed bottom-0 left-0 right-0 bg-[#fafafa]/80 backdrop-blur-md border-t border-gray-200 px-3 py-2 z-20">
         <div class="grid grid-cols-2 gap-3 max-w-md mx-auto">
           <button
             @click="handleQuickAction('buy')"
-            class="bg-green-500 hover:bg-green-600 active:bg-green-700 text-white font-bold py-2.5 rounded-lg text-base transition-colors shadow-lg"
+            class="bg-green-500 hover:bg-green-600 active:bg-green-700 text-gray-900 font-bold py-2.5 rounded-lg text-base transition-colors shadow-lg"
           >
             Up
           </button>
           <button
             @click="handleQuickAction('sell')"
-            class="bg-red-500 hover:bg-red-600 active:bg-red-700 text-white font-bold py-2.5 rounded-lg text-base transition-colors shadow-lg"
+            class="bg-red-500 hover:bg-red-600 active:bg-red-700 text-gray-900 font-bold py-2.5 rounded-lg text-base transition-colors shadow-lg"
           >
             Fall
           </button>
@@ -213,6 +213,7 @@ const symbols = ref([
   
   // Metals
   'XAU/USD', 'XAG/USD', 'XPT/USD', 'XPD/USD',
+  'XAU/USDT', 'XAG/USDT', 'XPT/USDT', 'XPD/USDT',
   
   // Forex
   'AUD/USD', 'BRL/USD', 'CAD/USD', 'CHF/USD', 'CNY/USD', 'CZK/USD', 'DKK/USD',
@@ -234,6 +235,8 @@ const getDefaultSymbol = () => {
     if (s.endsWith('USDT')) {
       const withSlash = s.replace(/USDT$/, '/USDT');
       if (symbols.value.includes(withSlash)) return withSlash;
+      // Allow it even if not in list, if it looks like a valid pair
+      return withSlash;
     }
     
     // 3. Try adding slash for forex/metals (GBPUSD -> GBP/USD, XAUUSD -> XAU/USD)
@@ -247,6 +250,9 @@ const getDefaultSymbol = () => {
        const withSlash = s.replace(/USD$/, '/USD');
        if (symbols.value.includes(withSlash)) return withSlash;
     }
+
+    // 5. Fallback: if it has a slash, just return it
+    if (s.includes('/')) return s;
   }
   return symbols.value[0];
 };
@@ -263,7 +269,7 @@ const getDefaultInterval = (symbol) => {
   if (symbol.endsWith('USDT')) return '1min';
   
   // Metal check (XAU, XAG, XPT, XPD)
-  if (['XAU/USD', 'XAG/USD', 'XPT/USD', 'XPD/USD'].includes(symbol)) return '1min';
+  if (['XAU/USD', 'XAG/USD', 'XPT/USD', 'XPD/USD', 'XAU/USDT', 'XAG/USDT', 'XPT/USDT', 'XPD/USDT'].includes(symbol)) return '1min';
   
   // Default to Realtime for Forex
   return 'Realtime';
@@ -569,7 +575,7 @@ const calculateMA = (data, period) => {
 const initChart = () => {
   if (!chartContainer.value) return;
   
-  chart = echarts.init(chartContainer.value, 'dark');
+  chart = echarts.init(chartContainer.value);
   
   // Set up resize observer
   resizeObserver = new ResizeObserver(() => {

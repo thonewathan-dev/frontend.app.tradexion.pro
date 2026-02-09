@@ -29,17 +29,10 @@ export const useSettingsStore = defineStore('settings', {
             }
         },
         applyTheme() {
-            // Apply gradient if both colors are set, otherwise use solid color
-            if (this.gradientColor1 && this.gradientColor2) {
-                const gradient = `linear-gradient(${this.gradientAngle}deg, ${this.gradientColor1}, ${this.gradientColor2})`;
-                document.documentElement.style.setProperty('--bg-color', 'transparent');
-                document.body.style.background = gradient;
-                document.body.style.backgroundAttachment = 'fixed';
-            } else {
-                document.documentElement.style.setProperty('--bg-color', this.themeColor);
-                document.body.style.background = this.themeColor;
-                document.body.style.backgroundAttachment = 'fixed';
-            }
+            // Theme is now static white/light theme as requested.
+            // Database settings for background color are ignored.
+            // document.documentElement.style.setProperty('--bg-color', '#ffffff');
+            // document.body.style.background = '#ffffff';
         }
     }
 });

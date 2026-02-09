@@ -35,6 +35,7 @@ import App from './App.vue';
 import router from './router';
 import i18n from './i18n';
 import './style.css';
+import 'vant/lib/index.css';
 import { registerServiceWorker } from './utils/pwa.js';
 
 const app = createApp(App);

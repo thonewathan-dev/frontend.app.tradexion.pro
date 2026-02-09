@@ -6,15 +6,15 @@
 
       <main class="flex-1 pb-16 md:pb-0">
         <!-- Header (same style as flash exchange) -->
-        <div class="glass-card-no-hover border-b border-white/10 px-4 py-3 mb-4">
+        <div class="glass-card-no-hover border-b border-gray-200 px-4 py-3 mb-4">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <button @click="goBack" class="p-1.5 hover:bg-white/10 rounded-lg transition-colors">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <button @click="goBack" class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+                <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
-              <h1 class="text-lg font-bold text-white">Contract account</h1>
+              <h1 class="text-lg font-bold text-gray-900">Contract account</h1>
             </div>
           </div>
         </div>
@@ -23,8 +23,8 @@
       <!-- Estimated Total Value -->
       <section class="mb-6">
         <div class="flex items-center justify-between mb-1">
-          <span class="text-xs text-white/60">Est. Total Value</span>
-          <button class="text-white/60 hover:text-white transition-colors" @click="toggleValues">
+          <span class="text-xs text-gray-900/60">Est. Total Value</span>
+          <button class="text-gray-900/60 hover:text-gray-900 transition-colors" @click="toggleValues">
             <svg v-if="showValues" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 stroke-linecap="round"
@@ -50,13 +50,13 @@
           </button>
         </div>
         <div class="flex items-baseline gap-2">
-          <span class="text-3xl font-semibold text-white">
-            <span v-if="isLoading" class="inline-block h-7 w-24 rounded bg-white/10 animate-pulse"></span>
+          <span class="text-3xl font-semibold text-gray-900">
+            <span v-if="isLoading" class="inline-block h-7 w-24 rounded bg-gray-100 animate-pulse"></span>
             <span v-else>
               {{ showValues ? formatFiat(totalValueUSDT) : '******' }}
             </span>
           </span>
-          <span class="text-sm text-white/70">USDT</span>
+          <span class="text-sm text-gray-900/70">USDT</span>
         </div>
       </section>
 
@@ -64,19 +64,19 @@
       <section class="mb-8">
         <div class="grid grid-cols-3 gap-3">
           <button
-            class="glass-button-no-hover rounded-xl py-2.5 text-sm font-medium text-white"
+            class="glass-button-no-hover rounded-xl py-2.5 text-sm font-medium text-gray-900"
             @click="goDeposit"
           >
             Deposit
           </button>
           <button
-            class="glass-button-no-hover rounded-xl py-2.5 text-sm font-medium text-white/80"
+            class="glass-button-no-hover rounded-xl py-2.5 text-sm font-medium text-gray-900/80"
             @click="goTrade"
           >
             Trade
           </button>
           <button
-            class="glass-button-no-hover rounded-xl py-2.5 text-sm font-medium text-white/80"
+            class="glass-button-no-hover rounded-xl py-2.5 text-sm font-medium text-gray-900/80"
             @click="$router.push('/transfer')"
           >
             Transfer
@@ -86,24 +86,24 @@
 
       <!-- Balances (no outer card) -->
       <section class="space-y-2">
-        <h2 class="text-base font-semibold text-white mb-1">Balances</h2>
+        <h2 class="text-base font-semibold text-gray-900 mb-1">Balances</h2>
         <!-- Loader skeleton while balances are loading -->
         <div v-if="isLoading" class="space-y-2">
           <div
             v-for="i in 3"
             :key="i"
-            class="px-3 py-3 rounded-xl flex items-center justify-between bg-white/5"
+            class="px-3 py-3 rounded-xl flex items-center justify-between bg-gray-50"
           >
             <div class="flex items-center gap-3">
-              <div class="w-7 h-7 rounded-full bg-white/10 animate-pulse"></div>
+              <div class="w-7 h-7 rounded-full bg-gray-100 animate-pulse"></div>
               <div class="space-y-1">
-                <div class="h-3 w-14 bg-white/10 rounded animate-pulse"></div>
-                <div class="h-2 w-20 bg-white/5 rounded animate-pulse"></div>
+                <div class="h-3 w-14 bg-gray-100 rounded animate-pulse"></div>
+                <div class="h-2 w-20 bg-gray-50 rounded animate-pulse"></div>
               </div>
             </div>
             <div class="text-right space-y-1">
-              <div class="h-3 w-16 bg-white/10 rounded animate-pulse"></div>
-              <div class="h-2 w-20 bg-white/5 rounded animate-pulse"></div>
+              <div class="h-3 w-16 bg-gray-100 rounded animate-pulse"></div>
+              <div class="h-2 w-20 bg-gray-50 rounded animate-pulse"></div>
             </div>
           </div>
         </div>
@@ -112,20 +112,20 @@
           v-else
           v-for="asset in assets"
           :key="asset.symbol"
-          class="px-3 py-3 rounded-xl flex items-center justify-between bg-white/5 hover:bg-white/10 transition-colors"
+          class="px-3 py-3 rounded-xl flex items-center justify-between bg-gray-50 hover:bg-gray-100 transition-colors"
         >
           <div class="flex items-center gap-3">
             <img :src="coinLogo(asset.symbol)" :alt="asset.symbol" class="w-7 h-7 object-contain" />
             <div class="flex flex-col">
-              <span class="text-sm font-medium text-white">{{ asset.symbol }}</span>
-              <span class="text-xs text-white/60">{{ asset.name }}</span>
+              <span class="text-sm font-medium text-gray-900">{{ asset.symbol }}</span>
+              <span class="text-xs text-gray-900/60">{{ asset.name }}</span>
             </div>
           </div>
           <div class="text-right">
-            <div class="text-sm font-medium text-white">
+            <div class="text-sm font-medium text-gray-900">
               {{ showValues ? formatWalletBalance(getAvailable(asset.symbol)) : '******' }}
             </div>
-            <div class="text-[11px] text-white/50">
+            <div class="text-[11px] text-gray-900/50">
               ≈ {{ showValues ? formatFiat(getAvailable(asset.symbol) * priceInUSDT(asset.symbol)) : '****' }} USDT
             </div>
           </div>
