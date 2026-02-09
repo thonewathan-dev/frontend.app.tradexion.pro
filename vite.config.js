@@ -22,7 +22,7 @@ export default defineConfig({
       'admin.tradexion.pro',
       'backend.tradexion.pro',
       'app.tradexion.pro',
-      'backend.app.tradexion.pro',
+      'be.app.tradexion.pro',
       'admin.app.tradexion.pro',
     ],
     strictPort: false,
@@ -42,7 +42,7 @@ export default defineConfig({
       'admin.tradexion.pro',
       'backend.tradexion.pro',
       'app.tradexion.pro',
-      'backend.app.tradexion.pro',
+      'be.app.tradexion.pro',
       'admin.app.tradexion.pro',
     ],
     // Disable local network access to prevent permission prompt
