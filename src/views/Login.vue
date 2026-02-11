@@ -1,15 +1,15 @@
-<template>
-  <div class="min-h-[100dvh] overflow-hidden text-gray-900 flex flex-col">
+﻿<template>
+  <div class="min-h-[100dvh] overflow-hidden text-white flex flex-col">
     <!-- Top bar -->
-    <div class="sticky top-0 z-10 glass-card-no-hover border-b border-gray-200">
+    <div class="sticky top-0 z-10 bg-[#181A20] border-b border-gray-800">
       <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <img :src="logoMarkUrl" alt="TradeXion" class="w-7 h-7 object-contain" />
-          <span class="font-semibold tracking-tight text-gray-900">TradeXion</span>
-        </div>
+        <router-link to="/" class="flex items-center gap-2 group">
+          <img :src="logoMarkUrl" alt="TrustXGlobal" class="w-7 h-7 object-contain" />
+          <span class="font-semibold tracking-tight text-white group-hover:text-binance-yellow transition-colors">TrustXGlobal</span>
+        </router-link>
         <router-link
           to="/register"
-          class="px-4 py-1.5 rounded-full text-sm font-semibold glass-button-no-hover text-gray-900 border border-gray-300 hover:border-white/30 transition-colors"
+          class="px-4 py-1.5 rounded-full text-sm font-bold bg-binance-yellow text-binance-black hover:bg-opacity-90 transition-colors shadow-lg shadow-binance-yellow/10"
         >
           {{ t('auth.register') }}
         </router-link>
@@ -25,42 +25,27 @@
 
         <!-- Right: login form -->
         <div class="min-w-0">
-          <h1 class="text-2xl md:text-3xl font-bold tracking-tight mb-3 text-gray-900">Log In</h1>
+          <h1 class="text-2xl md:text-3xl font-bold tracking-tight mb-3 text-white">Log In</h1>
 
-      <!-- Tabs -->
-      <div class="flex gap-6 text-sm font-semibold mb-3">
-        <button
-          type="button"
-          class="pb-2 border-b-2 transition-colors"
-          :class="loginMode === 'email' ? 'border-white text-gray-900' : 'border-transparent text-gray-900/50 hover:text-gray-900/80'"
-          @click="setMode('email')"
-        >
-          Email
-        </button>
-        <button
-          type="button"
-          class="pb-2 border-b-2 transition-colors"
-          :class="loginMode === 'phone' ? 'border-white text-gray-900' : 'border-transparent text-gray-900/50 hover:text-gray-900/80'"
-          @click="setMode('phone')"
-        >
-          Phone
-        </button>
+      <!-- Title removed tabs -->
+      <div class="mb-4">
+        <h2 class="text-sm font-bold text-white border-b-2 border-binance-yellow pb-2 w-fit">Email Login</h2>
       </div>
 
       <!-- Alerts shown via top Toast -->
 
       <!-- Card -->
-      <div class="glass-card-no-hover rounded-xl border border-white/12 p-3">
-        <!-- EMAIL MODE -->
-        <form v-if="loginMode === 'email'" @submit.prevent="onPrimaryAction" class="space-y-2.5">
+      <div class="glass-card-no-hover rounded-xl border border-white/10 p-4 bg-white/[0.02]">
+        <!-- EMAIL ONLY MODE -->
+        <form @submit.prevent="onPrimaryAction" class="space-y-2.5">
           <!-- Step 1: identifier -->
           <div v-if="step === 'identifier'" class="space-y-2.5">
-            <label class="block text-xs text-gray-900/80 font-medium">Email</label>
+            <label class="block text-xs text-white/70 font-medium">Email</label>
             <input
               v-model.trim="email"
               type="email"
               autocomplete="email"
-              class="w-full px-3 py-2.5 text-sm glass-input rounded-lg text-gray-900 placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+              class="w-full px-4 py-3 text-sm rounded-lg border border-white/10 bg-white/5 text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-binance-yellow/40 transition-all focus:bg-white/10"
               placeholder="Email"
               required
             />
@@ -68,7 +53,7 @@
             <button
               type="submit"
               :disabled="loading || !canGoNext"
-              class="w-full py-2.5 text-sm rounded-full font-semibold glass-button-no-hover text-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-gray-300"
+              class="w-full py-2.5 text-sm rounded-full font-bold bg-binance-yellow text-binance-black hover:bg-opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-binance-yellow/10"
             >
               Next
             </button>
@@ -79,96 +64,68 @@
             <div class="flex items-center gap-2 mb-1.5">
               <button
                 type="button"
-                class="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+                class="p-1 hover:bg-gray-700 rounded-lg transition-colors"
                 @click="backToIdentifier"
                 aria-label="Back"
               >
-                <svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                 </svg>
               </button>
-              <div class="flex-1 text-center text-xs font-semibold text-gray-900 truncate px-2">Log In</div>
+              <div class="flex-1 text-center text-xs font-semibold text-white truncate px-2">Log In</div>
               <div class="w-7"></div>
             </div>
 
-            <label class="block text-xs text-gray-900/80 font-medium">Email</label>
+            <label class="block text-xs text-white/70 font-medium">Email</label>
             <input
               :value="email"
               type="email"
               autocomplete="email"
               readonly
-              class="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 bg-gray-50 text-gray-900/80 placeholder-white/40 focus:outline-none"
+              class="w-full px-4 py-3 text-sm rounded-lg border border-white/10 bg-white/5 text-white placeholder-white/30 focus:outline-none focus:bg-white/10"
             />
 
-            <label class="block text-xs text-gray-900/80 font-medium">Password</label>
+            <label class="block text-xs text-white/70 font-medium">Password</label>
             <input
               v-model="password"
               type="password"
               autocomplete="current-password"
-              class="w-full px-3 py-2.5 text-sm glass-input rounded-lg text-gray-900 placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+              class="w-full px-4 py-3 text-sm rounded-lg border border-white/10 bg-white/5 text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-binance-yellow/40 transition-all focus:bg-white/10"
               placeholder="Password"
               required
             />
 
             <div class="flex justify-end">
-              <router-link to="/forgot-password" class="text-xs font-semibold text-gray-900/80 hover:text-gray-900">
+              <router-link to="/forgot-password" class="text-xs font-semibold text-gray-400 hover:text-white">
                 Forgot password
               </router-link>
             </div>
 
-            <!-- Turnstile only when we actually submit credentials -->
-            <div class="flex justify-center pt-1">
-              <div v-show="step === 'password'" ref="turnstileWidget" id="turnstile-widget-login"></div>
-            </div>
 
+            <!-- Submit Button (captcha removed from here) -->
             <button
               type="submit"
-              :disabled="loading || !turnstileToken || !password"
-              class="w-full py-2.5 text-sm rounded-full font-semibold glass-button-no-hover text-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-gray-300"
+              :disabled="loading || !password"
+              class="w-full py-2.5 text-sm rounded-full font-bold bg-binance-yellow text-binance-black hover:bg-opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-binance-yellow/10"
             >
               {{ loading ? t('auth.loggingIn') : 'Log In' }}
             </button>
           </div>
         </form>
-
-        <!-- PHONE MODE -->
-        <form v-else @submit.prevent="handlePhoneLogin" class="space-y-2.5">
-          <label class="block text-xs text-gray-900/80 font-medium">Phone</label>
-          <div class="flex items-center gap-2 rounded-lg border border-white/15 bg-gray-50 px-3 py-2 text-sm focus-within:ring-2 focus-within:ring-white/20 focus-within:border-white/25">
-            <div class="text-gray-900/70 text-sm font-semibold">+</div>
-            <input
-              v-model.trim="phone"
-              type="tel"
-              inputmode="tel"
-              autocomplete="tel"
-              class="flex-1 bg-transparent outline-none text-sm text-gray-900 placeholder-white/40"
-              placeholder="Enter phone number"
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            :disabled="loading || !phone"
-            class="w-full py-2.5 text-sm rounded-full font-semibold glass-button-no-hover text-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-gray-300"
-          >
-            Next
-          </button>
-        </form>
       </div>
 
       <!-- Divider -->
       <div class="my-3 flex items-center gap-3">
-        <div class="h-px flex-1 bg-[#fafafa]/15"></div>
-        <div class="text-xs text-gray-900/60">Or</div>
-        <div class="h-px flex-1 bg-[#fafafa]/15"></div>
+        <div class="h-px flex-1 bg-gray-700"></div>
+        <div class="text-xs text-white/40">Or</div>
+        <div class="h-px flex-1 bg-gray-700"></div>
       </div>
 
       <!-- Google button -->
       <button
         type="button"
         @click="loginWithGoogle"
-        class="w-full py-2.5 text-sm rounded-lg glass-card-no-hover border border-white/12 hover:border-gray-300 transition-colors flex items-center justify-center gap-2 font-semibold text-gray-900"
+        class="w-full py-2.5 text-sm rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-all flex items-center justify-center gap-2 font-bold text-white"
       >
         <svg class="w-4 h-4" viewBox="0 0 24 24">
           <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -179,8 +136,8 @@
         Continue with Google
       </button>
 
-      <div class="mt-3 mb-4 mb-safe text-center text-xs text-gray-900/70">
-        <router-link to="/register" class="font-semibold text-gray-900 hover:text-gray-900/80">Create a TradeXion Account</router-link>
+      <div class="mt-3 mb-4 mb-safe text-center text-xs text-white/60">
+        <router-link to="/register" class="font-bold text-white hover:text-binance-yellow transition-colors">Create a TrustXGlobal Account</router-link>
       </div>
         </div>
       </div>
@@ -191,25 +148,47 @@
     <!-- "Invalid user" modal -->
     <div v-if="showInvalidUserModal" class="fixed inset-0 z-50 flex items-center justify-center px-4">
       <div class="absolute inset-0 bg-black/40" @click="showInvalidUserModal = false"></div>
-      <div class="relative w-full max-w-sm glass-card-no-hover rounded-xl border border-white/12 p-4">
-        <div class="text-sm text-gray-900/80 leading-relaxed">
+      <div class="relative w-full max-w-sm glass-card-no-hover rounded-xl border border-gray-200 p-4 bg-white shadow-2xl">
+        <div class="text-sm text-slate-700 leading-relaxed">
           We can't find this account. Please click "Confirm" to sign up and log in now.
         </div>
         <div class="mt-4 flex gap-3">
           <button
             type="button"
-            class="flex-1 py-2.5 rounded-full border border-white/15 text-gray-900/80 font-semibold hover:bg-gray-100"
+            class="flex-1 py-2.5 rounded-full border border-slate-200 text-slate-600 font-semibold hover:bg-slate-50"
             @click="showInvalidUserModal = false"
           >
             Cancel
           </button>
           <button
             type="button"
-            class="flex-1 py-2.5 rounded-full glass-button-no-hover text-gray-900 font-semibold border border-gray-300"
+            class="flex-1 py-2.5 rounded-full bg-binance-yellow text-binance-black font-bold shadow-lg shadow-binance-yellow/10"
             @click="goRegisterFromModal"
           >
             Confirm
           </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Security Verification Modal -->
+    <div v-if="showCaptchaModal" class="fixed inset-0 z-[60] flex items-center justify-center px-4">
+      <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="closeCaptchaModal"></div>
+      <div class="relative w-full max-w-sm glass-card-no-hover rounded-2xl border border-white/10 p-6 bg-[#1e2329] shadow-2xl transform transition-all scale-100">
+        <button 
+          @click="closeCaptchaModal"
+          class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        
+        <h3 class="text-lg font-bold text-white mb-2 text-center">Security Verification</h3>
+        <p class="text-sm text-gray-400 mb-6 text-center">Please complete the challenge below to continue.</p>
+        
+        <div class="flex justify-center min-h-[65px]">
+          <div id="turnstile-widget-login"></div>
         </div>
       </div>
     </div>
@@ -237,59 +216,51 @@ const turnstileToken = ref('');
 let turnstileWidgetId = null;
 
 const logoMarkUrl = new URL('../assets/logo/Logo-Only.png', import.meta.url).href;
-const year = new Date().getFullYear();
 
 const email = ref('');
 const password = ref('');
 const error = ref('');
 const loading = ref(false);
-const phone = ref('');
 
-const loginMode = ref('email'); // 'email' | 'phone'
+const loginMode = ref('email');
 const step = ref('identifier'); // 'identifier' | 'password'
 const showInvalidUserModal = ref(false);
+const showCaptchaModal = ref(false);
 
 const canGoNext = computed(() => {
   const v = email.value.trim();
-  // simple, strict-enough email check for UI gating; backend is final authority
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-});
-
-
-const displayIdentifier = computed(() => {
-  const v = email.value.trim();
-  if (!v) return '';
-  // show a short identifier (like Gate)
-  if (v.length <= 22) return v;
-  return `${v.slice(0, 10)}…${v.slice(-8)}`;
 });
 
 const initTurnstile = () => {
   if (!window.turnstile) return;
-  if (turnstileWidgetId) return; // already rendered
-  if (step.value !== 'password') return;
-  if (!turnstileWidget.value) return;
-
-  turnstileWidgetId = window.turnstile.render('#turnstile-widget-login', {
-    sitekey: TURNSTILE_SITE_KEY,
-    callback: (token) => {
-      turnstileToken.value = token;
-    },
-    'error-callback': () => {
-      turnstileToken.value = '';
-    },
-    'expired-callback': () => {
-      turnstileToken.value = '';
-    },
+  if (turnstileWidgetId) return;
+  // Ensure DOM is ready
+  nextTick(() => {
+    const el = document.getElementById('turnstile-widget-login');
+    if (!el) return;
+    
+    turnstileWidgetId = window.turnstile.render('#turnstile-widget-login', {
+      sitekey: TURNSTILE_SITE_KEY,
+      callback: (token) => {
+        turnstileToken.value = token;
+        // Auto-submit when captcha is passed
+        finishLogin();
+      },
+      'error-callback': () => {
+        turnstileToken.value = '';
+      },
+      'expired-callback': () => {
+        turnstileToken.value = '';
+      },
+    });
   });
 };
 
 const resetTurnstile = () => {
-  if (!turnstileWidgetId || !window.turnstile) {
-    turnstileToken.value = '';
-    return;
+  if (turnstileWidgetId && window.turnstile) {
+    window.turnstile.reset(turnstileWidgetId);
   }
-  window.turnstile.reset(turnstileWidgetId);
   turnstileToken.value = '';
 };
 
@@ -302,57 +273,21 @@ const removeTurnstile = () => {
 };
 
 onMounted(() => {
-  // Prefill email from query params (e.g., from password reset)
   const emailParam = route.query.email;
   if (emailParam && typeof emailParam === 'string') {
     email.value = emailParam;
   }
-
-  // Turnstile is only needed on password step; we still watch for script load
-  if (window.turnstile) return;
-  const checkTurnstile = setInterval(() => {
-    if (window.turnstile) {
-      clearInterval(checkTurnstile);
-      // if user is already on password step, render now
-      nextTick().then(() => initTurnstile());
-    }
-  }, 100);
-
-  setTimeout(() => {
-    clearInterval(checkTurnstile);
-  }, 8000);
 });
 
 onUnmounted(() => {
   removeTurnstile();
 });
 
-watch(
-  () => step.value,
-  async (v) => {
-    if (v !== 'password') {
-      removeTurnstile();
-      return;
-    }
-    await nextTick();
-    initTurnstile();
-  }
-);
-
-const setMode = (mode) => {
-  loginMode.value = mode;
-  error.value = '';
-  loading.value = false;
-  password.value = '';
-  phone.value = '';
-  step.value = 'identifier';
-  removeTurnstile();
-};
-
 const backToIdentifier = () => {
   step.value = 'identifier';
   password.value = '';
   error.value = '';
+  showCaptchaModal.value = false;
   removeTurnstile();
 };
 
@@ -361,48 +296,52 @@ const onPrimaryAction = async () => {
     error.value = '';
     if (!canGoNext.value) return;
     step.value = 'password';
-    await nextTick();
-    initTurnstile();
     return;
   }
 
-  await handleLogin();
+  // If on password step, user clicked "Log In"
+  // Show Captcha Modal
+  openCaptchaModal();
 };
 
-const handleLogin = async () => {
-  if (!turnstileToken.value) {
-    if (typeof window !== 'undefined' && window.__toast?.error) {
-      window.__toast.error('Please complete the CAPTCHA verification');
-    }
-    return;
-  }
+const openCaptchaModal = async () => {
+  if (!password.value) return;
+  showCaptchaModal.value = true;
+  await nextTick();
+  // Small delay to ensure transition fits
+  setTimeout(initTurnstile, 100);
+};
+
+const closeCaptchaModal = () => {
+  showCaptchaModal.value = false;
+  resetTurnstile();
+  removeTurnstile(); // Fully remove so we can re-render fresh
+};
+
+const finishLogin = async () => {
+  if (!turnstileToken.value) return;
 
   error.value = '';
   loading.value = true;
+  // Keep modal open while loading, or close it? 
+  // Better to keep it or show loading state inside it.
+  // For now, let's keep it open but show loading.
 
   const result = await authStore.login(email.value.trim(), password.value, turnstileToken.value);
 
   if (result.success) {
-    resetTurnstile();
+    closeCaptchaModal();
     router.push('/');
   } else {
+    loading.value = false;
     error.value = result.error;
     if (typeof window !== 'undefined' && window.__toast?.error) {
       window.__toast.error(result.error || 'Login failed');
     }
-    // Only show signup modal for specific "account not found" errors, not for wrong password
-    // Since backend returns "Invalid credentials" for both cases, we don't show the modal
-    // to avoid confusing users who just entered the wrong password
+    // Reset captcha on failure so user can try again
     resetTurnstile();
-  }
-
-  loading.value = false;
-};
-
-const handlePhoneLogin = async () => {
-  // Phone login is disabled - show message like register page
-  if (typeof window !== 'undefined' && window.__toast?.info) {
-    window.__toast.info('Phone login is not available yet. Please use Email.');
+    // Optional: close modal on error
+    // closeCaptchaModal(); 
   }
 };
 
@@ -411,16 +350,11 @@ const goRegisterFromModal = () => {
   router.push({ path: '/register', query: { email: email.value.trim() } });
 };
 
-
 const loginWithGoogle = () => {
-  // Get API URL from config utility
   const apiUrl = getApiUrl();
-  
-  // Construct OAuth URL - API URL already includes /api
   const oauthUrl = apiUrl.endsWith('/api') 
     ? `${apiUrl}/auth/google`
     : `${apiUrl}/api/auth/google`;
-  
   window.location.href = oauthUrl;
 };
 </script>

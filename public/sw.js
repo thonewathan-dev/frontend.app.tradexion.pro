@@ -1,9 +1,9 @@
-// Service Worker for TradeXion PWA
+﻿// Service Worker for TrustXGlobal PWA
 // Version: 1.1.0
 // IMPORTANT: Avoid caching HTML app-shell aggressively. If a dev build (Vite/HMR)
 // ever gets cached as HTML, users can get stuck in reload loops until they clear site data.
-const CACHE_NAME = 'tradexion-v2';
-const RUNTIME_CACHE = 'tradexion-runtime-v2';
+const CACHE_NAME = 'TrustXGlobal-v2';
+const RUNTIME_CACHE = 'TrustXGlobal-runtime-v2';
 
 // Assets to cache immediately on install
 const STATIC_ASSETS = [
@@ -141,3 +141,4 @@ self.addEventListener('message', (event) => {
     );
   }
 });
+

@@ -1,11 +1,11 @@
-<template>
+﻿<template>
   <div class="min-h-[100dvh] overflow-hidden text-gray-900 flex flex-col">
     <!-- Top bar -->
     <div class="sticky top-0 z-10 glass-card-no-hover border-b border-gray-200">
       <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <img :src="logoMarkUrl" alt="TradeXion" class="w-7 h-7 object-contain" />
-          <span class="font-semibold tracking-tight text-gray-900">TradeXion</span>
+          <img :src="logoMarkUrl" alt="TrustXGlobal" class="w-7 h-7 object-contain" />
+          <span class="font-semibold tracking-tight text-gray-900">TrustXGlobal</span>
         </div>
         <router-link
           to="/login"

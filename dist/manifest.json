@@ -1,6 +1,6 @@
-{
-  "name": "TradeXion - Trading Platform",
-  "short_name": "TradeXion",
+﻿{
+  "name": "TrustXGlobal - Trading Platform",
+  "short_name": "TrustXGlobal",
   "description": "Professional cryptocurrency trading platform with spot and contract trading",
   "start_url": "/",
   "display": "standalone",
@@ -42,3 +42,4 @@
   ],
   "prefer_related_applications": false
 }
+

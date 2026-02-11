@@ -15,19 +15,21 @@
           <div class="flex items-center gap-3 py-2">
             <button
               @click="showSymbolSelector = true"
-              class="p-1.5 hover:opacity-80 transition-opacity"
+              class="p-1 hover:opacity-80 transition-opacity rounded-full"
             >
-              <svg class="w-5 h-5 text-gray-900/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
+              <img 
+                :src="getCoinLogo(selectedSymbol)" 
+                :alt="selectedSymbol.split('/')[0]" 
+                class="w-6 h-6 rounded-full object-cover"
+                @error="handleImageError"
+              />
             </button>
             <span class="flex-1 text-center text-gray-900 font-semibold text-base">{{ selectedSymbol }}</span>
             <button
               @click="$router.push({ path: '/kline', query: { symbol: selectedSymbol } })"
               class="p-1.5 hover:opacity-80 transition-opacity"
             >
-              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
+              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none">
                 <!-- Left green candlestick -->
                 <rect x="2" y="14" width="4" height="6" fill="#10B981" />
                 <line x1="4" y1="12" x2="4" y2="14" stroke="#10B981" stroke-width="1.5" stroke-linecap="round" />
@@ -49,27 +51,8 @@
         </div>
 
         <div class="p-2 md:p-4">
-          <!-- Loading Skeleton -->
-          <div v-if="isLoading" class="flex flex-row gap-2 md:gap-3 items-stretch">
-            <!-- Left Skeleton -->
-            <div class="flex-1 min-w-0 max-w-[50%] flex flex-col gap-3">
-              <SkeletonLoader type="button" />
-              <SkeletonLoader type="input" />
-              <SkeletonLoader type="input" />
-              <SkeletonLoader type="input" />
-              <SkeletonLoader type="button" />
-            </div>
-            <!-- Right Skeleton -->
-            <div class="flex-1 min-w-0 max-w-[50%] flex flex-col gap-3">
-              <SkeletonLoader type="button" />
-              <SkeletonLoader type="order-book" :rows="6" />
-              <div class="h-px bg-gray-100 my-1"></div>
-              <SkeletonLoader type="order-book" :rows="6" />
-            </div>
-          </div>
-          
-          <!-- Actual Content -->
-          <div v-else class="flex flex-row gap-2 md:gap-3 items-stretch">
+          <!-- Always Show Structure, Skeleteonize only data -->
+          <div class="flex flex-row gap-2 md:gap-3 items-stretch">
             <!-- Left: Trading Panel -->
             <div class="flex-1 min-w-0 max-w-[50%] flex flex-col h-full">
               <!-- Buy/Sell Tabs and Price on same line -->
@@ -77,10 +60,10 @@
                 <button
                   @click="orderSide = 'buy'"
                   :class="[
-                    'flex-1 py-2 rounded-lg font-medium transition-colors',
+                    'flex-1 py-2 rounded-lg font-bold transition-colors',
                     orderSide === 'buy'
-                      ? 'bg-blue-500/20 text-blue-300'
-                      : 'bg-gray-50 text-gray-900/60 hover:bg-gray-100'
+                      ? 'bg-green-600 text-white/100 shadow-lg shadow-green-600/20'
+                      : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
                   ]"
                 >
                   {{ $t('spot.buy') }}
@@ -88,10 +71,10 @@
                 <button
                   @click="orderSide = 'sell'"
                   :class="[
-                    'flex-1 py-2 rounded-lg font-medium transition-colors',
+                    'flex-1 py-2 rounded-lg font-bold transition-colors',
                     orderSide === 'sell'
-                      ? 'bg-red-500/20 text-red-300'
-                      : 'bg-gray-50 text-gray-900/60 hover:bg-gray-100'
+                      ? 'bg-red-600 text-white/100 shadow-lg shadow-red-600/20'
+                      : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
                   ]"
                 >
                   {{ $t('spot.sell') }}
@@ -100,7 +83,7 @@
 
               <!-- Transaction Mode -->
               <div class="mb-2">
-                <label class="block text-xs text-gray-900/70 mb-1">Transaction mode</label>
+                <label class="block text-xs text-gray-600 mb-1">Transaction mode</label>
                 <CustomSelect
                   v-model="transactionMode"
                   :options="[
@@ -112,7 +95,7 @@
 
               <!-- Price Input -->
               <div class="mb-2">
-                <label class="block text-xs text-gray-900/70 mb-1">{{ $t('spot.price') }}</label>
+                <label class="block text-xs text-gray-600 mb-1">{{ $t('spot.price') }}</label>
                 <div class="flex items-center gap-1.5">
                   <input
                     v-model="orderPrice"
@@ -202,23 +185,23 @@
                 @click="handlePlaceOrder"
                 :disabled="loading || !orderQuantity || parseFloat(orderQuantity) <= 0"
                 :class="[
-                  'w-full py-2.5 rounded-lg font-bold text-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm',
+                  'w-full py-2.5 rounded-lg font-bold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm',
                   orderSide === 'buy'
                     ? 'bg-blue-500 hover:bg-blue-600 active:bg-blue-700'
                     : 'bg-red-500 hover:bg-red-600 active:bg-red-700'
                 ]"
               >
-                {{ loading ? $t('common.loading') : `${orderSide === 'buy' ? $t('spot.buy') : $t('spot.sell')} ${selectedSymbol.split('/')[0]}` }}
+                {{ loading ? $t('common.loading') : `${orderSide === 'buy' ? $t('spot.buy') : $t('spot.sell')}` }}
               </button>
             </div>
 
             <!-- Right: Order Book -->
             <div class="flex-1 min-w-0 max-w-[50%] flex flex-col h-full">
-              <!-- Price aligned with Buy/Sell tabs -->
-              <div class="flex gap-2 mb-3 items-center">
+              <div class="flex gap-2 mb-3 items-center min-h-[40px]">
                 <div class="flex-1"></div>
                 <div class="flex-1 text-center">
-                  <div class="text-sm md:text-base font-bold text-blue-400 truncate">{{ formatPrice(ticker?.price || 0) }} USDT</div>
+                  <div v-if="ticker?.price" class="text-sm md:text-base font-bold text-blue-400 truncate">{{ formatPrice(ticker.price) }} USDT</div>
+                  <div v-else class="h-6 bg-gray-100 rounded w-20 mx-auto animate-pulse"></div>
                 </div>
                 <div class="flex-1"></div>
               </div>
@@ -230,45 +213,62 @@
                   <span>Number</span>
                 </div>
                 <div class="space-y-0 max-h-32 md:max-h-48 overflow-y-auto">
-                  <div
-                    v-for="(ask, index) in orderBook.asks.slice(0, 6).reverse()"
-                    :key="`ask-${index}`"
-                    class="relative flex justify-between items-center text-xs cursor-pointer hover:bg-gray-50 py-0.5 px-1"
-                    @click="selectOrderBookPrice(ask.price, 'sell')"
-                  >
-                    <!-- Volume bar background - right aligned -->
-                    <div 
-                      class="absolute right-0 top-0 bottom-0 bg-red-500/10 transition-all"
-                      :style="{ width: `${getVolumePercent(ask.quantity, 'ask')}%` }"
-                    ></div>
-                    <span class="relative z-10 text-red-400 font-medium text-xs truncate">{{ formatPrice(ask.price) }}</span>
-                    <span class="relative z-10 text-gray-900/70 text-xs truncate">{{ formatQuantity(ask.quantity) }}</span>
-                  </div>
+                  <template v-if="orderBook.asks.length > 0">
+                    <div
+                      v-for="(ask, index) in orderBook.asks.slice(0, 6).reverse()"
+                      :key="`ask-${index}`"
+                      class="relative flex justify-between items-center text-xs cursor-pointer hover:bg-gray-50 py-0.5 px-1"
+                      @click="selectOrderBookPrice(ask.price, 'sell')"
+                    >
+                      <!-- Volume bar background - right aligned -->
+                      <div 
+                        class="absolute right-0 top-0 bottom-0 bg-red-500/10 transition-all"
+                        :style="{ width: `${getVolumePercent(ask.quantity, 'ask')}%` }"
+                      ></div>
+                      <span class="relative z-10 text-red-500 font-medium text-xs truncate">{{ formatPrice(ask.price) }}</span>
+                      <span class="relative z-10 text-gray-600 text-xs truncate">{{ formatQuantity(ask.quantity) }}</span>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div v-for="i in 6" :key="`ask-skeleton-${i}`" class="flex justify-between py-1 px-1">
+                      <div class="h-3 bg-gray-50 rounded w-16 animate-pulse"></div>
+                      <div class="h-3 bg-gray-50 rounded w-12 animate-pulse"></div>
+                    </div>
+                  </template>
                 </div>
               </div>
 
               <!-- Current Price Separator -->
-              <div class="border-t border-b border-gray-200 py-1.5 my-1 text-center">
-                <div class="text-xs font-bold text-blue-400 truncate">{{ formatPrice(ticker?.price || 0) }} USDT</div>
+              <div class="border-t border-b border-gray-200 py-1.5 my-1 text-center min-h-[36px]">
+                <div v-if="ticker?.price" class="text-xs font-bold text-blue-400 truncate">{{ formatPrice(ticker.price) }} USDT</div>
+                <div v-else class="h-4 bg-gray-50 rounded w-16 mx-auto animate-pulse"></div>
               </div>
 
               <!-- Buy Orders (Bids) -->
               <div>
                 <div class="space-y-0 max-h-32 md:max-h-48 overflow-y-auto">
-                  <div
-                    v-for="(bid, index) in orderBook.bids.slice(0, 6)"
-                    :key="`bid-${index}`"
-                    class="relative flex justify-between items-center text-xs cursor-pointer hover:bg-gray-50 py-0.5 px-1"
-                    @click="selectOrderBookPrice(bid.price, 'buy')"
-                  >
-                    <!-- Volume bar background - right aligned -->
-                    <div 
-                      class="absolute right-0 top-0 bottom-0 bg-blue-500/10 transition-all"
-                      :style="{ width: `${getVolumePercent(bid.quantity, 'bid')}%` }"
-                    ></div>
-                    <span class="relative z-10 text-blue-400 font-medium text-xs truncate">{{ formatPrice(bid.price) }}</span>
-                    <span class="relative z-10 text-gray-900/70 text-xs truncate">{{ formatQuantity(bid.quantity) }}</span>
-                  </div>
+                  <template v-if="orderBook.bids.length > 0">
+                    <div
+                      v-for="(bid, index) in orderBook.bids.slice(0, 6)"
+                      :key="`bid-${index}`"
+                      class="relative flex justify-between items-center text-xs cursor-pointer hover:bg-gray-50 py-0.5 px-1"
+                      @click="selectOrderBookPrice(bid.price, 'buy')"
+                    >
+                      <!-- Volume bar background - right aligned -->
+                      <div 
+                        class="absolute right-0 top-0 bottom-0 bg-blue-500/10 transition-all"
+                        :style="{ width: `${getVolumePercent(bid.quantity, 'bid')}%` }"
+                      ></div>
+                      <span class="relative z-10 text-blue-400 font-medium text-xs truncate">{{ formatPrice(bid.price) }}</span>
+                      <span class="relative z-10 text-gray-600 text-xs truncate">{{ formatQuantity(bid.quantity) }}</span>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div v-for="i in 6" :key="`bid-skeleton-${i}`" class="flex justify-between py-1 px-1">
+                      <div class="h-3 bg-gray-50 rounded w-16 animate-pulse"></div>
+                      <div class="h-3 bg-gray-50 rounded w-12 animate-pulse"></div>
+                    </div>
+                  </template>
                 </div>
               </div>
             </div>
@@ -298,7 +298,7 @@
                   'px-4 py-2 text-sm font-medium transition-all relative',
                   activeTab === 'history'
                     ? 'text-blue-400'
-                    : 'text-gray-900/60'
+                    : 'text-gray-500'
                 ]"
               >
                 {{ $t('spot.history') }}
@@ -312,7 +312,7 @@
               <svg class="w-16 h-16 text-gray-900/30 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
               </svg>
-              <p class="text-gray-900/60">No data</p>
+              <p class="text-gray-500">No data</p>
             </div>
           </div>
         </div>
@@ -330,17 +330,17 @@
         
         <!-- Modal Content -->
         <div
-          class="relative bg-[#1e2329] w-full md:w-96 md:max-w-md rounded-t-3xl md:rounded-3xl shadow-2xl max-h-[90vh] flex flex-col modal-content-anim"
+          class="relative bg-[#0B0E11] w-full md:w-96 md:max-w-md rounded-t-3xl md:rounded-3xl shadow-2xl max-h-[90vh] flex flex-col modal-content-anim border border-white/10"
         >
         <!-- Header -->
-        <div class="sticky top-0 bg-[#1e2329] border-b border-gray-200 z-10">
+        <div class="sticky top-0 bg-[#0B0E11] border-b border-white/5 z-10">
           <div class="flex items-center justify-between px-4 py-4">
-            <h2 class="text-lg font-bold text-gray-900">Market</h2>
+            <h2 class="text-lg font-bold text-white">Market</h2>
             <button
               @click="showSymbolSelector = false"
-              class="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              class="p-2 hover:bg-white/5 rounded-full transition-colors"
             >
-              <svg class="w-5 h-5 text-gray-900/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -348,10 +348,10 @@
           
           <!-- Category Tabs with Sliding Indicator -->
           <div class="px-3 pb-3">
-            <div class="bg-gray-50 p-1 rounded-xl flex relative h-10 overflow-hidden isolate">
+            <div class="bg-white/5 p-1 rounded-xl flex relative h-10 overflow-hidden isolate">
               <!-- Sliding Background Indicator -->
               <div 
-                class="absolute inset-y-1 transition-all duration-300 ease-out bg-blue-500 rounded-lg shadow-lg shadow-blue-500/30 -z-10"
+                class="absolute inset-y-1 transition-all duration-300 ease-out bg-binance-yellow rounded-lg shadow-lg shadow-yellow-500/20 -z-10"
                 :style="{
                   width: 'calc(25% - 4px)',
                   left: activeCategory === 'hot' ? '4px' : 
@@ -365,7 +365,7 @@
                 :key="cat"
                 @click="activeCategory = cat"
                 class="flex-1 text-[11px] font-bold uppercase transition-colors duration-300 z-10"
-                :class="activeCategory === cat ? 'text-gray-900' : 'text-gray-900/40 hover:text-gray-900/60'"
+                :class="activeCategory === cat ? '!text-black' : 'text-gray-400 hover:text-white'"
               >
                 {{ cat }}
               </button>
@@ -379,35 +379,35 @@
             v-for="coin in coinList"
             :key="coin.originalSymbol"
             @click="selectSymbol(coin)"
-            class="flex items-center justify-between px-4 py-3 hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer border-b border-gray-200"
+            class="flex items-center justify-between px-4 py-3 hover:bg-white/5 active:bg-white/10 transition-colors cursor-pointer border-b border-white/5"
           >
             <div class="flex items-center gap-3 flex-1 min-w-0">
               <div class="relative w-10 h-10 flex-shrink-0">
                 <!-- Quote Currency (Bottom Left) - UNDER -->
                 <img
                   :src="getQuoteLogo(coin.symbol)"
-                  class="w-7 h-7 rounded-full absolute bottom-0 left-0 z-0 border border-gray-300 opacity-95 brightness-110"
+                  class="w-7 h-7 rounded-full absolute bottom-0 left-0 z-0 border border-gray-800 opacity-95 brightness-110"
                 />
                 <!-- Base Currency (Top Right) - ON TOP -->
                 <img
                   :src="getCoinLogo(coin.symbol)"
                   :alt="coin.symbol"
-                  class="w-7 h-7 rounded-full absolute top-0 right-0 z-10 border border-white/30 shadow-xl brightness-110"
+                  class="w-7 h-7 rounded-full absolute top-0 right-0 z-10 border border-white/10 shadow-xl brightness-110"
                   @error="handleImageError"
                 />
               </div>
-              <span class="text-gray-900 font-medium">{{ coin.symbol }}</span>
+              <span class="text-white font-medium">{{ coin.symbol }}</span>
             </div>
             <div class="flex items-center gap-4 flex-shrink-0">
               <span
                 :class="[
                   'text-sm font-medium',
-                  coin.change >= 0 ? 'text-green-400' : 'text-red-400'
+                  coin.change >= 0 ? 'text-binance-green' : 'text-binance-red'
                 ]"
               >
                 {{ coin.change >= 0 ? '+' : '' }}{{ coin.change.toFixed(2) }}%
               </span>
-              <span class="text-gray-900 font-medium text-sm min-w-[80px] text-right">
+              <span class="text-white font-medium text-sm min-w-[80px] text-right">
                 {{ formatPrice(coin.price) }}
               </span>
             </div>

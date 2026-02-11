@@ -34,20 +34,20 @@
               
               <!-- Number of Deposits -->
               <div class="mb-3">
-                <div class="text-gray-900/70 text-sm mb-1">{{ t('staking.numberOfDeposits') }}</div>
+                <div class="text-gray-500 text-sm mb-1">{{ t('staking.numberOfDeposits') }}</div>
                 <div class="text-gray-900 font-medium">{{ formatAmount(option.minDeposit) }} USDT</div>
               </div>
               
               <!-- Total Revenue -->
               <div class="mb-4">
-                <div class="text-gray-900/70 text-sm mb-1">{{ t('staking.totalRevenue') }}:</div>
+                <div class="text-gray-500 text-sm mb-1">{{ t('staking.totalRevenue') }}:</div>
                 <div class="text-gray-900 font-medium">{{ formatAmount(option.totalRevenue) }} USDT</div>
               </div>
               
               <!-- BUY Button -->
               <button
                 @click="handleBuy(option)"
-                class="w-full py-3 bg-teal-500/20 hover:bg-teal-500/30 border border-teal-500/50 rounded-lg font-medium text-gray-900 transition-all active:scale-[0.98]"
+                class="w-full py-3 bg-[#D9A307] hover:bg-[#C49A06] rounded-lg font-bold text-white transition-all active:scale-[0.98]"
               >
                 {{ t('staking.buy') }}
               </button>
@@ -65,12 +65,12 @@
     >
       <div class="glass-card rounded-xl w-full max-w-md p-6 animate-slide-up">
         <h2 class="text-xl font-bold text-gray-900 mb-4">{{ t('staking.kindlyReminder') }}</h2>
-        <p class="text-gray-900/80 text-sm leading-relaxed mb-6">
+        <p class="text-gray-600 text-sm leading-relaxed mb-6">
           {{ t('staking.reminderText') }}
         </p>
         <button
           @click="closeReminder"
-          class="w-full py-3 bg-teal-500/20 hover:bg-teal-500/30 border border-teal-500/50 rounded-lg font-medium text-gray-900 transition-all active:scale-[0.98]"
+          class="w-full py-3 bg-[#D9A307] hover:bg-[#C49A06] rounded-lg font-bold text-white transition-all active:scale-[0.98]"
         >
           {{ t('staking.sure') }}
         </button>
@@ -86,14 +86,14 @@
       <div class="glass-card rounded-t-xl md:rounded-xl w-full max-w-md max-h-[90vh] overflow-y-auto animate-slide-up">
         <div class="sticky top-0 bg-[#fafafa] border-b border-gray-200 p-4 flex justify-between items-center">
           <h2 class="text-lg font-bold text-gray-900">{{ t('staking.records') }}</h2>
-          <button @click="showRecords = false" class="text-gray-900/70 hover:text-gray-900">
+          <button @click="showRecords = false" class="text-gray-500 hover:text-gray-700">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
         <div class="p-4">
-          <div v-if="stakingRecords.length === 0" class="text-center py-8 text-gray-900/60">
+          <div v-if="stakingRecords.length === 0" class="text-center py-8 text-gray-500">
             {{ t('staking.noRecords') }}
           </div>
           <div v-else class="space-y-3">
@@ -105,7 +105,7 @@
               <div class="flex justify-between items-start mb-2">
                 <div>
                   <div class="text-gray-900 font-medium">{{ record.days }} Day Staking</div>
-                  <div class="text-gray-900/60 text-sm">{{ formatDate(record.createdAt) }}</div>
+                  <div class="text-gray-500 text-sm">{{ formatDate(record.createdAt) }}</div>
                 </div>
                 <div
                   :class="[
@@ -136,7 +136,7 @@
       <div class="glass-card rounded-t-xl md:rounded-xl w-full max-w-md animate-slide-up">
         <div class="sticky top-0 bg-[#fafafa] border-b border-gray-200 p-4 flex justify-between items-center">
           <h2 class="text-lg font-bold text-gray-900">{{ t('staking.stakeUSDT') }}</h2>
-          <button @click="showBuyModal = false" class="text-gray-900/70 hover:text-gray-900">
+          <button @click="showBuyModal = false" class="text-gray-500 hover:text-gray-700">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -144,15 +144,15 @@
         </div>
         <div class="p-4 space-y-4">
           <div>
-            <div class="text-gray-900/70 text-sm mb-2">{{ t('staking.lockPeriod') }}</div>
+            <div class="text-gray-500 text-sm mb-2">{{ t('staking.lockPeriod') }}</div>
             <div class="text-gray-900 font-medium">{{ selectedOption?.days }} {{ t('staking.days') }}</div>
           </div>
           <div>
-            <div class="text-gray-900/70 text-sm mb-2">{{ t('staking.minDeposit') }}</div>
+            <div class="text-gray-500 text-sm mb-2">{{ t('staking.minDeposit') }}</div>
             <div class="text-gray-900 font-medium">{{ formatAmount(selectedOption?.minDeposit || 0) }} USDT</div>
           </div>
           <div>
-            <label class="block text-sm text-gray-900/70 mb-2">{{ t('staking.amount') }}</label>
+            <label class="block text-sm text-gray-500 mb-2">{{ t('staking.amount') }}</label>
             <input
               v-model="stakeAmount"
               type="number"
@@ -161,14 +161,14 @@
               class="w-full px-4 py-2 glass-input rounded-lg focus:outline-none text-gray-900"
               placeholder="0.00000000"
             />
-            <div class="text-xs text-gray-900/50 mt-1">
+            <div class="text-xs text-gray-500 mt-1">
               {{ t('staking.minimum') }}: {{ formatAmount(selectedOption?.minDeposit || 0) }} USDT
             </div>
           </div>
           <button
             @click="handleConfirmStake"
             :disabled="loading || !isValidAmount"
-            class="w-full py-3 bg-teal-500/20 hover:bg-teal-500/30 border border-teal-500/50 rounded-lg font-medium text-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
+            class="w-full py-3 bg-[#D9A307] hover:bg-[#C49A06] rounded-lg font-bold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
           >
             {{ loading ? t('common.processing') : t('staking.confirmStake') }}
           </button>
@@ -251,20 +251,13 @@ const handleConfirmStake = async () => {
 
   loading.value = true;
   try {
-    // TODO: Implement actual staking API call
-    // await api.post('/staking/stake', {
-    //   days: selectedOption.value.days,
-    //   amount: parseFloat(stakeAmount.value),
-    // });
+    // Simulate processing
+    await new Promise(resolve => setTimeout(resolve, 800));
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // Always show insufficient balance as requested
+    alert(t('staking.insufficientBalance'));
     
-    alert('Staking successful!');
-    showBuyModal.value = false;
-    stakeAmount.value = '';
-    // Refresh staking records
-    // loadStakingRecords();
+    // Do not close modal or clear amount so user can see what happened
   } catch (error) {
     alert(error.response?.data?.error || 'Staking failed');
   } finally {

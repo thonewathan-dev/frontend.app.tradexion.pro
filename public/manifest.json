@@ -1,11 +1,11 @@
-{
-  "name": "TradeXion - Trading Platform",
-  "short_name": "TradeXion",
-  "description": "Professional cryptocurrency trading platform with spot and contract trading",
+﻿{
+  "name": "TrustXGlobal - Professional Trading",
+  "short_name": "TrustXGlobal",
+  "description": "TrustXGlobal is the world's most advanced cryptocurrency trading platform, offering a seamless experience for both beginners and professional traders. Our PWA provides real-time market insights, advanced charting tools, and high-speed execution for Spot and Contract trading.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0b1020",
-  "theme_color": "#667eea",
+  "theme_color": "#FCD535",
   "orientation": "portrait-primary",
   "scope": "/",
   "icons": [
@@ -22,22 +22,50 @@
       "purpose": "any"
     }
   ],
-  "categories": ["finance", "business"],
-  "screenshots": [],
+  "categories": [
+    "finance",
+    "business"
+  ],
+  "screenshots": [
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Secure Mobile Trading"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Advanced Trading Platform"
+    }
+  ],
   "shortcuts": [
     {
       "name": "Spot Trading",
       "short_name": "Spot",
       "description": "Open spot trading",
       "url": "/spot",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
       "name": "Contracts",
       "short_name": "Contracts",
       "description": "Open contract trading",
       "url": "/contracts",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ],
   "prefer_related_applications": false

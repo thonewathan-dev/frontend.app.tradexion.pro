@@ -9,12 +9,21 @@
     >
       <div class="flex flex-col items-center gap-3">
         <span class="loader"></span>
-        <span class="text-xs text-white/80 tracking-wide">Loading...</span>
+        <span class="text-xs text-binance-yellow tracking-wide">Loading...</span>
       </div>
     </div>
 
     <Toast ref="toastRef" />
-    <InstallButton />
+    <pwa-install 
+      id="pwa-install"
+      name="TrustXGlobal"
+      iconpath="/icon-512.png"
+      manifestpath="/manifest.json"
+      install-description="Install TrustXGlobal to your home screen for lightning-fast trading and real-time alerts."
+      description="Professional cryptocurrency trading platform with spot and contract trading. High security and low fees."
+      manual-apple="true" 
+      manual-chrome="true">
+    </pwa-install>
   </div>
 </template>
 
@@ -22,7 +31,6 @@
 import { ref, onMounted, nextTick } from 'vue';
 import { setToastComponent } from './composables/useAlert';
 import Toast from './components/Toast.vue';
-import InstallButton from './components/InstallButton.vue';
 import { isRouteLoading } from './router';
 import { useSettingsStore } from './stores/settings';
 
@@ -55,3 +63,14 @@ onMounted(async () => {
   }
 });
 </script>
+
+<style>
+pwa-install {
+  --modal-background-color: #1e2329;
+  --primary-text-color: #ffffff;
+  --secondary-text-color: #94a3b8;
+  --install-button-color: #FCD535;
+  --install-button-text-color: #0b1020;
+  --font-family: 'Inter', sans-serif;
+}
+</style>

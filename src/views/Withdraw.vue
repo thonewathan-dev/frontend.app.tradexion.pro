@@ -5,7 +5,7 @@
       <DesktopNav v-if="!isMobile" />
       <main class="flex-1 pb-16 md:pb-0">
         <!-- Header -->
-        <div class="glass-card-no-hover border-b border-gray-200 px-4 py-3">
+        <div class="bg-[#181A20] border-b border-gray-800 px-4 py-3">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
               <button @click="$router.back()" class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
@@ -15,7 +15,7 @@
               </button>
               <h1 class="text-lg font-bold text-gray-900">{{ t('withdraw.title') }}</h1>
             </div>
-            <button @click="showHistory = true" class="text-sm text-gray-900/70 hover:text-gray-900 transition-colors">
+            <button @click="showHistory = true" class="text-sm text-gray-600 hover:text-gray-900 transition-colors">
               {{ t('withdraw.history') }}
             </button>
           </div>
@@ -28,7 +28,7 @@
               <span class="text-gray-900 font-medium text-base">{{ selectedCurrency }}</span>
               <button
                 @click="showCurrencySelector = true"
-                class="flex items-center gap-1 text-sm text-gray-900/70 hover:text-gray-900 transition-colors"
+                class="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 transition-colors"
               >
                 {{ t('withdraw.selectCurrency') }}
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -40,33 +40,39 @@
 
           <!-- Network Selection -->
           <div v-if="availableNetworks.length > 1">
-            <div class="flex gap-2">
+            <div class="relative flex bg-[#2B3139] rounded-lg p-1 h-12 w-full">
+              <!-- Sliding Background -->
+              <div
+                class="absolute top-1 bottom-1 left-1 rounded-md bg-binance-yellow shadow-sm transition-all duration-300 ease-out"
+                :style="{
+                  width: `calc((100% - 8px) / ${availableNetworks.length})`,
+                  transform: `translateX(${availableNetworks.indexOf(selectedNetwork) * 100}%)`
+                }"
+              ></div>
+              
+              <!-- Buttons -->
               <button
                 v-for="network in availableNetworks"
                 :key="network"
                 @click="selectedNetwork = network"
-                :class="[
-                  'flex-1 py-2.5 px-4 rounded-lg font-medium text-sm transition-colors border',
-                  selectedNetwork === network
-                    ? 'bg-binance-yellow/20 text-binance-yellow border-binance-yellow'
-                    : 'bg-gray-50 text-gray-900/70 border-gray-200 hover:bg-gray-100'
-                ]"
+                class="relative z-10 flex-1 text-sm font-bold transition-colors duration-200"
+                :class="selectedNetwork === network ? 'text-binance-black' : 'text-gray-400 hover:text-gray-200'"
               >
                 {{ network }}
               </button>
             </div>
           </div>
           <!-- Single network display (for BTC and ETH) -->
-          <div v-else-if="availableNetworks.length === 1" class="text-gray-900/70 text-sm">
+          <div v-else-if="availableNetworks.length === 1" class="text-gray-600 text-sm">
             {{ t('withdraw.network') }}: <span class="text-gray-900 font-medium">{{ availableNetworks[0] }}</span>
           </div>
 
           <!-- Extractable Quantity -->
           <div>
-            <div class="text-gray-900/70 text-sm mb-1">{{ t('withdraw.extractableQuantity') }}</div>
+            <div class="text-gray-600 text-sm mb-1">{{ t('withdraw.extractableQuantity') }}</div>
             <div class="flex items-center justify-between">
               <span class="text-gray-900 text-lg font-medium">{{ formatBalance(extractableQuantity) }}</span>
-              <span class="text-gray-900/70 text-sm">{{ selectedCurrency }}</span>
+              <span class="text-gray-600 text-sm">{{ selectedCurrency }}</span>
             </div>
           </div>
 
@@ -83,7 +89,7 @@
 
           <!-- Amount Input -->
           <div>
-            <div class="text-gray-900/70 text-sm mb-1">{{ t('withdraw.amount') }}</div>
+            <div class="text-gray-600 text-sm mb-1">{{ t('withdraw.amount') }}</div>
             <div class="flex items-center gap-2">
               <input
                 v-model="withdrawAmount"
@@ -93,11 +99,11 @@
                 class="flex-1 px-4 py-3 glass-input rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-binance-yellow/50"
                 :placeholder="'0'"
               />
-              <span class="text-gray-900/70 text-sm px-2">{{ selectedCurrency }}</span>
+              <span class="text-gray-600 text-sm px-2">{{ selectedCurrency }}</span>
               <div class="w-px h-6 bg-gray-200"></div>
               <button
                 @click="setMaxAmount"
-                class="text-sm text-gray-900/70 hover:text-gray-900 transition-colors px-2"
+                class="text-sm text-gray-600 hover:text-gray-900 transition-colors px-2"
               >
                 {{ t('common.all') }}
               </button>
@@ -105,12 +111,12 @@
           </div>
 
           <!-- Fee Information -->
-          <div class="text-gray-900/70 text-sm">
+          <div class="text-gray-600 text-sm">
             {{ t('withdraw.fee') }}: <span class="text-gray-900 font-medium">{{ feePercent }}% {{ selectedCurrency }}</span>
           </div>
 
           <!-- Arrived Amount -->
-          <div class="text-gray-900/70 text-sm">
+          <div class="text-gray-600 text-sm">
             {{ t('withdraw.arrivedAmount') }}: <span class="text-gray-900 font-medium text-base">{{ formatBalance(arrivedAmount) }} {{ selectedCurrency }}</span>
           </div>
 
@@ -119,10 +125,10 @@
             @click="handleWithdraw"
             :disabled="loading || !canWithdraw"
             :class="[
-              'w-full py-4 rounded-lg font-bold text-gray-900 text-base transition-all',
+              'w-full py-4 rounded-lg font-bold text-base transition-all',
               canWithdraw && !loading
-                ? 'bg-binance-yellow hover:bg-opacity-90 active:brightness-95'
-                : 'bg-gray-100 text-gray-900/50 cursor-not-allowed'
+                ? 'bg-binance-yellow text-binance-black hover:bg-opacity-90 active:brightness-95'
+                : 'bg-gray-100 text-gray-500 cursor-not-allowed'
             ]"
           >
             {{ loading ? t('common.processing') : t('withdraw.button') }}
@@ -140,7 +146,7 @@
       <div class="glass-card rounded-t-lg md:rounded-lg w-full max-w-md max-h-[80vh] overflow-y-auto animate-slide-up">
         <div class="sticky top-0 glass-card-no-hover border-b border-gray-200 p-4 flex justify-between items-center">
           <h2 class="text-lg font-bold text-gray-900">{{ t('withdraw.selectCurrency') }}</h2>
-          <button @click="showCurrencySelector = false" class="text-gray-900/70 hover:text-gray-900">
+          <button @click="showCurrencySelector = false" class="text-gray-600 hover:text-gray-900">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -177,7 +183,7 @@
       <div class="glass-card rounded-t-lg md:rounded-lg w-full max-w-md max-h-[80vh] overflow-y-auto animate-slide-up">
         <div class="sticky top-0 glass-card-no-hover border-b border-gray-200 p-4 flex justify-between items-center">
           <h2 class="text-lg font-bold text-gray-900">{{ t('withdraw.history') }}</h2>
-          <button @click="showHistory = false" class="text-gray-900/70 hover:text-gray-900">
+          <button @click="showHistory = false" class="text-gray-600 hover:text-gray-900">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -185,7 +191,7 @@
         </div>
         <div class="p-4">
           <div v-if="withdrawHistory.length === 0" class="text-center py-12">
-            <p class="text-gray-900/60">{{ t('withdraw.noHistory') }}</p>
+            <p class="text-gray-500">{{ t('withdraw.noHistory') }}</p>
           </div>
           <div v-else class="space-y-3">
             <div
@@ -202,9 +208,9 @@
                   {{ t(`withdraw.status.${item.status}`) }}
                 </span>
               </div>
-              <div class="text-gray-900/70 text-xs mb-1">{{ t('withdraw.amount') }}: {{ formatBalance(item.amount) }} {{ item.currency }}</div>
-              <div class="text-gray-900/70 text-xs mb-1">{{ t('withdraw.address') }}: {{ item.address }}</div>
-              <div class="text-gray-900/70 text-xs">{{ new Date(item.created_at).toLocaleString() }}</div>
+              <div class="text-gray-600 text-xs mb-1">{{ t('withdraw.amount') }}: {{ formatBalance(item.amount) }} {{ item.currency }}</div>
+              <div class="text-gray-600 text-xs mb-1">{{ t('withdraw.address') }}: {{ item.address }}</div>
+              <div class="text-gray-600 text-xs">{{ new Date(item.created_at).toLocaleString() }}</div>
             </div>
           </div>
         </div>

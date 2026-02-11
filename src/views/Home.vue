@@ -119,7 +119,7 @@
         </div>
         
         <!-- Running Notice Line -->
-        <div class="w-full overflow-hidden relative py-2.5 mb-3">
+        <div class="mx-3 bg-white/[0.03] border border-white/5 rounded-full overflow-hidden relative py-1.5 mb-3">
           <div class="flex items-center gap-3 px-3 md:px-4">
             <!-- Speaker Icon -->
             <div class="flex-shrink-0">
@@ -142,8 +142,8 @@
             <!-- Menu Icon -->
             <div class="flex-shrink-0">
               <button class="p-1 hover:bg-gray-100 rounded transition-colors">
-                <svg class="w-4 h-4 text-gray-900/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" class="text-gray-500" />
                 </svg>
               </button>
             </div>
@@ -155,72 +155,58 @@
           <div class="grid grid-cols-3 gap-2 md:gap-3">
             <div
               v-for="(ticker, index) in top3Tickers"
-              :key="ticker?.originalSymbol || index"
-              class="glass-card rounded-lg p-3 cursor-pointer hover:border-blue-500/50 transition-colors relative overflow-hidden group"
-              @click="ticker && selectSymbol(ticker.originalSymbol || ticker.symbol)"
+              :key="ticker.originalSymbol || index"
+              class="glass-card-no-hover rounded-xl p-3 cursor-pointer hover:border-white/10 transition-all relative overflow-hidden group border border-white/5 bg-white/[0.02]"
+              @click="selectSymbol(ticker.originalSymbol)"
             >
-              <!-- Decorative Background Overlay - Inverted for White Theme -->
-              <img src="/background shadow.png" alt="" class="absolute top-0 right-0 w-14 h-14 md:w-24 md:h-24 object-contain pointer-events-none group-hover:scale-110 transition-transform duration-700 invert opacity-15" />
+              <!-- Background Accent -->
+               <img src="/background shadow.png" alt="" class="absolute top-0 right-0 w-20 h-20 object-contain pointer-events-none opacity-20" />
               
-              <div v-if="ticker" class="flex flex-col items-start text-left relative z-10">
-                <div class="relative w-12 h-12 md:w-14 md:h-14 mb-3">
-                  <!-- Quote Currency (Bottom Left) - UNDER -->
+              <!-- Card Content -->
+              <div class="flex flex-col items-start text-left relative z-10 w-full">
+                <!-- Logos - ALWAYS SHOW -->
+                <div class="relative w-12 h-12 mb-3">
                   <img
                     :src="getQuoteLogo(ticker.symbol)"
-                    class="w-8 h-8 md:w-10 md:h-10 rounded-full absolute bottom-0 left-0 z-0 border border-gray-300 opacity-95 brightness-110"
+                    class="w-8 h-8 rounded-full absolute bottom-0 left-0 z-0 border border-gray-800 bg-gray-900"
                   />
-                  <!-- Base Currency (Top Right) - ON TOP -->
                   <img
                     :src="getCoinLogo(ticker.symbol)"
                     :alt="ticker.symbol"
-                    class="w-8 h-8 md:w-10 md:h-10 rounded-full absolute top-0 right-0 z-10 border border-white/30 shadow-xl brightness-110"
+                    class="w-8 h-8 rounded-full absolute top-0 right-0 z-10 border border-white/10 shadow-lg bg-gray-900"
                     @error="handleImageError"
                   />
                 </div>
-                <div class="text-xs md:text-sm font-semibold text-gray-900 mb-1">{{ ticker.symbol }}</div>
-                <!-- Top 3: percentage -->
-                <span
-                  v-if="!ticker.isPlaceholder"
-                  :class="[
-                    'text-xs px-2 py-0.5 rounded-full font-medium mb-1',
-                    ticker.change >= 0 
-                      ? 'bg-green-500/20 text-green-300 border border-green-500/50' 
-                      : 'bg-red-500/20 text-red-300 border border-red-500/50'
-                  ]"
-                >
-                  {{ ticker.change >= 0 ? '+' : '' }}{{ ticker.change.toFixed(2) }}%
-                </span>
-                <div
-                  v-else
-                  class="h-4 bg-gray-100 rounded-full w-14 mb-1 animate-pulse"
-                ></div>
-                <!-- Top 3: last price -->
-                <div
-                  v-if="!ticker.isPlaceholder"
-                  class="text-sm md:text-base font-bold text-gray-900 mb-0.5"
-                >
+                
+                <!-- Symbol - ALWAYS SHOW -->
+                <div class="text-[11px] font-bold text-white mb-1 uppercase tracking-tight">{{ ticker.symbol }}</div>
+                
+                <!-- Change - DATA SKELETON ONLY -->
+                <template v-if="!ticker.isPlaceholder">
+                   <div
+                    :class="[
+                      'text-[10px] px-1.5 py-0.5 rounded-md font-bold',
+                      ticker.change >= 0 
+                        ? 'bg-green-500/10 text-binance-green' 
+                        : 'bg-red-500/10 text-binance-red'
+                    ]"
+                  >
+                    {{ ticker.change >= 0 ? '+' : '' }}{{ ticker.change.toFixed(2) }}%
+                  </div>
+                </template>
+                <div v-else class="h-4 bg-white/5 rounded w-12 animate-pulse mb-1"></div>
+                
+                <!-- Price - DATA SKELETON ONLY -->
+                <div v-if="!ticker.isPlaceholder" class="text-base font-bold text-white mt-1 leading-tight">
                   ${{ formatPrice(ticker.price) }}
                 </div>
-                <div
-                  v-else
-                  class="h-4 bg-gray-100 rounded w-16 mb-0.5 animate-pulse"
-                ></div>
-                <!-- Top 3: volume -->
-                <div
-                  v-if="!ticker.isPlaceholder"
-                  class="text-xs text-gray-900/60"
-                >
+                <div v-else class="h-6 bg-white/5 rounded w-20 mt-1 animate-pulse"></div>
+                
+                <!-- Volume - DATA SKELETON ONLY -->
+                <div v-if="!ticker.isPlaceholder" class="text-[10px] text-white/40 mt-0.5">
                   Vol {{ formatVolume(ticker.volume) }}
-              </div>
-                <div
-                  v-else
-                  class="h-3 bg-gray-100 rounded w-20 animate-pulse"
-                ></div>
-              </div>
-              <div v-else class="animate-pulse flex flex-col items-start gap-2 relative z-10 w-full">
-                  <div class="w-10 h-10 rounded-full bg-gray-100"></div>
-                  <div class="h-4 bg-gray-100 rounded w-3/4"></div>
-                  <div class="h-6 bg-gray-100 rounded w-1/2"></div>
+                </div>
+                <div v-else class="h-3 bg-white/5 rounded w-16 mt-1 animate-pulse"></div>
               </div>
             </div>
           </div>
@@ -263,10 +249,10 @@
               />
               <div>
                 <div class="text-gray-900 font-semibold text-sm md:text-base mb-1">Quick recharge</div>
-                <div class="text-gray-900/60 text-xs md:text-sm">Support Coin BTC/USDT/ETH</div>
+                 <div class="text-gray-500 text-xs md:text-sm">Support Coin BTC/USDT/ETH</div>
               </div>
             </div>
-            <svg class="w-5 h-5 md:w-6 md:h-6 text-gray-900/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+             <svg class="w-5 h-5 md:w-6 md:h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
           </div>
@@ -274,10 +260,10 @@
 
         <!-- Category Switcher (Refined Size & Spacing) -->
         <div class="px-3 md:px-4 mb-2 flex justify-start">
-          <div class="glass-card-no-hover rounded-full p-1 flex relative w-[280px]">
+          <div class="glass-card-no-hover rounded-full p-1 flex relative w-[280px] bg-white/[0.03] border border-white/10">
             <!-- Sliding Indicator -->
             <div 
-              class="absolute top-1 bottom-1 transition-all duration-300 ease-out bg-gray-100 rounded-full"
+              class="absolute top-1 bottom-1 transition-all duration-300 ease-out bg-binance-yellow rounded-full shadow-lg shadow-binance-yellow/20"
               :style="{
                 width: 'calc(25% - 2px)',
                 left: activeCategory === 'hot' ? '1%' : activeCategory === 'crypto' ? '26%' : activeCategory === 'metals' ? '51%' : '76%'
@@ -287,28 +273,28 @@
             <button 
               @click="activeCategory = 'hot'"
               class="flex-1 py-1.5 relative z-10 text-[10px] font-bold uppercase transition-colors duration-200"
-              :class="activeCategory === 'hot' ? 'text-gray-900' : 'text-gray-900/40'"
+              :class="activeCategory === 'hot' ? '!text-black' : 'text-white/40 hover:text-white/70'"
             >
               Hot
             </button>
             <button 
               @click="activeCategory = 'crypto'"
               class="flex-1 py-1.5 relative z-10 text-[10px] font-bold uppercase transition-colors duration-200"
-              :class="activeCategory === 'crypto' ? 'text-gray-900' : 'text-gray-900/40'"
+              :class="activeCategory === 'crypto' ? '!text-black' : 'text-white/40 hover:text-white/70'"
             >
               Crypto
             </button>
             <button 
               @click="activeCategory = 'metals'"
               class="flex-1 py-1.5 relative z-10 text-[10px] font-bold uppercase transition-colors duration-200"
-              :class="activeCategory === 'metals' ? 'text-gray-900' : 'text-gray-900/40'"
+              :class="activeCategory === 'metals' ? '!text-black' : 'text-white/40 hover:text-white/70'"
             >
               Metals
             </button>
             <button 
               @click="activeCategory = 'forex'"
               class="flex-1 py-1.5 relative z-10 text-[10px] font-bold uppercase transition-colors duration-200"
-              :class="activeCategory === 'forex' ? 'text-gray-900' : 'text-gray-900/40'"
+              :class="activeCategory === 'forex' ? '!text-black' : 'text-white/40 hover:text-white/70'"
             >
               Forex
             </button>
@@ -316,45 +302,8 @@
         </div>
 
         <div class="px-3 md:px-8 pt-1 md:pt-4 pb-8">
-          <!-- SKELETON LOADER -->
-          <div v-if="isInitialLoading">
-            <!-- Mobile Skeleton -->
-            <div class="flex flex-col gap-2 md:hidden mb-6">
-              <div v-for="i in 6" :key="i" class="glass-card rounded-lg p-3 animate-pulse">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-2.5 flex-1 min-w-0">
-                    <div class="w-11 h-11 rounded-full bg-gray-100 flex-shrink-0"></div>
-                    <div class="flex flex-col gap-2">
-                       <div class="h-4 bg-gray-100 rounded w-16"></div>
-                       <div class="h-3 bg-gray-100 rounded w-20"></div>
-                    </div>
-                  </div>
-                  <div class="flex items-center gap-3 flex-shrink-0">
-                    <div class="h-5 bg-gray-100 rounded w-20"></div>
-                    <div class="h-6 bg-gray-100 rounded-full w-16"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Desktop Skeleton -->
-            <div class="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              <div v-for="i in 8" :key="i" class="glass-card rounded-xl p-4 animate-pulse">
-                <div class="flex items-center justify-between mb-3">
-                  <div class="flex items-center gap-2">
-                    <div class="w-12 h-12 rounded-full bg-gray-100 flex-shrink-0"></div>
-                    <div class="h-4 bg-gray-100 rounded w-16"></div>
-                  </div>
-                  <div class="h-6 bg-gray-100 rounded-full w-16"></div>
-                </div>
-                <div class="h-8 bg-gray-100 rounded w-32 mb-2"></div>
-                <div class="h-3 bg-gray-100 rounded w-24"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Market Tickers - Always visible once loaded -->
-          <div v-else>
+          <!-- Market Tickers - Always visible, price/data show skeletons while loading -->
+          <div>
             <!-- Mobile: Compact horizontal cards -->
             <div class="flex flex-col gap-2 md:hidden mb-6">
               <div
@@ -364,7 +313,7 @@
                 @click="selectSymbol(ticker.originalSymbol || ticker.symbol)"
               >
                 <div class="flex items-center justify-between">
-                  <!-- Left: Logo and Name -->
+                  <!-- Left: Logo and Name (Always visible) -->
                   <div class="flex items-center gap-2.5 flex-1 min-w-0">
                     <div class="relative w-11 h-11 md:w-12 md:h-12 flex-shrink-0">
                       <!-- Quote Currency (Bottom Left) - UNDER -->
@@ -381,40 +330,36 @@
                       />
                     </div>
                     <div class="flex flex-col min-w-0">
-                      <span class="text-sm font-semibold text-gray-900 truncate">{{ ticker.symbol.split('/')[0] }}</span>
-                      <span class="text-xs text-gray-900/60">{{ $t('home.volume') }} {{ formatVolume(ticker.volume) }}</span>
+                      <span class="text-sm font-semibold text-white truncate">{{ ticker.symbol.split('/')[0] }}</span>
+                       <span class="text-xs text-white/40">
+                         <template v-if="!ticker.isPlaceholder">
+                           {{ $t('home.volume') }} {{ formatVolume(ticker.volume) }}
+                         </template>
+                         <div v-else class="h-3 bg-white/5 rounded w-16 animate-pulse mt-1"></div>
+                       </span>
                     </div>
                   </div>
                   
-                  <!-- Right: Price and Change -->
+                  <!-- Right: Price and Change (Skeletonized inside card) -->
                   <div class="flex items-center gap-3 flex-shrink-0">
                     <div class="text-right">
-                    <div
-                      v-if="!ticker.isPlaceholder"
-                      class="text-base font-bold text-gray-900 leading-tight"
-                    >
-                      ${{ formatPrice(ticker.price) }}
+                      <div v-if="!ticker.isPlaceholder" class="text-base font-bold text-white leading-tight">
+                        ${{ formatPrice(ticker.price) }}
+                      </div>
+                      <div v-else class="h-5 bg-white/5 rounded w-20 animate-pulse"></div>
                     </div>
-                    <div
-                      v-else
-                      class="h-4 bg-gray-100 rounded w-16 animate-pulse"
-                    ></div>
-                    </div>
-                    <span
-                    v-if="!ticker.isPlaceholder"
+                    
+                    <span v-if="!ticker.isPlaceholder"
                       :class="[
-                        'text-xs font-semibold whitespace-nowrap flex items-center gap-0.5',
+                        'text-xs font-semibold whitespace-nowrap flex items-center gap-0.5 px-2 py-0.5 rounded-full',
                         ticker.change >= 0 
-                          ? 'text-binance-green' 
-                          : 'text-binance-red'
+                          ? 'bg-green-500/10 text-binance-green border border-green-500/20' 
+                          : 'bg-red-500/10 text-binance-red border border-red-500/20'
                       ]"
                     >
                       {{ ticker.change >= 0 ? '+' : '' }}{{ ticker.change.toFixed(2) }}%
                     </span>
-                    <div
-                      v-else
-                      class="h-4 bg-gray-100 rounded-full w-14 animate-pulse"
-                    ></div>
+                    <div v-else class="h-6 bg-white/5 rounded-full w-14 animate-pulse"></div>
                   </div>
                 </div>
               </div>
@@ -422,68 +367,55 @@
             
             <!-- Desktop: Grid layout -->
             <div class="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div
-              v-for="ticker in tickers"
-              :key="ticker.originalSymbol || ticker.symbol"
-              class="glass-card rounded-xl p-4 cursor-pointer"
-              @click="selectSymbol(ticker.originalSymbol || ticker.symbol)"
-            >
-              <div class="flex items-center justify-between mb-3">
-                <div class="flex items-center gap-2">
-                  <div class="relative w-12 h-12 flex-shrink-0">
-                    <!-- Quote Currency (Bottom Left) - UNDER -->
-                    <img
-                      :src="getQuoteLogo(ticker.symbol)"
-                      class="w-8 h-8 rounded-full absolute bottom-0 left-0 z-0 border border-gray-300 opacity-95 brightness-110"
-                    />
-                    <!-- Base Currency (Top Right) - ON TOP -->
-                    <img
-                      :src="getCoinLogo(ticker.symbol)"
-                      :alt="ticker.symbol"
-                      class="w-8 h-8 rounded-full absolute top-0 right-0 z-10 border border-white/30 shadow-xl brightness-110"
-                      @error="handleImageError"
-                    />
+              <div
+                v-for="ticker in tickers"
+                :key="ticker.originalSymbol || ticker.symbol"
+                class="glass-card rounded-xl p-4 cursor-pointer hover:border-binance-yellow/20 transition-all"
+                @click="selectSymbol(ticker.originalSymbol || ticker.symbol)"
+              >
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center gap-2">
+                    <div class="relative w-12 h-12 flex-shrink-0">
+                      <!-- Quote Currency (Bottom Left) - UNDER -->
+                      <img
+                        :src="getQuoteLogo(ticker.symbol)"
+                        class="w-8 h-8 rounded-full absolute bottom-0 left-0 z-0 border border-gray-300 opacity-95 brightness-110"
+                      />
+                      <!-- Base Currency (Top Right) - ON TOP -->
+                      <img
+                        :src="getCoinLogo(ticker.symbol)"
+                        :alt="ticker.symbol"
+                        class="w-8 h-8 rounded-full absolute top-0 right-0 z-10 border border-white/30 shadow-xl brightness-110"
+                        @error="handleImageError"
+                      />
+                    </div>
+                    <span class="text-sm font-semibold text-white">{{ ticker.symbol }}</span>
                   </div>
-                  <span class="text-sm font-semibold text-gray-900">{{ ticker.symbol }}</span>
+                  
+                  <span v-if="!ticker.isPlaceholder"
+                    :class="[
+                      'text-xs px-2 py-1 rounded-full font-medium',
+                      ticker.change >= 0 
+                      ? 'bg-green-500/10 text-binance-green border border-green-500/20' 
+                      : 'bg-red-500/10 text-binance-red border border-red-500/20'
+                    ]"
+                  >
+                    {{ ticker.change >= 0 ? '+' : '' }}{{ ticker.change.toFixed(2) }}%
+                  </span>
+                  <div v-else class="h-6 bg-white/5 rounded-full w-16 animate-pulse"></div>
                 </div>
-                <span
-                  v-if="!ticker.isPlaceholder"
-                  :class="[
-                    'text-xs px-2 py-1 rounded-full font-medium',
-                    ticker.change >= 0 
-                      ? 'bg-green-500/20 text-green-300 border border-green-500/50' 
-                      : 'bg-red-500/20 text-red-300 border border-red-500/50'
-                  ]"
-                >
-                  {{ ticker.change >= 0 ? '+' : '' }}{{ ticker.change.toFixed(2) }}%
-                </span>
-                <div
-                  v-else
-                  class="h-4 bg-gray-100 rounded-full w-16 animate-pulse"
-                ></div>
+                
+                <div v-if="!ticker.isPlaceholder" class="text-2xl font-bold text-white mb-1">
+                  ${{ formatPrice(ticker.price) }}
+                </div>
+                <div v-else class="h-8 bg-white/5 rounded w-32 mb-1 animate-pulse"></div>
+                
+                <div v-if="!ticker.isPlaceholder" class="text-xs text-white/40">
+                  {{ $t('home.volume') }}: {{ formatVolume(ticker.volume) }}
+                </div>
+                <div v-else class="h-3 bg-white/5 rounded w-24 animate-pulse"></div>
               </div>
-              <div
-                v-if="!ticker.isPlaceholder"
-                class="text-2xl font-bold text-gray-900 mb-1"
-              >
-                ${{ formatPrice(ticker.price) }}
-              </div>
-              <div
-                v-else
-                class="h-5 bg-gray-100 rounded w-24 mb-1 animate-pulse"
-              ></div>
-              <div
-                v-if="!ticker.isPlaceholder"
-                class="text-xs text-gray-900/60"
-              >
-                {{ $t('home.volume') }}: {{ formatVolume(ticker.volume) }}
-              </div>
-              <div
-                v-else
-                class="h-3 bg-gray-100 rounded w-24 animate-pulse"
-              ></div>
             </div>
-          </div>
           </div>
         </div>
       </main>
@@ -613,17 +545,22 @@ const top3Tickers = computed(() => {
   const targetSymbols = ['BTCUSDT', 'XAUUSDT', 'EURUSD'];
   return targetSymbols.map(k => {
     const t = tickerMap[k];
-    if (!t) return null;
     
     let displaySymbol = k;
-    if (k === 'BTCUSDT') {
-      displaySymbol = 'BTC/USDT';
-    } else if (k === 'XAUUSDT') {
-      displaySymbol = 'XAU/USD';
-    } else if (k === 'EURUSD') {
-      displaySymbol = 'EUR/USD';
-    } else if (k.includes('USDT')) {
-      displaySymbol = k.replace('USDT', '/USDT');
+    if (k === 'BTCUSDT') displaySymbol = 'BTC/USDT';
+    else if (k === 'XAUUSDT') displaySymbol = 'XAU/USD';
+    else if (k === 'EURUSD') displaySymbol = 'EUR/USD';
+
+    // If ticker data doesn't exist yet, return a stable placeholder object
+    if (!t) {
+      return {
+        symbol: displaySymbol,
+        originalSymbol: k,
+        price: 0,
+        change: 0,
+        volume: 0,
+        isPlaceholder: true
+      };
     }
     
     return { ...t, symbol: displaySymbol };
@@ -1013,6 +950,9 @@ let clickOutsideHandler = null;
 
 onMounted(async () => {
   console.log('[Home] Mounted. Initializing dynamic tickers...');
+  
+  // Initialize priority symbols immediately for layout stability
+  initializeTickerMap(['BTCUSDT', 'XAUUSDT', 'EURUSD', 'ETHUSDT']);
   
   // First load all symbols and last-known prices from backend
   await loadInitialTickers();

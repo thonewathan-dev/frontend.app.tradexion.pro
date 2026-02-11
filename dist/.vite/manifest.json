@@ -1,4 +1,4 @@
-{
+﻿{
   "_AuthMarketPanel.Dp_fc3IN.js": {
     "file": "assets/AuthMarketPanel.Dp_fc3IN.js",
     "name": "AuthMarketPanel",
@@ -121,7 +121,7 @@
       "src/views/Transfer.vue",
       "src/views/FlashExchange.vue",
       "src/views/ChangePassword.vue",
-      "src/views/AboutTradeXion.vue",
+      "src/views/AboutTrustXGlobal.vue",
       "src/views/Chat.vue",
       "src/views/PrivacyPolicy.vue",
       "src/views/TermsOfService.vue"
@@ -266,10 +266,10 @@
     "file": "assets/tuto-center.DzFfNrbC.png",
     "src": "src/assets/quick-menus/tuto-center.png"
   },
-  "src/views/AboutTradeXion.vue": {
-    "file": "assets/AboutTradeXion.BpdFJTjG.js",
-    "name": "AboutTradeXion",
-    "src": "src/views/AboutTradeXion.vue",
+  "src/views/AboutTrustXGlobal.vue": {
+    "file": "assets/AboutTrustXGlobal.BpdFJTjG.js",
+    "name": "AboutTrustXGlobal",
+    "src": "src/views/AboutTrustXGlobal.vue",
     "isDynamicEntry": true,
     "imports": [
       "_DesktopNav.BGZcsY3O.js",

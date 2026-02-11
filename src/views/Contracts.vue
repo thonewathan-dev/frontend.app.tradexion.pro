@@ -15,19 +15,21 @@
           <div class="flex items-center gap-3 py-2">
             <button
               @click="showCoinSelector = true"
-              class="p-1.5 hover:opacity-80 transition-opacity"
+              class="p-1 hover:opacity-80 transition-opacity rounded-full"
             >
-              <svg class="w-5 h-5 text-gray-900/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
+              <img 
+                :src="getCoinLogo(selectedSymbol)" 
+                :alt="selectedSymbol.split('/')[0]" 
+                class="w-6 h-6 rounded-full object-cover"
+                @error="handleImageError"
+              />
             </button>
             <span class="flex-1 text-center text-gray-900 font-semibold text-base">{{ selectedSymbol }}</span>
             <button
               @click="$router.push({ path: '/kline', query: { symbol: selectedSymbol } })"
               class="p-1.5 hover:opacity-80 transition-opacity"
             >
-              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
+              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none">
                 <!-- Left green candlestick -->
                 <rect x="2" y="14" width="4" height="6" fill="#10B981" />
                 <line x1="4" y1="12" x2="4" y2="14" stroke="#10B981" stroke-width="1.5" stroke-linecap="round" />
@@ -48,27 +50,8 @@
         </div>
 
         <div class="p-2 md:p-4">
-          <!-- Loading Skeleton -->
-          <div v-if="isLoading" class="flex flex-row gap-2 md:gap-3 items-stretch">
-            <!-- Left Skeleton -->
-            <div class="flex-1 min-w-0 max-w-[50%] flex flex-col gap-3">
-              <SkeletonLoader type="button" />
-              <SkeletonLoader type="input" />
-              <SkeletonLoader type="input" />
-              <SkeletonLoader type="input" />
-              <SkeletonLoader type="button" />
-            </div>
-            <!-- Right Skeleton -->
-            <div class="flex-1 min-w-0 max-w-[50%] flex flex-col gap-3">
-              <SkeletonLoader type="button" />
-              <SkeletonLoader type="order-book" :rows="6" />
-              <div class="h-px bg-gray-100 my-1"></div>
-              <SkeletonLoader type="order-book" :rows="6" />
-            </div>
-          </div>
-          
-          <!-- Actual Content -->
-          <div v-else class="flex flex-row gap-2 md:gap-3 items-stretch">
+          <!-- Always Show Structure, Skeleteonize only data -->
+          <div class="flex flex-row gap-2 md:gap-3 items-stretch">
             <!-- Left: Trading Panel -->
             <div class="flex-1 min-w-0 max-w-[50%] flex flex-col h-full">
               <!-- UP/FALL Tabs and Price on same line -->
@@ -76,10 +59,10 @@
                 <button
                   @click="orderSide = 'buy'"
                   :class="[
-                    'flex-1 py-2 rounded-lg font-medium transition-colors',
+                    'flex-1 py-2 rounded-lg font-bold transition-colors',
                     orderSide === 'buy'
-                      ? 'bg-green-500/20 text-green-300'
-                      : 'bg-gray-50 text-gray-900/60 hover:bg-gray-100'
+                      ? 'bg-green-600 text-white/100 shadow-lg shadow-green-600/20'
+                      : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
                   ]"
                 >
                   {{ t('contracts.up') }}
@@ -87,10 +70,10 @@
                 <button
                   @click="orderSide = 'sell'"
                   :class="[
-                    'flex-1 py-2 rounded-lg font-medium transition-colors',
+                    'flex-1 py-2 rounded-lg font-bold transition-colors',
                     orderSide === 'sell'
-                      ? 'bg-red-500/20 text-red-300'
-                      : 'bg-gray-50 text-gray-900/60 hover:bg-gray-100'
+                      ? 'bg-red-600 text-white/100 shadow-lg shadow-red-600/20'
+                      : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
                   ]"
                 >
                   {{ t('contracts.fall') }}
@@ -98,7 +81,7 @@
               </div>
               <!-- Transaction Mode - Fixed to USDT -->
               <div class="mb-2">
-                <label class="block text-xs text-gray-900/70 mb-1">{{ t('contracts.transactionMode') }}</label>
+                <label class="block text-xs text-gray-600 mb-1">{{ t('contracts.transactionMode') }}</label>
                 <div class="px-2 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900">
                   USDT
                 </div>
@@ -106,7 +89,7 @@
 
               <!-- Opening Quantity -->
               <div class="mb-2">
-                <label class="block text-xs text-gray-900/70 mb-1">Opening quantity</label>
+                <label class="block text-xs text-gray-600 mb-1">Opening quantity</label>
                 <div class="flex items-center gap-1.5">
                   <input
                     v-model="openingQuantity"
@@ -115,13 +98,13 @@
                     placeholder="0.00"
                     class="flex-1 min-w-0 px-2 py-1.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500/50 text-sm text-gray-900"
                   />
-                  <span class="text-gray-900/70 text-xs whitespace-nowrap flex-shrink-0">USDT</span>
+                  <span class="text-gray-600 text-xs whitespace-nowrap flex-shrink-0">USDT</span>
                 </div>
               </div>
 
               <!-- Open Time -->
               <div class="mb-2">
-                <label class="block text-xs text-gray-900/70 mb-1">Open time</label>
+                <label class="block text-xs text-gray-600 mb-1">Open time</label>
                 <CustomSelect
                   v-model="openTime"
                   :options="[
@@ -138,15 +121,15 @@
               <!-- Info -->
               <div class="mb-3 space-y-0.5">
                 <div class="flex justify-between text-xs">
-                  <span class="text-gray-900/70">Profit rate</span>
+                  <span class="text-gray-600">Profit rate</span>
                   <span class="text-gray-900 truncate ml-2">{{ currentDurationConfig.profitRate }}%</span>
                 </div>
                 <div class="flex justify-between text-xs">
-                  <span class="text-gray-900/70">{{ t('contracts.minimumAmount') }}</span>
+                  <span class="text-gray-600">{{ t('contracts.minimumAmount') }}</span>
                   <span class="text-gray-900 truncate ml-2">{{ currentDurationConfig.minAmount.toFixed(2) }} USDT</span>
                 </div>
                 <div class="flex justify-between text-xs">
-                  <span class="text-gray-900/70">Usable</span>
+                  <span class="text-gray-600">Usable</span>
                   <span class="text-gray-900 truncate ml-2">{{ formatPrice(walletBalance) }} USDT</span>
                 </div>
               </div>
@@ -156,10 +139,10 @@
                 @click="placeOrder"
                 :disabled="loading || !openingQuantity || parseFloat(openingQuantity) <= 0"
                 :class="[
-                  'w-full py-2.5 rounded-lg font-bold text-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm',
+                  'w-full py-2.5 rounded-lg font-bold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm',
                   orderSide === 'buy'
-                    ? 'bg-green-500 hover:bg-green-600 active:bg-green-700'
-                    : 'bg-red-500 hover:bg-red-600 active:bg-red-700'
+                    ? 'bg-green-600 hover:bg-green-700 active:bg-green-800'
+                    : 'bg-red-600 hover:bg-red-700 active:bg-red-800'
                 ]"
               >
                 {{ loading ? t('common.processing') : `${orderSide === 'buy' ? t('contracts.up') : t('contracts.fall')} ${selectedSymbol.split('/')[0]}` }}
@@ -168,61 +151,78 @@
 
             <!-- Right: Order Book -->
             <div class="flex-1 min-w-0 max-w-[50%] flex flex-col h-full">
-              <!-- Price aligned with UP/FALL tabs -->
-              <div class="flex gap-2 mb-3 items-center">
+              <div class="flex gap-2 mb-3 items-center min-h-[40px]">
                 <div class="flex-1"></div>
                 <div class="flex-1 text-center">
-                  <div class="text-sm md:text-base font-bold text-blue-400 truncate">{{ formatPrice(ticker?.price || 0) }} USDT</div>
+                  <div v-if="ticker?.price" class="text-sm md:text-base font-bold text-blue-400 truncate">{{ formatPrice(ticker.price) }} USDT</div>
+                  <div v-else class="h-6 bg-gray-100 rounded w-20 mx-auto animate-pulse"></div>
                 </div>
                 <div class="flex-1"></div>
               </div>
               
               <!-- Sell Orders (Asks) -->
               <div class="mb-2">
-                <div class="flex justify-between text-[10px] text-gray-900/40 mb-1 px-1">
+                <div class="flex justify-between text-[10px] text-gray-500 mb-1 px-1">
                   <span>Unit Price</span>
                   <span>Number</span>
                 </div>
                 <div class="space-y-0 max-h-32 md:max-h-48 overflow-y-auto">
-                  <div
-                    v-for="(ask, index) in orderBook.asks.slice(0, 6).reverse()"
-                    :key="`ask-${index}`"
-                    class="relative flex justify-between items-center text-xs cursor-pointer hover:bg-gray-50 py-0.5 px-1"
-                    @click="selectOrderBookPrice(ask.price)"
-                  >
-                    <!-- Volume bar background - right aligned -->
-                    <div 
-                      class="absolute right-0 top-0 bottom-0 bg-red-500/10 transition-all"
-                      :style="{ width: `${getVolumePercent(ask.quantity, 'ask')}%` }"
-                    ></div>
-                    <span class="relative z-10 text-red-400 font-medium text-xs truncate">{{ formatPrice(ask.price) }}</span>
-                    <span class="relative z-10 text-gray-900/70 text-xs truncate">{{ formatQuantity(ask.quantity) }}</span>
-                  </div>
+                  <template v-if="orderBook.asks.length > 0">
+                    <div
+                      v-for="(ask, index) in orderBook.asks.slice(0, 6).reverse()"
+                      :key="`ask-${index}`"
+                      class="relative flex justify-between items-center text-xs cursor-pointer hover:bg-gray-50 py-0.5 px-1"
+                      @click="selectOrderBookPrice(ask.price)"
+                    >
+                      <!-- Volume bar background - right aligned -->
+                      <div 
+                        class="absolute right-0 top-0 bottom-0 bg-red-500/10 transition-all"
+                        :style="{ width: `${getVolumePercent(ask.quantity, 'ask')}%` }"
+                      ></div>
+                      <span class="relative z-10 text-red-400 font-medium text-xs truncate">{{ formatPrice(ask.price) }}</span>
+                      <span class="relative z-10 text-gray-600 text-xs truncate">{{ formatQuantity(ask.quantity) }}</span>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div v-for="i in 6" :key="`ask-skeleton-${i}`" class="flex justify-between py-1 px-1">
+                      <div class="h-3 bg-gray-50 rounded w-16 animate-pulse"></div>
+                      <div class="h-3 bg-gray-50 rounded w-12 animate-pulse"></div>
+                    </div>
+                  </template>
                 </div>
               </div>
 
               <!-- Current Price Separator -->
-              <div class="border-t border-b border-gray-200 py-1.5 my-1 text-center">
-                <div class="text-xs font-bold text-blue-400 truncate">{{ formatPrice(ticker?.price || 0) }} USDT</div>
+              <div class="border-t border-b border-gray-200 py-1.5 my-1 text-center min-h-[36px]">
+                <div v-if="ticker?.price" class="text-xs font-bold text-blue-400 truncate">{{ formatPrice(ticker.price) }} USDT</div>
+                <div v-else class="h-4 bg-gray-50 rounded w-16 mx-auto animate-pulse"></div>
               </div>
 
               <!-- Buy Orders (Bids) -->
               <div>
                 <div class="space-y-0 max-h-32 md:max-h-48 overflow-y-auto">
-                  <div
-                    v-for="(bid, index) in orderBook.bids.slice(0, 6)"
-                    :key="`bid-${index}`"
-                    class="relative flex justify-between items-center text-xs cursor-pointer hover:bg-gray-50 py-0.5 px-1"
-                    @click="selectOrderBookPrice(bid.price)"
-                  >
-                    <!-- Volume bar background - right aligned -->
-                    <div 
-                      class="absolute right-0 top-0 bottom-0 bg-blue-500/10 transition-all"
-                      :style="{ width: `${getVolumePercent(bid.quantity, 'bid')}%` }"
-                    ></div>
-                    <span class="relative z-10 text-blue-400 font-medium text-xs truncate">{{ formatPrice(bid.price) }}</span>
-                    <span class="relative z-10 text-gray-900/70 text-xs truncate">{{ formatQuantity(bid.quantity) }}</span>
-                  </div>
+                  <template v-if="orderBook.bids.length > 0">
+                    <div
+                      v-for="(bid, index) in orderBook.bids.slice(0, 6)"
+                      :key="`bid-${index}`"
+                      class="relative flex justify-between items-center text-xs cursor-pointer hover:bg-gray-50 py-0.5 px-1"
+                      @click="selectOrderBookPrice(bid.price)"
+                    >
+                      <!-- Volume bar background - right aligned -->
+                      <div 
+                        class="absolute right-0 top-0 bottom-0 bg-blue-500/10 transition-all"
+                        :style="{ width: `${getVolumePercent(bid.quantity, 'bid')}%` }"
+                      ></div>
+                      <span class="relative z-10 text-blue-400 font-medium text-xs truncate">{{ formatPrice(bid.price) }}</span>
+                      <span class="relative z-10 text-gray-600 text-xs truncate">{{ formatQuantity(bid.quantity) }}</span>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div v-for="i in 6" :key="`bid-skeleton-${i}`" class="flex justify-between py-1 px-1">
+                      <div class="h-3 bg-gray-50 rounded w-16 animate-pulse"></div>
+                      <div class="h-3 bg-gray-50 rounded w-12 animate-pulse"></div>
+                    </div>
+                  </template>
                 </div>
               </div>
             </div>
@@ -242,27 +242,11 @@
               <div class="relative rounded-2xl w-full max-w-sm shadow-2xl z-[10000] overflow-hidden bg-white border border-gray-200" 
                    @click.stop>
               <!-- Header -->
-              <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200">
-                <button
-                  @click="showActiveTradeModal = false"
-                  class="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                >
-                  <svg class="w-4 h-4 text-gray-900/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                </button>
+              <!-- Header -->
+              <div class="flex items-center justify-center px-4 py-3 border-b border-gray-200">
                 <h2 class="text-sm font-semibold tracking-wide text-gray-900">
                   {{ currentActiveTrade?.symbol || selectedSymbol }}
                 </h2>
-                <button
-                  @click="showActiveTradeModal = false"
-                  class="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                >
-                  <svg class="w-4 h-4 text-gray-900/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
               </div>
               
               <!-- Countdown Circle or Result -->
@@ -272,7 +256,7 @@
                 <div v-if="isProcessingTrade" class="w-full flex flex-col items-center justify-center py-12">
                    <div class="w-16 h-16 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin mb-4"></div>
                    <div class="text-gray-900 font-medium text-lg">Preparing trade...</div>
-                   <div class="text-gray-900/50 text-sm mt-1">Please wait a moment</div>
+                   <div class="text-gray-500 text-sm mt-1">Please wait a moment</div>
                 </div>
 
                 <!-- Show countdown if > 0 (always count to the end, ignore admin status) -->
@@ -302,29 +286,36 @@
                             cx="112"
                             cy="112"
                             r="100"
-                            stroke="#3B82F6"
+                            stroke="#FCD535"
                             stroke-width="4"
                             fill="none"
                             stroke-linecap="round"
                             :style="{
                               strokeDasharray: `${2 * Math.PI * 100}`,
-                              strokeDashoffset: `${2 * Math.PI * 100 * (1 - (countdowns[currentActiveTrade?.id] || 0) / (currentActiveTrade?.duration || 30))}`
+                              strokeDashoffset: modalCircleOffset
                             }"
-                            class="transition-all duration-1000 ease-linear"
+                            class="transition-none"
                           />
                         </svg>
                         
                         <!-- Center content -->
                         <div class="absolute inset-0 flex flex-col items-center justify-center">
-                          <div class="text-5xl font-bold text-blue-400">
+                          <div class="text-5xl font-bold text-[#FCD535]">
                             {{ countdowns[currentActiveTrade?.id] || 0 }}
                           </div>
-                          <div class="text-xs text-gray-900/50 mt-1 mb-3">seconds</div>
+                          <div class="text-xs text-gray-500 mt-1 mb-3">seconds</div>
                           
                           <!-- Current Price inside circle -->
                           <div class="text-center">
-                            <div class="text-[10px] text-gray-900/40 mb-0.5">Now price</div>
-                            <div class="text-base font-bold text-blue-400">
+                            <div class="text-[10px] text-gray-500 mb-0.5">Now price</div>
+                            <div 
+                              class="text-base font-bold"
+                              :class="{
+                                'text-green-500': priceTrend === 'up',
+                                'text-red-500': priceTrend === 'down',
+                                'text-gray-500': priceTrend === 'neutral'
+                              }"
+                            >
                               {{ formatPrice(ticker?.price || currentActiveTrade?.entry_price || 0) }}
                             </div>
                           </div>
@@ -341,10 +332,10 @@
                 >
                   <div class="w-24 h-24 mx-auto mb-4 flex items-center justify-center">
                     <div class="text-center">
-                      <svg class="w-10 h-10 text-blue-400 mx-auto mb-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg class="w-10 h-10 text-[#FCD535] mx-auto mb-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                       </svg>
-                      <div class="text-sm font-medium text-blue-400">Analyzing trading data...</div>
+                      <div class="text-sm font-medium text-[#FCD535]">Analyzing trading data...</div>
                     </div>
                   </div>
                 </div>
@@ -393,8 +384,8 @@
                         {{ parseFloat(currentActiveTrade.profit_loss || 0) > 0 ? '+' : '' }}{{ parseFloat(currentActiveTrade.profit_loss || 0).toFixed(2) }} USDT
                       </div>
                       <!-- Now price line for completed trade - Shows logical winning/losing price -->
-                      <div class="mt-2 text-xs text-gray-900/50">Now price</div>
-                      <div class="text-base font-semibold text-blue-400">
+                      <div class="mt-2 text-xs text-gray-500">Now price</div>
+                      <div class="text-base font-semibold text-[#FCD535]">
                         {{ formatPrice(displayExitPrice) }}
                       </div>
                     </div>
@@ -406,31 +397,31 @@
                 <!-- Trade Details -->
                 <div class="w-full space-y-0 px-5 pb-2">
                   <div class="flex justify-between items-center py-3 border-b border-gray-100">
-                    <span class="text-sm text-gray-900/60">Direction:</span>
+                    <span class="text-sm text-gray-600">Direction:</span>
                     <span :class="[
                       'text-sm font-semibold',
-                      currentActiveTrade?.side === 'buy' ? 'text-green-400' : 'text-red-400'
+                      currentActiveTrade?.side === 'buy' ? 'text-green-600' : 'text-red-600'
                     ]">
                       {{ currentActiveTrade?.side === 'buy' ? t('contracts.up') : t('contracts.fall') }}
                     </span>
                   </div>
                   <div class="flex justify-between items-center py-3 border-b border-gray-100">
-                    <span class="text-sm text-gray-900/60">Opening quantity:</span>
+                    <span class="text-sm text-gray-600">Opening quantity:</span>
                     <span class="text-sm font-medium text-gray-900">{{ parseFloat(currentActiveTrade?.amount || 0).toFixed(2) }} USDT</span>
                   </div>
                   <div class="flex justify-between items-center py-3 border-b border-gray-100">
-                    <span class="text-sm text-gray-900/60">Purchase price:</span>
+                    <span class="text-sm text-gray-600">Purchase price:</span>
                     <span class="text-sm font-medium text-gray-900">{{ formatPrice(currentActiveTrade?.entry_price || 0) }}</span>
                   </div>
                   <div class="flex justify-between items-center py-3">
-                    <span class="text-sm text-gray-900/60">
+                    <span class="text-sm text-gray-500">
                       {{ currentActiveTrade?.status === 'completed' ? 'Profit and loss:' : 'Estimated profit and loss:' }}
                     </span>
                     <span :class="[
                       'text-sm font-semibold',
                       currentActiveTrade?.status === 'completed' 
-                        ? (parseFloat(currentActiveTrade.profit_loss || 0) >= 0 ? 'text-green-400' : 'text-red-400')
-                        : (estimatedPL >= 0 ? 'text-green-400' : 'text-red-400')
+                        ? (parseFloat(currentActiveTrade.profit_loss || 0) >= 0 ? 'text-green-600' : 'text-red-600')
+                        : (estimatedPL >= 0 ? 'text-green-600' : 'text-red-600')
                     ]">
                       {{ currentActiveTrade?.status === 'completed' 
                         ? (parseFloat(currentActiveTrade.profit_loss || 0) > 0 ? '+' : '') + parseFloat(currentActiveTrade.profit_loss || 0).toFixed(2) + ' USDT'
@@ -445,7 +436,7 @@
               <div class="px-4 pb-4 pt-2">
                 <button
                   @click="showActiveTradeModal = false"
-                  class="w-full py-3.5 rounded-lg text-base font-semibold text-gray-900 transition-all bg-blue-500 hover:bg-blue-600"
+                  class="w-full py-3.5 rounded-lg text-base font-semibold !text-black transition-all bg-[#FCD535] hover:bg-[#efc92e]"
                 >
                   {{ currentActiveTrade?.status === 'completed' ? 'OK' : 'Back' }}
                 </button>
@@ -469,7 +460,7 @@
                 Current
                 <span
                   v-if="activeTab === 'transaction'"
-                  class="absolute bottom-0 left-0 right-0 h-0.5 bg-green-400"
+                  class="absolute bottom-0 left-0 right-0 h-0.5 bg-green-600"
                 ></span>
               </button>
               <button
@@ -484,7 +475,7 @@
                 History
                 <span
                   v-if="activeTab === 'closed'"
-                  class="absolute bottom-0 left-0 right-0 h-0.5 bg-green-400"
+                  class="absolute bottom-0 left-0 right-0 h-0.5 bg-green-600"
                 ></span>
               </button>
             </div>
@@ -508,18 +499,18 @@
                       <div class="flex items-center gap-2 mb-1">
                         <span :class="[
                           'text-sm font-bold',
-                          trade.side === 'buy' ? 'text-green-400' : 'text-red-400'
+                          trade.side === 'buy' ? 'text-green-600' : 'text-red-600'
                         ]">
                           {{ trade.side === 'buy' ? t('contracts.up') : t('contracts.fall') }}
                         </span>
-                        <span class="text-gray-900/70 text-xs">{{ trade.symbol }}</span>
+                        <span class="text-gray-600 text-xs">{{ trade.symbol }}</span>
                       </div>
-                      <div class="text-xs text-gray-900/60">
+                      <div class="text-xs text-gray-600">
                         {{ parseFloat(trade.amount).toFixed(2) }} USDT • {{ trade.duration }}s • {{ trade.profit_rate }}%
                       </div>
                     </div>
                     <div class="text-right">
-                      <div v-if="(countdowns[trade.id] || 0) > 0" class="text-lg font-bold text-green-400">
+                      <div v-if="(countdowns[trade.id] || 0) > 0" class="text-lg font-bold text-green-600">
                         {{ formatCountdown(countdowns[trade.id] || 0) }}
                       </div>
                       <div v-else class="text-sm text-blue-400 flex items-center justify-end gap-1">
@@ -528,7 +519,7 @@
                         </svg>
                         Analyzing trading data...
                       </div>
-                      <div class="text-xs text-gray-900/60 mt-1">Entry: {{ formatPrice(trade.entry_price) }}</div>
+                      <div class="text-xs text-gray-600 mt-1">Entry: {{ formatPrice(trade.entry_price) }}</div>
                     </div>
                   </div>
                 </div>
@@ -558,21 +549,21 @@
                         ]">
                           {{ trade.side === 'buy' ? t('contracts.up') : t('contracts.fall') }}
                         </span>
-                        <span class="text-gray-900/70 text-xs">{{ trade.symbol }}</span>
-                        <span v-if="trade.result === 'win'" class="flex items-center gap-1 text-xs px-2 py-0.5 rounded bg-green-500/20 text-green-400">
+                        <span class="text-gray-600 text-xs">{{ trade.symbol }}</span>
+                        <span v-if="trade.result === 'win'" class="flex items-center gap-1 text-xs px-2 py-0.5 rounded bg-green-500/10 text-green-600">
                           <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                           </svg>
                           WIN
                         </span>
-                        <span v-else-if="trade.result === 'lose'" class="flex items-center gap-1 text-xs px-2 py-0.5 rounded bg-red-500/20 text-red-400">
+                        <span v-else-if="trade.result === 'lose'" class="flex items-center gap-1 text-xs px-2 py-0.5 rounded bg-red-500/10 text-red-600">
                           <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
                           </svg>
                           LOSE
                         </span>
                       </div>
-                      <div class="text-xs text-gray-900/60">
+                      <div class="text-xs text-gray-500">
                         {{ parseFloat(trade.amount).toFixed(2) }} USDT • {{ trade.duration }}s • {{ trade.profit_rate }}%
                       </div>
                     </div>
@@ -580,11 +571,11 @@
                       <div class="text-lg font-bold" :class="{
                         'text-green-400': parseFloat(trade.profit_loss) > 0,
                         'text-red-400': parseFloat(trade.profit_loss) < 0,
-                        'text-gray-900/60': parseFloat(trade.profit_loss) === 0
+                        'text-gray-400': parseFloat(trade.profit_loss) === 0
                       }">
                         {{ parseFloat(trade.profit_loss) > 0 ? '+' : '' }}{{ parseFloat(trade.profit_loss).toFixed(2) }} USDT
                       </div>
-                      <div class="text-xs text-gray-900/60">{{ formatDate(trade.created_at) }}</div>
+                      <div class="text-xs text-gray-600">{{ formatDate(trade.created_at) }}</div>
                     </div>
                   </div>
                 </div>
@@ -606,17 +597,17 @@
         
         <!-- Modal Content -->
         <div
-          class="relative bg-[#fafafa] w-full md:w-96 md:max-w-md rounded-t-3xl md:rounded-3xl shadow-2xl max-h-[90vh] flex flex-col modal-content-anim"
+          class="relative bg-[#0B0E11] w-full md:w-96 md:max-w-md rounded-t-3xl md:rounded-3xl shadow-2xl max-h-[90vh] flex flex-col modal-content-anim border border-white/10"
         >
         <!-- Header -->
-        <div class="sticky top-0 bg-[#fafafa] border-b border-gray-200 z-10">
+        <div class="sticky top-0 bg-[#0B0E11] border-b border-white/5 z-10">
           <div class="flex items-center justify-between px-4 py-4">
-            <h2 class="text-lg font-bold text-gray-900">Market</h2>
+            <h2 class="text-lg font-bold text-white">Market</h2>
             <button
               @click="showCoinSelector = false"
-              class="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              class="p-2 hover:bg-white/5 rounded-full transition-colors"
             >
-              <svg class="w-5 h-5 text-gray-900/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -624,10 +615,10 @@
           
           <!-- Category Tabs with Sliding Indicator -->
           <div class="px-3 pb-3">
-            <div class="bg-gray-50 p-1 rounded-xl flex relative h-10 overflow-hidden isolate">
+            <div class="bg-white/5 p-1 rounded-xl flex relative h-10 overflow-hidden isolate">
               <!-- Sliding Background Indicator -->
               <div 
-                class="absolute inset-y-1 transition-all duration-300 ease-out bg-blue-500 rounded-lg shadow-lg shadow-blue-500/30 -z-10"
+                class="absolute inset-y-1 transition-all duration-300 ease-out bg-binance-yellow rounded-lg shadow-lg shadow-yellow-500/20 -z-10"
                 :style="{
                   width: 'calc(25% - 4px)',
                   left: activeCategory === 'hot' ? '4px' : 
@@ -641,7 +632,7 @@
                 :key="cat"
                 @click="activeCategory = cat"
                 class="flex-1 text-[11px] font-bold uppercase transition-colors duration-300 z-10"
-                :class="activeCategory === cat ? 'text-gray-900' : 'text-gray-500 hover:text-gray-700'"
+                :class="activeCategory === cat ? '!text-black' : 'text-gray-400 hover:text-white'"
               >
                 {{ cat }}
               </button>
@@ -655,35 +646,35 @@
             v-for="coin in coinList"
             :key="coin.originalSymbol"
             @click="selectCoin(coin)"
-            class="flex items-center justify-between px-4 py-3 hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer border-b border-gray-200"
+            class="flex items-center justify-between px-4 py-3 hover:bg-white/5 active:bg-white/10 transition-colors cursor-pointer border-b border-white/5"
           >
             <div class="flex items-center gap-3 flex-1 min-w-0">
               <div class="relative w-10 h-10 flex-shrink-0">
                 <!-- Quote Currency (Bottom Left) - UNDER -->
                 <img
                   :src="getQuoteLogo(coin.symbol)"
-                  class="w-7 h-7 rounded-full absolute bottom-0 left-0 z-0 border border-gray-300 opacity-95 brightness-110"
+                  class="w-7 h-7 rounded-full absolute bottom-0 left-0 z-0 border border-gray-800 opacity-95 brightness-110"
                 />
                 <!-- Base Currency (Top Right) - ON TOP -->
                 <img
                   :src="getCoinLogo(coin.symbol)"
                   :alt="coin.symbol"
-                  class="w-7 h-7 rounded-full absolute top-0 right-0 z-10 border border-white/30 shadow-xl brightness-110"
+                  class="w-7 h-7 rounded-full absolute top-0 right-0 z-10 border border-white/10 shadow-xl brightness-110"
                   @error="handleImageError"
                 />
               </div>
-              <span class="text-gray-900 font-medium">{{ coin.symbol }}</span>
+              <span class="text-white font-medium">{{ coin.symbol }}</span>
             </div>
             <div class="flex items-center gap-4 flex-shrink-0">
               <span
                 :class="[
                   'text-sm font-medium',
-                  coin.change >= 0 ? 'text-green-400' : 'text-red-400'
+                  coin.change >= 0 ? 'text-binance-green' : 'text-binance-red'
                 ]"
               >
                 {{ coin.change >= 0 ? '+' : '' }}{{ coin.change.toFixed(2) }}%
               </span>
-              <span class="text-gray-900 font-medium text-sm min-w-[80px] text-right">
+              <span class="text-white font-medium text-sm min-w-[80px] text-right">
                 {{ formatPrice(coin.price) }}
               </span>
             </div>
@@ -744,7 +735,10 @@ const openingQuantity = ref('');
 const openTime = ref('30');
 const activeTab = ref('transaction');
 const ticker = ref(null);
+const priceTrend = ref('neutral'); // 'up' | 'down' | 'neutral'
 const orderBook = ref({ bids: [], asks: [] });
+const modalCircleOffset = ref(0);
+let circleRafId = null;
 const walletBalance = ref(0);
 const isLoading = ref(true); // Start true, set false after initial load
 const showCoinSelector = ref(false);
@@ -1687,6 +1681,67 @@ const scheduleReconnect = () => {
   }, wsBackoffMs);
   wsBackoffMs = Math.min(wsBackoffMs * 2, MAX_BACKOFF_MS);
 };
+
+// Watch for price changes to update trend direction
+watch(() => ticker.value?.price, (newPrice, oldPrice) => {
+  if (newPrice && oldPrice) {
+    const current = parseFloat(newPrice);
+    const previous = parseFloat(oldPrice);
+    
+    if (current > previous) {
+      priceTrend.value = 'up';
+    } else if (current < previous) {
+      priceTrend.value = 'down';
+    }
+  }
+});
+
+const startCircleAnimation = () => {
+  const animate = () => {
+    if (!showActiveTradeModal.value || !currentActiveTrade.value) {
+      if (circleRafId) cancelAnimationFrame(circleRafId);
+      circleRafId = null;
+      return;
+    }
+    
+    // Safety check
+    if (currentActiveTrade.value.expires_at) {
+        const expiresAt = new Date(currentActiveTrade.value.expires_at).getTime();
+        const now = Date.now();
+        const durationSecs = parseFloat(currentActiveTrade.value.duration) || 30;
+        // Don't divide by zero
+        const duration = Math.max(durationSecs * 1000, 1000); 
+        const remaining = Math.max(0, expiresAt - now);
+        
+        const circumference = 2 * Math.PI * 100;
+        const fraction = remaining / duration;
+        
+        // 1 - fraction = percent elapsed. Offset increases as time elapses.
+        modalCircleOffset.value = circumference * (1 - fraction);
+        
+        if (remaining <= 0) {
+             modalCircleOffset.value = circumference;
+        }
+    } else {
+        modalCircleOffset.value = 0;
+    }
+    
+    circleRafId = requestAnimationFrame(animate);
+  };
+  
+  if (circleRafId) cancelAnimationFrame(circleRafId);
+  circleRafId = requestAnimationFrame(animate);
+};
+
+// Watch modal visibility
+watch(showActiveTradeModal, (val) => {
+  if (val) {
+    startCircleAnimation();
+  } else {
+    if (circleRafId) cancelAnimationFrame(circleRafId);
+    circleRafId = null;
+  }
+});
 
 onMounted(() => {
   // Fire all requests in parallel to speed up initial load

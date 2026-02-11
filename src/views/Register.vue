@@ -1,15 +1,15 @@
-<template>
-  <div class="min-h-[100dvh] overflow-hidden text-gray-900 flex flex-col">
+﻿<template>
+  <div class="min-h-[100dvh] overflow-hidden text-white flex flex-col">
     <!-- Top bar (same as Login) -->
-    <div class="sticky top-0 z-10 glass-card-no-hover border-b border-gray-200">
+    <div class="sticky top-0 z-10 bg-[#181A20] border-b border-gray-800">
       <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <img :src="logoMarkUrl" alt="TradeXion" class="w-7 h-7 object-contain" />
-          <span class="font-semibold tracking-tight text-gray-900">TradeXion</span>
-        </div>
+        <router-link to="/" class="flex items-center gap-2 group">
+          <img :src="logoMarkUrl" alt="TrustXGlobal" class="w-7 h-7 object-contain" />
+          <span class="font-semibold tracking-tight text-white group-hover:text-binance-yellow transition-colors">TrustXGlobal</span>
+        </router-link>
         <router-link
           to="/login"
-          class="px-4 py-1.5 rounded-full text-sm font-semibold glass-button-no-hover text-gray-900 border border-gray-300 hover:border-white/30 transition-colors"
+          class="px-4 py-1.5 rounded-full text-sm font-bold bg-binance-yellow text-binance-black hover:bg-opacity-90 transition-all shadow-lg shadow-binance-yellow/10"
         >
           Log In
         </router-link>
@@ -27,64 +27,49 @@
         <div class="min-w-0">
           <h1 class="text-2xl md:text-3xl font-bold tracking-tight mb-3">Create Account</h1>
 
-      <!-- Tabs -->
-      <div class="flex gap-6 text-sm font-semibold mb-3">
-        <button
-          type="button"
-          class="pb-2 border-b-2 transition-colors"
-          :class="registerMode === 'email' ? 'border-white text-gray-900' : 'border-transparent text-gray-900/50 hover:text-gray-900/80'"
-          @click="setMode('email')"
-        >
-          Email
-        </button>
-        <button
-          type="button"
-          class="pb-2 border-b-2 transition-colors"
-          :class="registerMode === 'phone' ? 'border-white text-gray-900' : 'border-transparent text-gray-900/50 hover:text-gray-900/80'"
-          @click="setMode('phone')"
-        >
-          Phone
-        </button>
+      <!-- Title removed tabs -->
+      <div class="mb-4">
+        <h2 class="text-sm font-bold text-white border-b-2 border-binance-yellow pb-2 w-fit">Create Account</h2>
       </div>
 
       <!-- Alerts shown via top Toast -->
 
       <!-- Main card -->
-      <div class="glass-card-no-hover rounded-xl border border-white/12 p-3">
+      <div class="glass-card-no-hover rounded-xl border border-white/10 p-4 bg-white/[0.02]">
         <!-- Verification screen (kept, just restyled) -->
         <form v-if="showVerification" @submit.prevent="handleVerify" class="space-y-3">
           <div class="text-center mb-2">
-            <p class="text-gray-900/80 text-sm mb-1">{{ t('auth.sentCodeTo') }}</p>
+             <p class="text-gray-600 text-sm mb-1">{{ t('auth.sentCodeTo') }}</p>
             <p class="text-gray-900 text-sm font-semibold">{{ email }}</p>
           </div>
 
           <div>
-            <label class="block text-xs text-gray-900/80 mb-2 font-medium text-center">{{ t('auth.verificationCode') }}</label>
+             <label class="block text-xs text-gray-600 mb-2 font-medium text-center">{{ t('auth.verificationCode') }}</label>
             <input
               v-model="code"
               type="text"
               required
               maxlength="6"
-              class="w-full px-3 py-3 glass-input rounded-lg text-gray-900 text-center text-2xl tracking-[0.4em] font-bold focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
-              placeholder="000000"
+               class="w-full px-4 py-4 rounded-lg border border-white/10 bg-white/5 text-white text-center text-2xl tracking-[0.4em] font-bold focus:outline-none focus:ring-2 focus:ring-binance-yellow/40 transition-all focus:bg-white/10"
+               placeholder="000000"
               autocomplete="one-time-code"
             />
-            <p class="text-xs text-gray-900/50 mt-1.5 text-center">{{ t('auth.enterCode') }}</p>
+             <p class="text-xs text-gray-500 mt-1.5 text-center">{{ t('auth.enterCode') }}</p>
           </div>
 
-          <button
-            type="submit"
-            :disabled="loading"
-            class="w-full py-2.5 text-sm rounded-full font-semibold glass-button-no-hover text-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-gray-300"
-          >
-            {{ loading ? t('auth.verifying') : t('auth.verifyEmail') }}
-          </button>
+           <button
+             type="submit"
+             :disabled="loading"
+             class="w-full py-2.5 text-sm rounded-full font-bold bg-binance-yellow text-binance-black hover:bg-opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-binance-yellow/10"
+           >
+             {{ loading ? t('auth.verifying') : t('auth.verifyEmail') }}
+           </button>
 
           <button
             type="button"
             @click="handleResendCode"
             :disabled="loading || resendingCode"
-            class="w-full py-2.5 text-sm rounded-full font-semibold border border-white/15 text-gray-900/90 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+             class="w-full py-2.5 text-sm rounded-full font-semibold border border-gray-200 text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {{ resendingCode ? 'Sending...' : 'Resend Code' }}
           </button>
@@ -92,35 +77,35 @@
           <button
             type="button"
             @click="showVerification = false"
-            class="w-full py-2.5 text-sm rounded-full font-semibold border border-white/15 text-gray-900/90 hover:bg-gray-100 transition-colors"
+             class="w-full py-2.5 text-sm rounded-full font-semibold border border-gray-200 text-gray-600 hover:bg-gray-100 transition-colors"
           >
             {{ t('auth.back') }}
           </button>
         </form>
 
-        <!-- Register flow -->
+        <!-- EMAIL ONLY MODE -->
         <div v-else>
-          <!-- EMAIL MODE -->
-          <form v-if="registerMode === 'email'" @submit.prevent="onPrimaryAction" class="space-y-2.5">
+          <form @submit.prevent="onPrimaryAction" class="space-y-2.5">
+            <!-- Email registration steps content... -->
             <!-- Step 1: email only -->
             <div v-if="step === 'identifier'" class="space-y-2.5">
-              <label class="block text-xs text-gray-900/80 font-medium">Email</label>
+              <label class="block text-xs text-white/70 font-medium">Email</label>
               <input
                 v-model.trim="email"
                 type="email"
                 required
                 autocomplete="email"
-                class="w-full px-3 py-2.5 text-sm glass-input rounded-lg text-gray-900 placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+                class="w-full px-4 py-3 text-sm rounded-lg border border-white/10 bg-white/5 text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-binance-yellow/40 transition-all focus:bg-white/10"
                 placeholder="Enter email address"
               />
 
-              <button
-                type="submit"
-                :disabled="loading || !canGoNext"
-                class="w-full py-2.5 text-sm rounded-full font-semibold glass-button-no-hover text-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-gray-300"
-              >
-                Next
-              </button>
+               <button
+                 type="submit"
+                 :disabled="loading || !canGoNext"
+                 class="w-full py-2.5 text-sm rounded-full font-bold bg-binance-yellow text-binance-black hover:bg-opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-binance-yellow/10"
+               >
+                 Next
+               </button>
             </div>
 
             <!-- Step 2: invite code + password + captcha -->
@@ -128,116 +113,78 @@
               <div class="flex items-center gap-2 mb-1.5">
                 <button
                   type="button"
-                  class="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+                  class="p-1 hover:bg-gray-700 rounded-lg transition-colors"
                   @click="backToIdentifier"
                   aria-label="Back"
                 >
-                  <svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                   </svg>
                 </button>
-                <div class="flex-1 text-center text-xs font-semibold text-gray-900 truncate px-2">Create Account</div>
+                <div class="flex-1 text-center text-xs font-semibold text-white truncate px-2">Create Account</div>
                 <div class="w-7"></div>
               </div>
 
-              <label class="block text-xs text-gray-900/80 font-medium">Email</label>
+              <label class="block text-xs text-white/70 font-medium">Email</label>
               <input
                 :value="email"
                 type="email"
                 autocomplete="email"
                 readonly
-                class="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 bg-gray-50 text-gray-900/80 placeholder-white/40 focus:outline-none"
+                class="w-full px-4 py-3 text-sm rounded-lg border border-white/10 bg-white/5 text-white placeholder-white/30 focus:outline-none focus:bg-white/10"
               />
 
-              <label class="block text-xs text-gray-900/80 font-medium">Invite Code <span class="text-red-400">*</span></label>
+              <label class="block text-xs text-white/70 font-medium">Invite Code <span class="text-red-400">*</span></label>
               <input
                 v-model.trim="inviteCode"
                 type="text"
                 required
-                class="w-full px-3 py-2.5 text-sm glass-input rounded-lg text-gray-900 placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+                class="w-full px-4 py-3 text-sm rounded-lg border border-white/10 bg-white/5 text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-binance-yellow/40 transition-all focus:bg-white/10"
                 placeholder="Enter invite code"
               />
-              <p class="text-xs text-gray-900/50">Invite code is required to register</p>
+              <p class="text-xs text-white/60">Invite code is required to register</p>
 
-              <label class="block text-xs text-gray-900/80 font-medium">Password</label>
-              <input
+               <label class="block text-xs text-white/70 font-medium">Password</label>
+               <input
                 v-model="password"
                 type="password"
                 required
                 minlength="6"
                 autocomplete="new-password"
-                class="w-full px-3 py-2.5 text-sm glass-input rounded-lg text-gray-900 placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
-                placeholder="Password"
+                 class="w-full px-4 py-3 text-sm rounded-lg border border-white/10 bg-white/5 text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-binance-yellow/40 transition-all focus:bg-white/10"
+                 placeholder="Password"
               />
-              <p class="text-xs text-gray-900/50">{{ t('auth.minimumChars') }}</p>
+               <p class="text-xs text-white/70">{{ t('auth.minimumChars') }}</p>
 
-              <!-- Turnstile only on submit step -->
-              <div class="flex justify-center pt-1">
-                <div v-show="step === 'password'" ref="turnstileWidget" id="turnstile-widget-register"></div>
-              </div>
 
-              <button
-                type="submit"
-                :disabled="loading || !turnstileToken || !password || !inviteCode.trim() || !acceptTerms"
-                class="w-full py-2.5 text-sm rounded-full font-semibold glass-button-no-hover text-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-gray-300"
-              >
-                {{ loading ? t('auth.registering') : 'Create Account' }}
-              </button>
+              <!-- Submit Button (captcha removed from here) -->
+               <button
+                 type="submit"
+                 :disabled="loading || !password || !inviteCode.trim() || !acceptTerms"
+                 class="w-full py-2.5 text-sm rounded-full font-bold bg-binance-yellow text-binance-black hover:bg-opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-binance-yellow/10"
+               >
+                 {{ loading ? t('auth.registering') : 'Create Account' }}
+               </button>
             </div>
-          </form>
-
-          <!-- PHONE MODE (UI only for now) -->
-          <form v-else @submit.prevent="handlePhoneRegister" class="space-y-2.5">
-            <label class="block text-xs text-gray-900/80 font-medium">Phone</label>
-            <div class="flex items-center gap-2 rounded-lg border border-white/15 bg-gray-50 px-3 py-2 text-sm focus-within:ring-2 focus-within:ring-white/20 focus-within:border-white/25">
-              <div class="text-gray-900/70 text-sm font-semibold">+ </div>
-              <input
-                v-model.trim="phone"
-                type="tel"
-                inputmode="tel"
-                autocomplete="tel"
-                class="flex-1 bg-transparent outline-none text-sm text-gray-900 placeholder-white/40"
-                placeholder="Enter phone number"
-                required
-              />
-            </div>
-
-              <label class="block text-xs text-gray-900/80 font-medium">Invite Code <span class="text-red-400">*</span></label>
-              <input
-                v-model.trim="inviteCode"
-                type="text"
-                required
-                class="w-full px-3 py-2.5 text-sm glass-input rounded-lg text-gray-900 placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
-                placeholder="Enter invite code"
-              />
-              <p class="text-xs text-gray-900/50">Invite code is required to register</p>
-
-            <button
-              type="submit"
-              :disabled="loading || !phone || !inviteCode.trim()"
-              class="w-full py-2.5 text-sm rounded-full font-semibold glass-button-no-hover text-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-gray-300"
-            >
-              Next
-            </button>
           </form>
         </div>
       </div>
 
       <!-- Divider -->
-      <div class="my-3 flex items-center gap-3">
-        <div class="h-px flex-1 bg-[#fafafa]/15"></div>
-        <div class="text-xs text-gray-900/60">Or</div>
-        <div class="h-px flex-1 bg-[#fafafa]/15"></div>
-      </div>
+       <div class="my-3 flex items-center gap-3">
+         <div class="h-px flex-1 bg-gray-700"></div>
+         <div class="text-xs text-white/40">Or</div>
+         <div class="h-px flex-1 bg-gray-700"></div>
+       </div>
 
       <!-- Terms and Privacy Checkbox (before Google login) -->
       <div class="flex items-start gap-2.5 mb-3">
         <button
           type="button"
           @click="acceptTerms = !acceptTerms"
-          class="relative flex-shrink-0 w-5 h-5 rounded border-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/20"
-          :class="acceptTerms ? 'bg-[#fafafa] border-white' : 'bg-transparent border-white/30 hover:border-gray-1000'"
-        >
+           class="relative flex-shrink-0 w-5 h-5 rounded border-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-binance-yellow/20"
+           :class="acceptTerms ? 'bg-binance-yellow border-binance-yellow' : 'bg-gray-50 border-gray-300 hover:border-gray-400'"
+         >
           <transition
             enter-active-class="transition-all duration-200"
             enter-from-class="opacity-0 scale-75"
@@ -248,7 +195,7 @@
           >
             <svg
               v-if="acceptTerms"
-              class="absolute inset-0 w-full h-full text-slate-950"
+                class="absolute inset-0 w-full h-full text-binance-black"
               fill="none"
               stroke="currentColor"
               stroke-width="3"
@@ -260,22 +207,22 @@
         </button>
         <label
           @click="acceptTerms = !acceptTerms"
-          class="text-xs text-gray-900/70 leading-relaxed cursor-pointer flex-1"
+           class="text-xs text-white/70 leading-relaxed cursor-pointer flex-1"
         >
           I agree to the 
-          <router-link to="/terms-of-service" class="text-gray-900 font-semibold underline hover:text-gray-900/80">Terms of Service</router-link>
-          and 
-          <router-link to="/privacy-policy" class="text-gray-900 font-semibold underline hover:text-gray-900/80">Privacy Policy</router-link>
+           <router-link to="/terms-of-service" class="font-bold text-white underline hover:text-binance-yellow transition-colors">Terms of Service</router-link>
+           and 
+           <router-link to="/privacy-policy" class="font-bold text-white underline hover:text-binance-yellow transition-colors">Privacy Policy</router-link>
         </label>
       </div>
 
       <!-- Google button -->
-      <button
-        type="button"
-        @click="loginWithGoogle"
-        :disabled="!acceptTerms"
-        class="w-full py-2.5 text-sm rounded-lg glass-card-no-hover border border-white/12 hover:border-gray-300 transition-colors flex items-center justify-center gap-2 font-semibold text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
-      >
+       <button
+         type="button"
+         @click="loginWithGoogle"
+         :disabled="!acceptTerms"
+         class="w-full py-2.5 text-sm rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-all flex items-center justify-center gap-2 font-bold text-white disabled:opacity-50 disabled:cursor-not-allowed"
+       >
         <svg class="w-4 h-4" viewBox="0 0 24 24">
           <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
           <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -285,10 +232,32 @@
         Continue with Google
       </button>
 
-      <div class="mt-3 mb-4 mb-safe text-center text-xs text-gray-900/70">
+       <div class="mt-3 mb-4 mb-safe text-center text-xs text-white/60">
         Already have an account?
-        <router-link to="/login" class="font-semibold text-gray-900 hover:text-gray-900/80 ml-1">Log In</router-link>
+         <router-link to="/login" class="font-bold text-white hover:text-binance-yellow transition-colors ml-1">Log In</router-link>
+       </div>
+        </div>
       </div>
+    </div>
+
+    <!-- Security Verification Modal -->
+    <div v-if="showCaptchaModal" class="fixed inset-0 z-[60] flex items-center justify-center px-4">
+      <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="closeCaptchaModal"></div>
+      <div class="relative w-full max-w-sm glass-card-no-hover rounded-2xl border border-white/10 p-6 bg-[#1e2329] shadow-2xl transform transition-all scale-100">
+        <button 
+          @click="closeCaptchaModal"
+          class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        
+        <h3 class="text-lg font-bold text-white mb-2 text-center">Security Verification</h3>
+        <p class="text-sm text-gray-400 mb-6 text-center">Please complete the challenge below to continue.</p>
+        
+        <div class="flex justify-center min-h-[65px]">
+          <div id="turnstile-widget-register"></div>
         </div>
       </div>
     </div>
@@ -330,17 +299,13 @@ const success = ref('');
 const loading = ref(false);
 const showVerification = ref(false);
 const displayedOTP = ref('');
-const registerMode = ref('email'); // 'email' | 'phone'
+const registerMode = ref('email');
 const step = ref('identifier'); // 'identifier' | 'password'
 const acceptTerms = ref(false);
 const resendingCode = ref(false);
+const showCaptchaModal = ref(false);
 
 const canGoNext = computed(() => {
-  if (registerMode.value === 'email') {
-    // Step 1: only check email
-    const v = email.value.trim();
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-  }
   const v = email.value.trim();
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 });
@@ -348,29 +313,31 @@ const canGoNext = computed(() => {
 const initTurnstile = () => {
   if (!window.turnstile) return;
   if (turnstileWidgetId) return;
-  if (step.value !== 'password') return;
-  if (!turnstileWidget.value) return;
+  
+  nextTick(() => {
+    const el = document.getElementById('turnstile-widget-register');
+    if (!el) return;
 
-  turnstileWidgetId = window.turnstile.render('#turnstile-widget-register', {
-    sitekey: TURNSTILE_SITE_KEY,
-    callback: (token) => {
-      turnstileToken.value = token;
-    },
-    'error-callback': () => {
-      turnstileToken.value = '';
-    },
-    'expired-callback': () => {
-      turnstileToken.value = '';
-    },
+    turnstileWidgetId = window.turnstile.render('#turnstile-widget-register', {
+      sitekey: TURNSTILE_SITE_KEY,
+      callback: (token) => {
+        turnstileToken.value = token;
+        finishRegister();
+      },
+      'error-callback': () => {
+        turnstileToken.value = '';
+      },
+      'expired-callback': () => {
+        turnstileToken.value = '';
+      },
+    });
   });
 };
 
 const resetTurnstile = () => {
-  if (!turnstileWidgetId || !window.turnstile) {
-    turnstileToken.value = '';
-    return;
+  if (turnstileWidgetId && window.turnstile) {
+    window.turnstile.reset(turnstileWidgetId);
   }
-  window.turnstile.reset(turnstileWidgetId);
   turnstileToken.value = '';
 };
 
@@ -383,41 +350,15 @@ const removeTurnstile = () => {
 };
 
 onMounted(() => {
-  // Prefill from login modal
   const qEmail = typeof route.query?.email === 'string' ? route.query.email : '';
   if (qEmail) {
     email.value = qEmail;
   }
-
-  // Wait for Turnstile script to load
-  if (window.turnstile) return;
-  const checkTurnstile = setInterval(() => {
-    if (window.turnstile) {
-      clearInterval(checkTurnstile);
-      nextTick().then(() => initTurnstile());
-    }
-  }, 100);
-
-  setTimeout(() => {
-    clearInterval(checkTurnstile);
-  }, 8000);
 });
 
 onUnmounted(() => {
   removeTurnstile();
 });
-
-watch(
-  () => step.value,
-  async (v) => {
-    if (v !== 'password') {
-      removeTurnstile();
-      return;
-    }
-    await nextTick();
-    initTurnstile();
-  }
-);
 
 const setMode = (mode) => {
   registerMode.value = mode;
@@ -426,9 +367,7 @@ const setMode = (mode) => {
   loading.value = false;
   showVerification.value = false;
   password.value = '';
-  phone.value = '';
   step.value = 'identifier';
-  // Don't reset acceptTerms - user should only accept once per session
   removeTurnstile();
 };
 
@@ -436,6 +375,7 @@ const backToIdentifier = () => {
   step.value = 'identifier';
   password.value = '';
   error.value = '';
+  showCaptchaModal.value = false; // Add this
   removeTurnstile();
 };
 
@@ -444,21 +384,30 @@ const onPrimaryAction = async () => {
     error.value = '';
     if (!canGoNext.value) return;
     step.value = 'password';
-    await nextTick();
-    initTurnstile();
     return;
   }
 
-  await handleRegister();
+  // Handle Register click
+  openCaptchaModal();
 };
 
-const handleRegister = async () => {
-  if (!turnstileToken.value) {
-    if (typeof window !== 'undefined' && window.__toast?.error) {
-      window.__toast.error('Please complete the CAPTCHA verification');
-    }
-    return;
-  }
+const openCaptchaModal = async () => {
+  if (!password.value || !inviteCode.value.trim() || !acceptTerms.value) return;
+  
+  showCaptchaModal.value = true;
+  await nextTick();
+  setTimeout(initTurnstile, 100);
+};
+
+const closeCaptchaModal = () => {
+  showCaptchaModal.value = false;
+  resetTurnstile();
+  removeTurnstile();
+};
+
+
+const finishRegister = async () => {
+  if (!turnstileToken.value) return;
 
   error.value = '';
   success.value = '';
@@ -467,12 +416,12 @@ const handleRegister = async () => {
   const result = await authStore.register(email.value.trim(), password.value, turnstileToken.value, inviteCode.value.trim());
   
   if (result.success) {
+    closeCaptchaModal();
     // If email is auto-verified, redirect to login
     if (result.emailVerified) {
       if (typeof window !== 'undefined' && window.__toast?.success) {
         window.__toast.success('Registration successful!');
       }
-      resetTurnstile();
       setTimeout(() => {
         router.push('/');
       }, 2000);
@@ -484,7 +433,6 @@ const handleRegister = async () => {
         window.__toast.success('Registration successful! Please verify your email.');
       }
       showVerification.value = true;
-      resetTurnstile();
     }
     // Normal flow - check email
     else {
@@ -492,9 +440,9 @@ const handleRegister = async () => {
         window.__toast.success('Registration successful! Please check your email for the verification code.');
       }
       showVerification.value = true;
-      resetTurnstile();
     }
   } else {
+    loading.value = false; // crucial fix
     error.value = result.error;
     if (typeof window !== 'undefined' && window.__toast?.error) {
       window.__toast.error(result.error || 'Registration failed');
@@ -547,11 +495,7 @@ const handleResendCode = async () => {
   resendingCode.value = false;
 };
 
-const handlePhoneRegister = async () => {
-  if (typeof window !== 'undefined' && window.__toast?.info) {
-    window.__toast.info('Phone registration is not available yet. Please use Email.');
-  }
-};
+
 
 const loginWithGoogle = () => {
   if (!acceptTerms.value) {

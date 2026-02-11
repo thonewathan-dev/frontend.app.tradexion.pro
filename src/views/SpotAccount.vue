@@ -6,7 +6,7 @@
 
       <main class="flex-1 pb-16 md:pb-0">
         <!-- Header (same style as flash exchange) -->
-        <div class="glass-card-no-hover border-b border-gray-200 px-4 py-3 mb-4">
+        <div class="bg-[#181A20] border-b border-gray-800 px-4 py-3">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
               <button @click="goBack" class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
@@ -19,12 +19,12 @@
           </div>
         </div>
 
-        <div class="px-4">
+        <div class="px-4 pt-4">
       <!-- Estimated Total Value -->
       <section class="mb-6">
         <div class="flex items-center justify-between mb-1">
-          <span class="text-xs text-gray-900/60">Est. Total Value</span>
-          <button class="text-gray-900/60 hover:text-gray-900 transition-colors" @click="toggleValues">
+          <span class="text-xs text-gray-600">Est. Total Value</span>
+          <button class="text-gray-600 hover:text-gray-900 transition-colors" @click="toggleValues">
             <svg v-if="showValues" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 stroke-linecap="round"
@@ -56,7 +56,7 @@
               {{ showValues ? formatFiat(totalValueUSDT) : '******' }}
             </span>
           </span>
-          <span class="text-sm text-gray-900/70">USDT</span>
+          <span class="text-sm text-gray-600">USDT</span>
         </div>
       </section>
 
@@ -64,19 +64,19 @@
       <section class="mb-8">
         <div class="grid grid-cols-3 gap-3">
           <button
-            class="glass-button-no-hover rounded-xl py-2.5 text-sm font-medium text-gray-900"
+            class="w-full rounded-lg py-2.5 text-sm font-bold bg-binance-yellow text-binance-black hover:opacity-90 shadow-lg shadow-binance-yellow/10"
             @click="goDeposit"
           >
             Deposit
           </button>
           <button
-            class="glass-button-no-hover rounded-xl py-2.5 text-sm font-medium text-gray-900/80"
+            class="w-full rounded-lg py-2.5 text-sm font-medium bg-gray-200 text-gray-900 hover:bg-gray-300"
             @click="goTrade"
           >
             Trade
           </button>
           <button
-            class="glass-button-no-hover rounded-xl py-2.5 text-sm font-medium text-gray-900/80"
+            class="w-full rounded-lg py-2.5 text-sm font-medium bg-gray-200 text-gray-900 hover:bg-gray-300"
             @click="$router.push('/transfer')"
           >
             Transfer
@@ -92,7 +92,7 @@
           <div
             v-for="i in 3"
             :key="i"
-            class="px-3 py-3 rounded-xl flex items-center justify-between bg-gray-50"
+            class="px-3 py-3 rounded-lg flex items-center justify-between bg-gray-50"
           >
             <div class="flex items-center gap-3">
               <div class="w-7 h-7 rounded-full bg-gray-100 animate-pulse"></div>
@@ -112,21 +112,21 @@
           v-else
           v-for="asset in assets"
           :key="asset.symbol"
-          class="px-3 py-3 rounded-xl flex items-center justify-between bg-gray-50 hover:bg-gray-100 transition-colors"
+          class="px-3 py-3 rounded-lg flex items-center justify-between bg-gray-50 hover:bg-gray-100 transition-colors"
         >
           <div class="flex items-center gap-3">
             <img :src="coinLogo(asset.symbol)" :alt="asset.symbol" class="w-7 h-7 object-contain" />
             <div class="flex flex-col">
               <span class="text-sm font-medium text-gray-900">{{ asset.symbol }}</span>
-              <span class="text-xs text-gray-900/60">{{ asset.name }}</span>
+              <span class="text-xs text-gray-600">{{ asset.name }}</span>
             </div>
           </div>
           <div class="text-right">
             <div class="text-sm font-medium text-gray-900">
               {{ showValues ? formatWalletBalance(getAvailable(asset.symbol)) : '******' }}
             </div>
-            <div class="text-[11px] text-gray-900/50">
-              ≈ {{ showValues ? formatFiat(getAvailable(asset.symbol) * priceInUSDT(asset.symbol)) : '****' }} USDT
+            <div class="text-[11px] text-gray-500">
+              &approx; {{ showValues ? formatFiat(getAvailable(asset.symbol) * priceInUSDT(asset.symbol)) : '****' }} USDT
             </div>
           </div>
         </div>

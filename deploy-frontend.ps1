@@ -1,4 +1,4 @@
-# Railway Frontend Deployment Script
+﻿# Railway Frontend Deployment Script
 # Run this from the frontend directory
 
 Write-Host "========================================" -ForegroundColor Cyan
@@ -36,11 +36,11 @@ Write-Host ""
 # Set environment variables
 Write-Host "Setting environment variables..." -ForegroundColor Yellow
 Write-Host "  - VITE_API_URL" -ForegroundColor Gray
-railway variables set VITE_API_URL=https://backend.tradexion.pro/api
+railway variables set VITE_API_URL=https://backend.trustxglobal.site/api
 
 Write-Host ""
 Write-Host "Environment variables set:" -ForegroundColor Green
-    Write-Host "  VITE_API_URL=https://backend.tradexion.pro/api" -ForegroundColor White
+    Write-Host "  VITE_API_URL=https://backend.trustxglobal.site/api" -ForegroundColor White
 Write-Host ""
 
 # Deploy
@@ -62,11 +62,11 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "========================================" -ForegroundColor Green
     Write-Host ""
     Write-Host "Next steps:" -ForegroundColor Yellow
-    Write-Host "  1. Set custom domain: railway domain www.tradexion.pro" -ForegroundColor White
+    Write-Host "  1. Set custom domain: railway domain www.trustxglobal.site" -ForegroundColor White
     Write-Host "  2. View logs: railway logs" -ForegroundColor White
     Write-Host "  3. Open service: railway open" -ForegroundColor White
     Write-Host ""
-    Write-Host "Frontend URL: https://www.tradexion.pro" -ForegroundColor Cyan
+    Write-Host "Frontend URL: https://www.trustxglobal.site" -ForegroundColor Cyan
     Write-Host ""
 } else {
     Write-Host ""
@@ -77,3 +77,5 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "Check logs: railway logs" -ForegroundColor Yellow
     exit 1
 }
+
+

@@ -6,11 +6,12 @@
     "dev": "node node_modules/vite/bin/vite.js --host 0.0.0.0",
     "build": "node node_modules/vite/bin/vite.js build",
     "preview": "node node_modules/vite/bin/vite.js preview",
-    "start": "node node_modules/vite/bin/vite.js preview --host 0.0.0.0 --port ${PORT:-8080}",
+    "start": "vite preview --host 0.0.0.0 --port ${PORT:-8080}",
     "railway:build": "npm run build",
     "railway:start": "npm start"
   },
   "dependencies": {
+    "@khmyznikov/pwa-install": "^0.6.3",
     "axios": "^1.6.2",
     "echarts": "^6.0.0",
     "pinia": "^2.1.7",

@@ -1,10 +1,10 @@
-/**
+﻿/**
  * Browser cache utility for storing temporary data
  * Uses localStorage for persistent cache and memory cache for session data
  */
 
 const MEMORY_CACHE = new Map();
-const CACHE_PREFIX = 'tradexion_cache_';
+const CACHE_PREFIX = 'TrustXGlobal_cache_';
 const MAX_CACHE_SIZE = 50; // Maximum number of cached items
 
 /**

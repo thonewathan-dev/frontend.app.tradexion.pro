@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+﻿import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import path from 'path';
 
@@ -13,17 +13,17 @@ export default defineConfig({
     port: process.env.PORT || 5173,
     host: '0.0.0.0',
     allowedHosts: [
-      'www.tradexion.pro',
+      'www.trustxglobal.site',
       '.railway.app',
       '.up.railway.app',
       'localhost',
-      'tradexion.pro',
-      'www.tradexion.pro',
-      'admin.tradexion.pro',
-      'backend.tradexion.pro',
-      'app.tradexion.pro',
-      'be.tradexion.pro',
-      'admin.app.tradexion.pro',
+      'trustxglobal.site',
+      'www.trustxglobal.site',
+      'admin.trustxglobal.site',
+      'backend.trustxglobal.site',
+      'app.trustxglobal.site',
+      'be.trustxglobal.site',
+      'admin.app.trustxglobal.site',
     ],
     strictPort: false,
     hmr: {
@@ -34,16 +34,16 @@ export default defineConfig({
     port: process.env.PORT || 5173,
     host: '0.0.0.0',
     allowedHosts: [
-      'www.tradexion.pro',
+      'www.trustxglobal.site',
       '.railway.app',
       '.up.railway.app',
-      'tradexion.pro',
-      'www.tradexion.pro',
-      'admin.tradexion.pro',
-      'backend.tradexion.pro',
-      'app.tradexion.pro',
-      'be.tradexion.pro',
-      'admin.app.tradexion.pro',
+      'trustxglobal.site',
+      'www.trustxglobal.site',
+      'admin.trustxglobal.site',
+      'backend.trustxglobal.site',
+      'app.trustxglobal.site',
+      'be.trustxglobal.site',
+      'admin.app.trustxglobal.site',
     ],
     // Disable local network access to prevent permission prompt
     strictPort: false,
@@ -74,3 +74,5 @@ export default defineConfig({
   // Ensure service worker and manifest are copied to dist
   publicDir: 'public',
 });
+
+

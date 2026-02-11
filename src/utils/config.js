@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Configuration utility for API URLs and environment detection
  */
 
@@ -8,7 +8,7 @@
  * MUST be called at runtime, not at build time
  */
 export function getApiUrl() {
-  const DEFAULT_PROD_API = 'https://backend.tradexion.pro/api';
+  const DEFAULT_PROD_API = 'https://backend.trustxglobal.site/api';
   const DEFAULT_DEV_API = 'http://localhost:3000/api';
 
   // Build-time / SSR safety: never return localhost
@@ -55,3 +55,4 @@ export function getApiUrl() {
  * This is evaluated at runtime, not at build time
  */
 export const API_URL = getApiUrl();
+

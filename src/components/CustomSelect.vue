@@ -21,7 +21,7 @@
     <transition name="dropdown">
       <div
         v-if="isOpen"
-        class="absolute z-50 w-full mt-2 bg-white/95 backdrop-blur-md border border-gray-300 rounded-lg overflow-hidden shadow-2xl"
+        class="absolute z-50 w-full mt-2 bg-gray-800 backdrop-blur-md border border-gray-700 rounded-lg overflow-hidden shadow-2xl"
       >
         <div class="max-h-60 overflow-y-auto">
           <button
@@ -29,10 +29,10 @@
             :key="option.value"
             @click="selectOption(option)"
             type="button"
-            class="w-full px-4 py-3 text-left text-gray-900 transition-colors"
+            class="w-full px-4 py-3 text-left transition-colors"
             :class="{
-              'bg-blue-500/50 text-blue-200': modelValue === option.value,
-              'bg-gray-700/50 hover:bg-gray-700/70': modelValue !== option.value
+              'bg-blue-600 text-white': modelValue === option.value,
+              'text-gray-300 hover:bg-gray-700': modelValue !== option.value
             }"
           >
             {{ option.label }}

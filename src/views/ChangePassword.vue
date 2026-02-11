@@ -6,7 +6,7 @@
 
       <main class="flex-1 pb-16 md:pb-0">
         <!-- Header (same style as flash exchange) -->
-        <div class="glass-card-no-hover border-b border-gray-200 px-4 py-3 mb-4">
+        <div class="bg-[#181A20] border-b border-gray-800 px-4 py-3">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
               <button @click="$router.back()" class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
@@ -19,7 +19,7 @@
           </div>
         </div>
 
-        <div class="px-4 space-y-5">
+        <div class="px-4 pt-4 space-y-5">
           <!-- Info -->
           <p class="text-xs text-gray-900/70">
             For your account security, please enter your current password and then your new password twice.
@@ -64,7 +64,7 @@
             <button
               type="submit"
               :disabled="loading"
-              class="w-full py-3 glass-button-no-hover rounded-lg text-sm font-medium text-gray-900 hover:bg-[#fafafa]/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              class="w-full py-3 rounded-lg text-sm font-bold bg-binance-yellow text-binance-black hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-binance-yellow/10"
             >
               {{ loading ? 'Changing password...' : 'Change password' }}
             </button>

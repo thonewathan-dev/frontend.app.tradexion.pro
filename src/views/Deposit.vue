@@ -5,7 +5,7 @@
       <DesktopNav v-if="!isMobile" />
       <main class="flex-1 pb-16 md:pb-0">
         <!-- Header -->
-        <div class="glass-card-no-hover border-b border-gray-200 px-4 py-3">
+        <div class="bg-[#181A20] border-b border-gray-800 px-4 py-3">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
               <button @click="$router.back()" class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
@@ -15,20 +15,20 @@
               </button>
               <h1 class="text-lg font-bold text-gray-900">{{ t('deposit.title') }}</h1>
             </div>
-            <button @click="showHistory = true" class="text-sm text-gray-900/70 hover:text-gray-900 transition-colors">
+            <button @click="showHistory = true" class="text-sm text-gray-600 hover:text-gray-900 transition-colors">
               {{ t('deposit.history') }}
             </button>
           </div>
         </div>
 
-        <div class="p-3 pb-4">
+        <div class="p-4 space-y-4">
           <!-- Currency Selection -->
           <div class="mb-4">
             <div class="flex items-center justify-between mb-2">
               <span class="text-gray-900 font-medium">{{ selectedCurrency }}</span>
               <button
                 @click="showCurrencySelector = true"
-                class="flex items-center gap-1 text-sm text-gray-900/70 hover:text-gray-900 transition-colors"
+                class="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 transition-colors"
               >
                 {{ t('deposit.selectCurrency') }}
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -39,18 +39,24 @@
           </div>
 
           <!-- Network Selection (only for crypto) -->
-          <div v-if="selectedCurrency !== 'BANK'" class="mb-4">
-            <div class="flex gap-2">
+          <div v-if="selectedCurrency !== 'BANK' && availableNetworks.length > 0" class="mb-4">
+            <div class="relative flex bg-[#2B3139] rounded-lg p-1 h-12 w-full">
+              <!-- Sliding Background -->
+              <div
+                class="absolute top-1 bottom-1 left-1 rounded-md bg-binance-yellow shadow-sm transition-all duration-300 ease-out"
+                :style="{
+                  width: `calc((100% - 8px) / ${availableNetworks.length})`,
+                  transform: `translateX(${availableNetworks.indexOf(selectedNetwork) * 100}%)`
+                }"
+              ></div>
+              
+              <!-- Buttons -->
               <button
                 v-for="network in availableNetworks"
                 :key="network"
                 @click="selectedNetwork = network"
-                :class="[
-                  'flex-1 py-2 px-4 rounded-lg font-medium transition-colors',
-                  selectedNetwork === network
-                    ? 'bg-blue-500/30 text-blue-200 border border-blue-500/50'
-                    : 'glass-input text-gray-900/70 hover:bg-gray-100'
-                ]"
+                class="relative z-10 flex-1 text-sm font-bold transition-colors duration-200"
+                :class="selectedNetwork === network ? 'text-binance-black' : 'text-gray-400 hover:text-gray-200'"
               >
                 {{ network }}
               </button>
@@ -58,7 +64,7 @@
           </div>
 
           <!-- QR Code and Address -->
-          <div class="rounded-xl p-4 mb-3 text-center bg-gray-50 border border-gray-200 min-h-[230px] flex flex-col items-center justify-center">
+          <div class="rounded-lg p-4 mb-3 text-center bg-gray-50 border border-gray-200 min-h-[230px] flex flex-col items-center justify-center">
             <!-- Loading state -->
             <div v-if="depositAddressLoading" class="flex flex-col items-center gap-3 w-full">
               <div class="w-32 h-32 rounded-lg bg-gray-100 animate-pulse" />
@@ -80,7 +86,7 @@
                 </div>
               </div>
               <div class="mb-2">
-                <p class="text-gray-900/70 text-xs mb-1.5">{{ t('deposit.depositAddress') }}</p>
+                <p class="text-gray-600 text-xs mb-1.5">{{ t('deposit.depositAddress') }}</p>
                 <div class="flex items-center gap-2 justify-center">
                   <p class="text-gray-900 font-mono text-xs break-all">{{ depositAddress }}</p>
                   <button
@@ -94,15 +100,15 @@
             </template>
 
             <!-- No address state -->
-            <p v-else class="text-xs text-gray-900/60">
+            <p v-else class="text-xs text-gray-500">
               {{ t('deposit.noAddressAvailable') || 'Deposit address not available for this currency/network.' }}
             </p>
           </div>
 
           <!-- Deposit Form -->
-          <div class="rounded-xl p-3 space-y-3 bg-gray-50 border border-gray-200">
+          <div class="rounded-lg p-3 space-y-3 bg-gray-50 border border-gray-200">
             <div>
-              <label class="block text-xs text-gray-900/70 mb-1.5">{{ t('deposit.rechargeQuantity') }}</label>
+               <label class="block text-xs text-gray-600 mb-1.5">{{ t('deposit.rechargeQuantity') }}</label>
               <div class="flex items-center gap-2">
                 <input
                   v-model="depositAmount"
@@ -111,12 +117,12 @@
                   class="flex-1 px-3 py-2 glass-input rounded-lg focus:outline-none text-sm"
                   placeholder="0.00"
                 />
-                <span class="text-gray-900/70 text-xs">{{ selectedCurrency }}</span>
+                 <span class="text-gray-600 text-xs">{{ selectedCurrency }}</span>
               </div>
             </div>
 
             <div>
-              <label class="block text-xs text-gray-900/70 mb-1.5">{{ t('deposit.transferScreenshot') }}</label>
+               <label class="block text-xs text-gray-600 mb-1.5">{{ t('deposit.transferScreenshot') }}</label>
               <input
                 type="file"
                 accept="image/*"
@@ -140,12 +146,12 @@
             <button
               @click="handleSubmit"
               :disabled="loading || !depositAmount || (selectedCurrency !== 'BANK' && !screenshotFile)"
-              class="w-full py-2.5 bg-blue-500/40 border border-blue-500/60 rounded-lg font-medium text-sm text-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              class="w-full py-2.5 rounded-lg text-sm font-bold bg-binance-yellow text-binance-black hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-binance-yellow/10"
             >
               {{ loading ? t('common.processing') : t('deposit.submitButton') }}
             </button>
 
-            <p class="text-[11px] text-gray-900/60 text-center leading-snug">
+            <p class="text-[11px] text-gray-500 text-center leading-snug">
               {{ t('deposit.waitForReview') }}
             </p>
           </div>
@@ -159,10 +165,10 @@
       class="fixed inset-0 bg-black/50 z-50 flex items-end md:items-center justify-center p-4"
       @click.self="showCurrencySelector = false"
     >
-      <div class="glass-card rounded-t-xl md:rounded-xl w-full max-w-md max-h-[80vh] overflow-y-auto animate-slide-up">
+      <div class="glass-card rounded-t-xl md:rounded-lg w-full max-w-md max-h-[80vh] overflow-y-auto animate-slide-up">
         <div class="sticky top-0 glass-card-no-hover border-b border-gray-200 p-4 flex justify-between items-center">
           <h2 class="text-lg font-bold text-gray-900">{{ t('deposit.selectCurrency') }}</h2>
-          <button @click="showCurrencySelector = false" class="text-gray-900/70 hover:text-gray-900">
+          <button @click="showCurrencySelector = false" class="text-gray-600 hover:text-gray-900">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -196,10 +202,10 @@
       class="fixed inset-0 bg-black/50 z-50 flex items-end md:items-center justify-center p-4"
       @click.self="showHistory = false"
     >
-      <div class="glass-card rounded-t-xl md:rounded-xl w-full max-w-md max-h-[80vh] overflow-y-auto animate-slide-up">
+      <div class="glass-card rounded-t-xl md:rounded-lg w-full max-w-md max-h-[80vh] overflow-y-auto animate-slide-up">
         <div class="sticky top-0 glass-card-no-hover border-b border-gray-200 p-4 flex justify-between items-center">
           <h2 class="text-lg font-bold text-gray-900">Recharge record</h2>
-          <button @click="showHistory = false" class="text-gray-900/70 hover:text-gray-900">
+          <button @click="showHistory = false" class="text-gray-600 hover:text-gray-900">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -214,7 +220,7 @@
             <div class="flex justify-between items-start mb-2">
               <div>
                 <div class="text-gray-900 font-medium">{{ deposit.currency }} - {{ formatBalance(deposit.amount) }}</div>
-                <div class="text-gray-900/60 text-sm">{{ formatDate(deposit.created_at) }}</div>
+                <div class="text-gray-500 text-sm">{{ formatDate(deposit.created_at) }}</div>
               </div>
               <span
                 :class="[
@@ -228,7 +234,7 @@
               </span>
             </div>
           </div>
-          <div v-if="depositHistory.length === 0" class="text-center text-gray-900/60 py-8">
+          <div v-if="depositHistory.length === 0" class="text-center text-gray-500 py-8">
             {{ t('deposit.noRecords') }}
           </div>
         </div>

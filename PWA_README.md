@@ -1,7 +1,7 @@
-# PWA Implementation Guide - TradeXion
+﻿# PWA Implementation Guide - TrustXGlobal
 
 ## Overview
-TradeXion has been converted into a Progressive Web App (PWA) that can be installed on Android, iOS, and Desktop browsers. The app works offline for basic pages and provides a native app-like experience.
+TrustXGlobal has been converted into a Progressive Web App (PWA) that can be installed on Android, iOS, and Desktop browsers. The app works offline for basic pages and provides a native app-like experience.
 
 ## Files Created/Modified
 
@@ -21,22 +21,22 @@ TradeXion has been converted into a Progressive Web App (PWA) that can be instal
 
 ## Features
 
-### ✅ Installable
+### âœ… Installable
 - **Android/Desktop**: Custom install button appears when `beforeinstallprompt` event fires
 - **iOS**: Shows step-by-step instructions for "Add to Home Screen"
 - Automatically detects if app is already installed and hides prompts
 
-### ✅ Offline Support
+### âœ… Offline Support
 - Service worker caches static assets (HTML, CSS, JS, images)
 - Basic pages work offline
 - API calls are not cached (always fetch fresh data)
 
-### ✅ Standalone Mode
+### âœ… Standalone Mode
 - App launches fullscreen without browser UI
 - Configured via `manifest.json` with `display: "standalone"`
 - Works on all supported platforms
 
-### ✅ Platform Detection
+### âœ… Platform Detection
 - Detects iOS, Android, and Desktop
 - Shows appropriate install instructions for each platform
 - Remembers user's dismiss preference (localStorage)
@@ -102,31 +102,31 @@ TradeXion has been converted into a Progressive Web App (PWA) that can be instal
 ## Browser Support
 
 ### Fully Supported
-- ✅ Chrome (Android, Desktop)
-- ✅ Edge (Desktop)
-- ✅ Safari (iOS 11.3+)
+- âœ… Chrome (Android, Desktop)
+- âœ… Edge (Desktop)
+- âœ… Safari (iOS 11.3+)
 
 ### Partially Supported
-- ⚠️ Firefox (installable, but no custom install prompt)
-- ⚠️ Samsung Internet (installable)
+- âš ï¸ Firefox (installable, but no custom install prompt)
+- âš ï¸ Samsung Internet (installable)
 
 ### Not Supported
-- ❌ Safari Desktop (no PWA support)
-- ❌ Opera (limited support)
+- âŒ Safari Desktop (no PWA support)
+- âŒ Opera (limited support)
 
 ## Configuration
 
 ### Manifest Settings
-- **Name**: "TradeXion - Trading Platform"
-- **Short Name**: "TradeXion"
+- **Name**: "TrustXGlobal - Trading Platform"
+- **Short Name**: "TrustXGlobal"
 - **Display**: "standalone"
 - **Theme Color**: "#667eea"
 - **Background Color**: "#0b1020"
 - **Orientation**: "portrait-primary"
 
 ### Service Worker Settings
-- **Cache Name**: `tradexion-v1`
-- **Runtime Cache**: `tradexion-runtime-v1`
+- **Cache Name**: `TrustXGlobal-v1`
+- **Runtime Cache**: `TrustXGlobal-runtime-v1`
 - **Scope**: `/` (entire domain)
 
 ## Troubleshooting
@@ -166,3 +166,4 @@ TradeXion has been converted into a Progressive Web App (PWA) that can be instal
 - [MDN PWA Guide](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps)
 - [Web.dev PWA](https://web.dev/progressive-web-apps/)
 - [Service Worker API](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API)
+

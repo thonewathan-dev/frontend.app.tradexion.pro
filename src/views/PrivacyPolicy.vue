@@ -1,7 +1,7 @@
-<template>
+﻿<template>
   <div class="min-h-[100dvh] overflow-hidden text-gray-900">
     <!-- Top bar -->
-    <div class="sticky top-0 z-10 glass-card-no-hover border-b border-gray-200">
+    <div class="sticky top-0 z-10 bg-[#181A20] border-b border-gray-800">
       <div class="max-w-3xl mx-auto px-4 h-14 flex items-center">
         <button
           @click="$router.back()"
@@ -22,24 +22,24 @@
 
     <div class="max-w-3xl mx-auto px-4 py-6 pb-8 pb-safe space-y-6">
         <div>
-          <p class="text-sm text-gray-900/80 mb-4">
+          <p class="text-sm text-gray-600 mb-4">
             Last updated: {{ new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) }}
           </p>
         </div>
 
         <section>
           <h2 class="text-xl font-bold text-gray-900 mb-3">1. Introduction</h2>
-          <p class="text-sm text-gray-900/70 leading-relaxed mb-4">
-            Welcome to TradeXion. We are committed to protecting your personal information and your right to privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our trading platform.
+          <p class="text-sm text-gray-700 leading-relaxed mb-4">
+            Welcome to TrustXGlobal. We are committed to protecting your personal information and your right to privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our trading platform.
           </p>
         </section>
 
         <section>
           <h2 class="text-xl font-bold text-gray-900 mb-3">2. Information We Collect</h2>
-          <p class="text-sm text-gray-900/70 leading-relaxed mb-3">
+          <p class="text-sm text-gray-700 leading-relaxed mb-3">
             We collect information that you provide directly to us, including:
           </p>
-          <ul class="list-disc list-inside text-sm text-gray-900/70 space-y-2 ml-4">
+          <ul class="list-disc list-inside text-sm text-gray-700 space-y-2 ml-4">
             <li>Email address</li>
             <li>Phone number (if provided)</li>
             <li>Password (encrypted)</li>
@@ -50,10 +50,10 @@
 
         <section>
           <h2 class="text-xl font-bold text-gray-900 mb-3">3. How We Use Your Information</h2>
-          <p class="text-sm text-gray-900/70 leading-relaxed mb-3">
+          <p class="text-sm text-gray-700 leading-relaxed mb-3">
             We use the information we collect to:
           </p>
-          <ul class="list-disc list-inside text-sm text-gray-900/70 space-y-2 ml-4">
+          <ul class="list-disc list-inside text-sm text-gray-700 space-y-2 ml-4">
             <li>Provide, maintain, and improve our services</li>
             <li>Process transactions and manage your account</li>
             <li>Send you technical notices and support messages</li>
@@ -64,10 +64,10 @@
 
         <section>
           <h2 class="text-xl font-bold text-gray-900 mb-3">4. Information Sharing</h2>
-          <p class="text-sm text-gray-900/70 leading-relaxed mb-4">
+          <p class="text-sm text-gray-700 leading-relaxed mb-4">
             We do not sell, trade, or rent your personal information to third parties. We may share your information only in the following circumstances:
           </p>
-          <ul class="list-disc list-inside text-sm text-gray-900/70 space-y-2 ml-4">
+          <ul class="list-disc list-inside text-sm text-gray-700 space-y-2 ml-4">
             <li>To comply with legal obligations or court orders</li>
             <li>To protect our rights, privacy, safety, or property</li>
             <li>With your explicit consent</li>
@@ -76,17 +76,17 @@
 
         <section>
           <h2 class="text-xl font-bold text-gray-900 mb-3">5. Data Security</h2>
-          <p class="text-sm text-gray-900/70 leading-relaxed mb-4">
+          <p class="text-sm text-gray-700 leading-relaxed mb-4">
             We implement appropriate technical and organizational security measures to protect your personal information. However, no method of transmission over the Internet is 100% secure, and we cannot guarantee absolute security.
           </p>
         </section>
 
         <section>
           <h2 class="text-xl font-bold text-gray-900 mb-3">6. Your Rights</h2>
-          <p class="text-sm text-gray-900/70 leading-relaxed mb-3">
+          <p class="text-sm text-gray-700 leading-relaxed mb-3">
             You have the right to:
           </p>
-          <ul class="list-disc list-inside text-sm text-gray-900/70 space-y-2 ml-4">
+          <ul class="list-disc list-inside text-sm text-gray-700 space-y-2 ml-4">
             <li>Access your personal information</li>
             <li>Correct inaccurate information</li>
             <li>Request deletion of your account</li>
@@ -96,21 +96,21 @@
 
         <section>
           <h2 class="text-xl font-bold text-gray-900 mb-3">7. Cookies and Tracking</h2>
-          <p class="text-sm text-gray-900/70 leading-relaxed mb-4">
+          <p class="text-sm text-gray-700 leading-relaxed mb-4">
             We use cookies and similar tracking technologies to improve your experience on our platform. You can control cookie preferences through your browser settings.
           </p>
         </section>
 
         <section>
           <h2 class="text-xl font-bold text-gray-900 mb-3">8. Contact Us</h2>
-          <p class="text-sm text-gray-900/70 leading-relaxed mb-4">
+          <p class="text-sm text-gray-700 leading-relaxed mb-4">
             If you have any questions about this Privacy Policy, please contact us through our support channels.
           </p>
         </section>
 
         <section>
           <h2 class="text-xl font-bold text-gray-900 mb-3">9. Changes to This Policy</h2>
-          <p class="text-sm text-gray-900/70 leading-relaxed mb-4">
+          <p class="text-sm text-gray-700 leading-relaxed mb-4">
             We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last updated" date.
           </p>
         </section>

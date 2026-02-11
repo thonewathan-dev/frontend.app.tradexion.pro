@@ -1,38 +1,41 @@
 <template>
-  <div class="min-h-screen">
+  <div class="min-h-screen bg-[#fafafa] text-gray-900">
     <!-- Top Header Section -->
-    <div class="bg-[#fafafa]/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-10">
-      <div class="px-3 py-2">
-        <div class="flex items-center gap-2 mb-2">
+    <div class="bg-white border-b border-gray-100 sticky top-0 z-10 shadow-sm">
+      <div class="px-4 py-3">
+        <div class="flex items-center justify-between mb-3">
           <button
             @click="$router.back()"
-            class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+            class="p-2 -ml-2 hover:bg-gray-50 rounded-full transition-colors"
           >
-            <svg class="w-5 h-5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <h1 class="text-base font-bold text-gray-900 flex-1 text-center">{{ selectedSymbol }}</h1>
-          <div class="w-8"></div> <!-- Spacer for centering -->
+          <div class="flex flex-col items-center">
+            <h1 class="text-lg font-bold text-gray-900 tracking-tight">{{ selectedSymbol }}</h1>
+            <div class="text-[10px] text-gray-500 font-medium uppercase tracking-widest mt-0.5">Spot Trading</div>
+          </div>
+          <div class="w-10"></div> <!-- Balance spacer -->
         </div>
         
-        <!-- Price Display -->
-        <div class="flex items-start justify-between">
-          <div class="flex-1">
+        <!-- Price and Stats Display -->
+        <div class="flex items-center justify-between">
+          <div class="flex flex-col">
             <div 
               :class="[
-                'text-xl font-bold mb-1',
-                (Number(ticker?.priceChangePercent) || 0) >= 0 ? 'text-green-400' : 'text-red-400'
+                'text-3xl font-bold tracking-tighter leading-none mb-1',
+                (Number(ticker?.priceChangePercent) || 0) >= 0 ? 'text-green-500' : 'text-red-500'
               ]"
             >
               {{ formatPrice(ticker?.price || 0) }}
             </div>
             <div 
               :class="[
-                'inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium',
+                'inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-bold w-fit',
                 (Number(ticker?.priceChangePercent) || 0) >= 0 
-                  ? 'bg-green-500/20 text-green-300' 
-                  : 'bg-red-500/20 text-red-300'
+                  ? 'bg-green-50 text-green-600' 
+                  : 'bg-red-50 text-red-600'
               ]"
             >
               <svg v-if="(Number(ticker?.priceChangePercent) || 0) < 0" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -45,26 +48,31 @@
             </div>
           </div>
           
-          <!-- 24H Stats -->
-          <div class="text-right text-xs space-y-1">
-            <div class="flex items-center justify-end gap-2">
-              <span class="text-gray-400">{{ t('kline.high') }}</span>
-              <span class="text-gray-900 font-medium">{{ formatPrice(ticker?.highPrice || 0) }}</span>
+          <!-- 24H Stats Grid -->
+          <div class="grid grid-cols-2 gap-x-4 gap-y-1">
+            <div class="flex flex-col items-end">
+              <span class="text-[10px] text-gray-500 font-medium tracking-wider uppercase">{{ t('kline.high') }}</span>
+              <span class="text-xs text-gray-900 font-semibold">{{ formatPrice(ticker?.highPrice || 0) }}</span>
             </div>
-            <div class="flex items-center justify-end gap-2">
-              <span class="text-gray-400">{{ t('kline.low') }}</span>
-              <span class="text-gray-900 font-medium">{{ formatPrice(ticker?.lowPrice || 0) }}</span>
+            <div class="flex flex-col items-end">
+              <span class="text-[10px] text-gray-500 font-medium tracking-wider uppercase">{{ t('kline.volume24h') }}</span>
+              <span class="text-xs text-gray-900 font-semibold">{{ formatVolume(ticker?.volume || 0) }}</span>
             </div>
-            <div class="flex items-center justify-end gap-2">
-              <span class="text-gray-400">{{ t('kline.volume24h') }}</span>
-              <span class="text-gray-900 font-medium">{{ formatVolume(ticker?.volume || 0) }}</span>
+            <div class="flex flex-col items-end">
+              <span class="text-[10px] text-gray-500 font-medium tracking-wider uppercase">{{ t('kline.low') }}</span>
+              <span class="text-xs text-gray-900 font-semibold">{{ formatPrice(ticker?.lowPrice || 0) }}</span>
+            </div>
+            <div class="flex flex-col items-end">
+              <!-- Placeholder for layout symmetry -->
+              <span class="text-[10px] text-gray-400 font-medium">--</span>
+              <span class="text-xs text-gray-400">--</span>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <main class="pb-20">
+    <main class="pb-28">
         <div class="px-4">
           <!-- Timeframe Selection -->
           <div class="flex gap-4 overflow-x-auto scrollbar-hide border-b border-gray-200">
@@ -75,21 +83,20 @@
               :class="[
                 'px-2 py-2 text-xs font-medium whitespace-nowrap transition-all relative',
                 selectedInterval === interval
-                  ? 'text-blue-400'
-                  : 'text-gray-400 hover:text-gray-300'
+                  ? 'text-blue-500'
+                  : 'text-gray-600 hover:text-gray-800'
               ]"
             >
               {{ interval }}
               <span
                 v-if="selectedInterval === interval"
-                class="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-400"
+                class="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500"
               ></span>
             </button>
           </div>
         </div>
 
-        <!-- Chart Container -->
-        <div class="glass-card-no-hover rounded-none md:rounded-xl p-2 md:p-4 mb-3 md:mb-4 mx-0 md:mx-4">
+        <div class="bg-white rounded-none md:rounded-2xl p-2 md:p-4 mb-3 md:mb-4 mx-0 md:mx-4 shadow-sm border border-gray-100">
           <div
             ref="chartContainer"
             class="w-full"
@@ -104,47 +111,48 @@
             <SkeletonLoader v-for="i in 10" :key="i" type="table-row" />
           </div>
         </div>
-        <div v-else class="glass-card-no-hover rounded-none md:rounded-xl p-4 mb-4 mx-0 md:mx-4">
-            <h3 class="font-bold text-gray-900 mb-3">{{ t('kline.marketTrades') }}</h3>
+        <div v-else class="bg-white rounded-none md:rounded-2xl p-4 mb-4 mx-0 md:mx-4 shadow-sm border border-gray-100">
+            <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <div class="w-1 h-4 bg-blue-500 rounded-full"></div>
+              {{ t('kline.marketTrades') }}
+            </h3>
             <div class="overflow-x-auto">
               <table class="w-full text-sm">
                 <thead>
-                  <tr class="text-gray-400 border-b border-gray-200">
-                    <th class="text-left py-2 px-2">{{ t('kline.time') }}</th>
-                    <th class="text-left py-2 px-2">Direction</th>
-                    <th class="text-left py-2 px-2">{{ t('kline.price') }}</th>
-                    <th class="text-left py-2 px-2">{{ t('kline.quantity') }}</th>
+                  <tr class="text-gray-500 border-b border-gray-100 uppercase text-[10px] tracking-wider font-semibold">
+                    <th class="text-left py-3 px-2">{{ t('kline.time') }}</th>
+                    <th class="text-left py-3 px-2">Direction</th>
+                    <th class="text-right py-3 px-2">{{ t('kline.price') }}</th>
+                    <th class="text-right py-3 px-2">{{ t('kline.quantity') }}</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr
                     v-for="trade in recentTrades.slice(0, 20)"
                     :key="trade.id"
-                    class="border-b border-gray-100"
+                    class="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors"
                   >
-                    <td class="py-2 px-2 text-gray-300">{{ formatTime(trade.time) }}</td>
+                    <td class="py-2.5 px-2 text-gray-500 tabular-nums">{{ formatTime(trade.time) }}</td>
                     <td 
                       :class="[
-                        'py-2 px-2 font-medium',
-                        trade.isBuyerMaker ? 'text-red-400' : 'text-green-400'
+                        'py-2.5 px-2 font-bold',
+                        trade.isBuyerMaker ? 'text-red-500' : 'text-green-500'
                       ]"
                     >
-                      {{ trade.isBuyerMaker ? 'Inbuy' : 'Outsell' }}
+                      <div class="flex items-center gap-1.5">
+                         <span class="w-1.5 h-1.5 rounded-full" :class="trade.isBuyerMaker ? 'bg-red-500' : 'bg-green-500'"></span>
+                         {{ trade.isBuyerMaker ? 'Inbuy' : 'Outsell' }}
+                      </div>
                     </td>
                     <td 
                       :class="[
-                        'py-2 px-2',
-                        trade.isBuyerMaker ? 'text-red-400' : 'text-green-400'
+                        'py-2.5 px-2 text-right font-medium tabular-nums',
+                        trade.isBuyerMaker ? 'text-red-500' : 'text-green-500'
                       ]"
                     >
                       {{ formatPrice(trade.price) }}
                     </td>
-                    <td 
-                      :class="[
-                        'py-2 px-2',
-                        trade.isBuyerMaker ? 'text-red-400' : 'text-green-400'
-                      ]"
-                    >
+                    <td class="py-2.5 px-2 text-right text-gray-600 tabular-nums">
                       {{ formatQuantity(trade.quantity) }}
                     </td>
                   </tr>
@@ -155,19 +163,21 @@
       </main>
 
       <!-- Fixed Bottom Navigation Buttons -->
-      <div class="fixed bottom-0 left-0 right-0 bg-[#fafafa]/80 backdrop-blur-md border-t border-gray-200 px-3 py-2 z-20">
+      <div class="fixed bottom-0 left-0 right-0 bg-[#0B0E11] border-t border-white/5 px-4 py-2.5 z-20 shadow-[0_-4px_20px_rgba(0,0,0,0.4)]">
         <div class="grid grid-cols-2 gap-3 max-w-md mx-auto">
           <button
             @click="handleQuickAction('buy')"
-            class="bg-green-500 hover:bg-green-600 active:bg-green-700 text-gray-900 font-bold py-2.5 rounded-lg text-base transition-colors shadow-lg"
+            class="flex flex-col items-center justify-center bg-binance-green hover:opacity-90 active:scale-95 text-white font-bold py-1.5 rounded-xl transition-all shadow-lg shadow-green-500/10 group"
           >
-            Up
+            <span class="text-base tracking-tight leading-tight">Up</span>
+            <span class="text-[8px] opacity-60 group-hover:opacity-100 transition-opacity uppercase tracking-widest font-medium">Call Market</span>
           </button>
           <button
             @click="handleQuickAction('sell')"
-            class="bg-red-500 hover:bg-red-600 active:bg-red-700 text-gray-900 font-bold py-2.5 rounded-lg text-base transition-colors shadow-lg"
+            class="flex flex-col items-center justify-center bg-binance-red hover:opacity-90 active:scale-95 text-white font-bold py-1.5 rounded-xl transition-all shadow-lg shadow-red-500/10 group"
           >
-            Fall
+            <span class="text-base tracking-tight leading-tight">Fall</span>
+            <span class="text-[8px] opacity-60 group-hover:opacity-100 transition-opacity uppercase tracking-widest font-medium">Put Market</span>
           </button>
         </div>
       </div>

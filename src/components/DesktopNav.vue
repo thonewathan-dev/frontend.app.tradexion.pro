@@ -1,7 +1,7 @@
 <template>
   <nav class="hidden md:flex md:flex-col md:w-64 glass-dark border-r border-gray-200 min-h-screen">
     <div class="p-4 border-b border-gray-200">
-      <h1 class="text-xl font-bold gradient-text">TradeXion</h1>
+      <h1 class="text-xl font-bold gradient-text">TrustXGlobal</h1>
     </div>
     <div class="flex-1 p-4">
       <router-link
@@ -27,8 +27,19 @@
     </div>
     <div class="p-4 border-t border-gray-200">
       <button
+        v-if="!isInstalled"
+        @click="handleDownloadApp"
+        class="flex items-center w-full px-4 py-3 rounded-lg text-binance-yellow hover:bg-yellow-500/10 transition-colors mb-2"
+      >
+        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+        </svg>
+        <span>Download App</span>
+      </button>
+
+      <button
         @click="handleLogout"
-        class="flex items-center w-full px-4 py-3 mt-2 rounded-lg text-gray-900/70 hover:bg-red-500/20 hover:text-red-300 transition-colors"
+        class="flex items-center w-full px-4 py-3 mt-2 rounded-lg text-gray-600 hover:bg-red-500/20 hover:text-red-300 transition-colors"
       >
         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -43,11 +54,26 @@
 import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
 import { useI18n } from 'vue-i18n';
+import { ref, onMounted } from 'vue';
+import { isAppInstalled } from '../utils/pwa.js';
 
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
 const { t } = useI18n();
+
+const isInstalled = ref(false);
+
+const handleDownloadApp = () => {
+  const pwaInstall = document.querySelector('pwa-install');
+  if (pwaInstall) {
+    pwaInstall.showDialog(true);
+  }
+};
+
+onMounted(() => {
+  isInstalled.value = isAppInstalled();
+});
 
 const navItems = [
   { path: '/', label: t('common.home'), icon: 'home' },

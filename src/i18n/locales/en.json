@@ -95,7 +95,8 @@
     "amount": "Amount",
     "minimum": "Minimum",
     "confirmStake": "Confirm Stake",
-    "amountLabel": "Amount"
+    "amountLabel": "Amount",
+    "insufficientBalance": "Insufficient balance"
   },
   "kline": {
     "high": "High",

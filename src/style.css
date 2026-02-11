@@ -8,21 +8,6 @@
   box-sizing: border-box;
 }
 
-:root {
-  --bg-color: #f0f2f5;
-  /* Soft Gray background */
-}
-
-body {
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  background-color: var(--bg-color);
-  background-attachment: fixed;
-  color: #323233;
-  /* Dark text */
-  overflow-x: hidden;
-  min-height: 100vh;
-}
-
 #app {
   min-height: 100vh;
 }
@@ -348,46 +333,46 @@ body {
   top: 0;
   width: 16px;
   height: 16px;
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(252, 213, 53, 0.85);
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
   animation: animloader2 2s ease infinite;
 }
 
 @keyframes animloader {
   0% {
-    box-shadow: 0 16px rgba(255, 255, 255, 0), 16px 16px rgba(255, 255, 255, 0), 16px 32px rgba(255, 255, 255, 0), 0px 32px rgba(255, 255, 255, 0);
+    box-shadow: 0 16px rgba(252, 213, 53, 0), 16px 16px rgba(252, 213, 53, 0), 16px 32px rgba(252, 213, 53, 0), 0px 32px rgba(252, 213, 53, 0);
   }
 
   12% {
-    box-shadow: 0 16px white, 16px 16px rgba(255, 255, 255, 0), 16px 32px rgba(255, 255, 255, 0), 0px 32px rgba(255, 255, 255, 0);
+    box-shadow: 0 16px #FCD535, 16px 16px rgba(252, 213, 53, 0), 16px 32px rgba(252, 213, 53, 0), 0px 32px rgba(252, 213, 53, 0);
   }
 
   25% {
-    box-shadow: 0 16px white, 16px 16px white, 16px 32px rgba(255, 255, 255, 0), 0px 32px rgba(255, 255, 255, 0);
+    box-shadow: 0 16px #FCD535, 16px 16px #FCD535, 16px 32px rgba(252, 213, 53, 0), 0px 32px rgba(252, 213, 53, 0);
   }
 
   37% {
-    box-shadow: 0 16px white, 16px 16px white, 16px 32px white, 0px 32px rgba(255, 255, 255, 0);
+    box-shadow: 0 16px #FCD535, 16px 16px #FCD535, 16px 32px #FCD535, 0px 32px rgba(252, 213, 53, 0);
   }
 
   50% {
-    box-shadow: 0 16px white, 16px 16px white, 16px 32px white, 0px 32px white;
+    box-shadow: 0 16px #FCD535, 16px 16px #FCD535, 16px 32px #FCD535, 0px 32px #FCD535;
   }
 
   62% {
-    box-shadow: 0 16px rgba(255, 255, 255, 0), 16px 16px white, 16px 32px white, 0px 32px white;
+    box-shadow: 0 16px rgba(252, 213, 53, 0), 16px 16px #FCD535, 16px 32px #FCD535, 0px 32px #FCD535;
   }
 
   75% {
-    box-shadow: 0 16px rgba(255, 255, 255, 0), 16px 16px rgba(255, 255, 255, 0), 16px 32px white, 0px 32px white;
+    box-shadow: 0 16px rgba(252, 213, 53, 0), 16px 16px rgba(252, 213, 53, 0), 16px 32px #FCD535, 0px 32px #FCD535;
   }
 
   87% {
-    box-shadow: 0 16px rgba(255, 255, 255, 0), 16px 16px rgba(255, 255, 255, 0), 16px 32px rgba(255, 255, 255, 0), 0px 32px white;
+    box-shadow: 0 16px rgba(252, 213, 53, 0), 16px 16px rgba(252, 213, 53, 0), 16px 32px rgba(252, 213, 53, 0), 0px 32px #FCD535;
   }
 
   100% {
-    box-shadow: 0 16px rgba(255, 255, 255, 0), 16px 16px rgba(255, 255, 255, 0), 16px 32px rgba(255, 255, 255, 0), 0px 32px rgba(255, 255, 255, 0);
+    box-shadow: 0 16px rgba(252, 213, 53, 0), 16px 16px rgba(252, 213, 53, 0), 16px 32px rgba(252, 213, 53, 0), 0px 32px rgba(252, 213, 53, 0);
   }
 }
 

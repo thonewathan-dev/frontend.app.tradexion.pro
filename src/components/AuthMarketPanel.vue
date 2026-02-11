@@ -20,10 +20,10 @@
             </div>
             <div>
               <div class="text-base font-bold text-gray-900 leading-tight">{{ featured.symbol }}</div>
-              <div class="text-xs text-gray-900/60">{{ featured.name }}</div>
+              <div class="text-xs text-gray-500">{{ featured.name }}</div>
             </div>
           </div>
-          <div class="text-gray-900/60 text-lg">›</div>
+          <div class="text-gray-400 text-lg">›</div>
         </div>
 
         <!-- Sparkline -->
@@ -54,7 +54,7 @@
             <div :class="featured.change < 0 ? 'text-red-300' : 'text-emerald-300'" class="text-2xl font-extrabold">
               {{ formatChange(featured.change) }}
             </div>
-            <div class="text-xs text-gray-900/50 mt-0.5">Price</div>
+            <div class="text-xs text-gray-500 mt-0.5">Price</div>
           </div>
           <div class="text-right">
             <div class="text-gray-900 font-bold text-lg">{{ formatPrice(featured.price) }}</div>
@@ -70,7 +70,7 @@
               <button
                 type="button"
                 class="pb-2 border-b-2 transition-colors"
-                :class="activeTab === 'spot' ? 'border-white text-gray-900' : 'border-transparent text-gray-900/50 hover:text-gray-900/80'"
+                :class="activeTab === 'spot' ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-900'"
                 @click="activeTab = 'spot'"
               >
                 Spot
@@ -78,7 +78,7 @@
               <button
                 type="button"
                 class="pb-2 border-b-2 transition-colors"
-                :class="activeTab === 'futures' ? 'border-white text-gray-900' : 'border-transparent text-gray-900/50 hover:text-gray-900/80'"
+                :class="activeTab === 'futures' ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-900'"
                 @click="activeTab = 'futures'"
               >
                 Futures
@@ -86,7 +86,7 @@
               <button
                 type="button"
                 class="pb-2 border-b-2 transition-colors"
-                :class="activeTab === 'new' ? 'border-white text-gray-900' : 'border-transparent text-gray-900/50 hover:text-gray-900/80'"
+                :class="activeTab === 'new' ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-900'"
                 @click="activeTab = 'new'"
               >
                 New
@@ -95,10 +95,10 @@
 
             <button
               type="button"
-              class="text-xs text-gray-900/50 font-semibold hover:text-gray-900/80 transition-colors"
+              class="text-xs text-gray-500 font-semibold hover:text-gray-900 transition-colors"
               @click="goHome"
             >
-              View All <span class="text-gray-900/40">›</span>
+              View All <span class="text-gray-400">›</span>
             </button>
           </div>
         </div>
@@ -124,7 +124,7 @@
               </div>
               <div class="min-w-0">
                 <div class="text-sm font-bold text-gray-900 leading-tight">{{ item.symbol }}</div>
-                <div class="text-xs text-gray-900/60 truncate">{{ item.name }}</div>
+                <div class="text-xs text-gray-500 truncate">{{ item.name }}</div>
               </div>
             </div>
 
@@ -140,7 +140,7 @@
           </div>
         </div>
 
-        <div class="px-5 py-3 text-xs text-gray-900/40">
+        <div class="px-5 py-3 text-xs text-gray-400">
           Market data is illustrative on auth pages.
         </div>
       </div>

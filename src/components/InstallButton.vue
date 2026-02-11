@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <!-- Install Button for Android/Desktop -->
   <div
     v-if="showInstallButton && !isIOSDevice && !isInstalled"
@@ -7,10 +7,10 @@
     <div class="glass-card rounded-xl p-4 shadow-2xl border border-gray-200 animate-slide-up">
       <div class="flex items-start gap-3">
         <div class="flex-shrink-0">
-          <img src="/icon-192.png" alt="TradeXion" class="w-12 h-12 rounded-lg" />
+          <img src="/icon-192.png" alt="TrustXGlobal" class="w-12 h-12 rounded-lg" />
         </div>
         <div class="flex-1 min-w-0">
-          <h3 class="text-gray-900 font-semibold text-sm mb-1">Install TradeXion</h3>
+          <h3 class="text-gray-900 font-semibold text-sm mb-1">Install TrustXGlobal</h3>
           <p class="text-gray-900/70 text-xs mb-3">Get the full app experience with offline access</p>
           <div class="flex gap-2">
             <button
@@ -39,9 +39,9 @@
   >
     <div class="glass-card rounded-2xl p-6 max-w-sm w-full shadow-2xl border border-gray-200 animate-slide-up">
       <div class="text-center mb-6">
-        <img src="/icon-192.png" alt="TradeXion" class="w-20 h-20 rounded-2xl mx-auto mb-4" />
+        <img src="/icon-192.png" alt="TrustXGlobal" class="w-20 h-20 rounded-2xl mx-auto mb-4" />
         <h2 class="text-gray-900 font-bold text-xl mb-2">Add to Home Screen</h2>
-        <p class="text-gray-900/70 text-sm">Install TradeXion for the best experience</p>
+        <p class="text-gray-900/70 text-sm">Install TrustXGlobal for the best experience</p>
       </div>
       
       <div class="space-y-4 mb-6">

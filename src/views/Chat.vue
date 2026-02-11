@@ -1,7 +1,7 @@
-<template>
+﻿<template>
   <div class="fixed inset-0 bg-dark flex flex-col overflow-hidden">
     <!-- Header - Fixed at top -->
-    <div class="glass-card-no-hover border-b border-gray-200 px-4 py-3 flex-shrink-0 z-10">
+    <div class="bg-[#181A20] border-b border-gray-800 px-4 py-3 flex-shrink-0 z-10">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
           <button
@@ -12,16 +12,21 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <img :src="logoUrl" alt="TradeXion" class="w-8 h-8 object-contain" />
+          <img :src="logoUrl" alt="TrustXGlobal" class="w-8 h-8 object-contain" />
           <div>
             <h3 class="text-gray-900 font-semibold text-sm">Customer Support</h3>
-            <p class="text-gray-900/60 text-xs" :class="{ 'text-green-400': isConnected, 'text-red-400': !isConnected }">
-              {{ isConnected ? 'Online' : 'Connecting...' }}
-            </p>
+            <div class="flex items-center gap-1.5" v-if="isConnected">
+              <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+              </span>
+              <span class="text-green-500 text-xs font-semibold">Online</span>
+            </div>
+            <p v-else class="text-red-500 text-xs">Connecting...</p>
           </div>
         </div>
         <button
-          v-if="!chatEnded"
+          v-if="!chatEnded && hasUserMessages"
           @click="handleEndChat"
           :disabled="endingChat"
           class="flex items-center gap-2 px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 rounded-lg text-red-400 hover:text-red-300 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -39,10 +44,10 @@
       <!-- Auto Bot Welcome Message with Menu Buttons -->
       <div v-if="messages.length === 0 && !loading && !chatEnded" class="flex flex-col items-center justify-center h-full py-6 px-4">
         <div class="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mb-3">
-          <img :src="logoUrl" alt="TradeXion" class="w-10 h-10 object-contain" />
+          <img :src="logoUrl" alt="TrustXGlobal" class="w-10 h-10 object-contain" />
         </div>
         <h3 class="text-gray-900 text-base font-semibold mb-1.5">Welcome to Customer Support</h3>
-        <p class="text-gray-900/60 text-xs text-center max-w-sm mb-4">
+        <p class="text-gray-500 text-xs text-center max-w-sm mb-4">
           Hi! I'm your support assistant. How can I help you today?
         </p>
         
@@ -60,9 +65,9 @@
               </div>
               <div class="flex-1">
                 <div class="text-gray-900 text-xs font-medium">{{ option.label }}</div>
-                <div class="text-gray-900/50 text-[10px]">{{ option.description }}</div>
+                <div class="text-gray-500 text-[10px]">{{ option.description }}</div>
               </div>
-              <svg class="w-3 h-3 text-gray-900/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
               </svg>
             </div>
@@ -71,52 +76,66 @@
       </div>
       <div v-if="loading && messages.length === 0" class="flex flex-col items-center justify-center h-full py-12">
         <span class="loader"></span>
-        <p class="text-gray-900/60 text-sm mt-4">Loading messages...</p>
+        <p class="text-gray-500 text-sm mt-4">Loading messages...</p>
       </div>
       <div
         v-for="message in messages"
         :key="message.id"
-        class="flex items-end gap-2"
-        :class="(message.sender_role === 'user' || message.sender_id === authStore.user?.id) ? 'justify-end' : 'justify-start'"
       >
-        <!-- Profile Icon with Logo (only for admin messages, on the LEFT) -->
-        <div
-          v-if="message.sender_role === 'admin' && message.sender_id !== authStore.user?.id"
-          class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0"
-        >
-          <img :src="logoUrl" alt="Admin" class="w-6 h-6 object-contain" />
-        </div>
-        
-        <div
-          class="max-w-[75%] rounded-xl px-4 py-2.5 shadow-sm transition-all duration-200 bg-gray-100 backdrop-blur-sm border border-gray-300 text-gray-900"
-          :class="(message.sender_role === 'user' || message.sender_id === authStore.user?.id)
-            ? 'animate-message-sent' 
-            : 'animate-message-received'"
-        >
-          <!-- Image if present -->
-          <div v-if="message.image_url" class="mb-2 rounded-lg overflow-hidden">
-            <img 
-              :src="getImageUrl(message.image_url)" 
-              alt="Chat image" 
-              class="max-w-full h-auto max-h-48 object-contain rounded-lg cursor-pointer"
-              @click="openImageModal(message.image_url)"
-            />
+        <!-- System Message (centered with actual lines) -->
+        <div v-if="message.sender_role === 'system'" class="flex items-center justify-center my-6 px-4">
+          <div class="flex-1 h-px bg-gray-300"></div>
+          <div class="text-xs text-gray-500 text-center px-4 py-1 whitespace-nowrap">
+            {{ message.message.replace(/-------------------/g, '').trim() }}
           </div>
-          <!-- Message text -->
-          <p v-if="message.message" class="text-sm whitespace-pre-wrap">{{ message.message }}</p>
-          <p class="text-xs mt-1 opacity-70">
-            {{ formatTime(message.created_at) }}
-          </p>
+          <div class="flex-1 h-px bg-gray-300"></div>
         </div>
 
-        <!-- Profile Icon (only for user messages, on the RIGHT) -->
+        <!-- User/Admin Message -->
         <div
-          v-if="message.sender_role === 'user' || message.sender_id === authStore.user?.id"
-          class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0"
+          v-else
+          class="flex items-end gap-2"
+          :class="(message.sender_role === 'user' || message.sender_id === authStore.user?.id) ? 'justify-end' : 'justify-start'"
         >
-          <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-          </svg>
+          <!-- Profile Icon with Logo (only for admin messages, on the LEFT) -->
+          <div
+            v-if="message.sender_role === 'admin' && message.sender_id !== authStore.user?.id"
+            class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0"
+          >
+            <img :src="logoUrl" alt="Admin" class="w-6 h-6 object-contain" />
+          </div>
+          
+          <div
+            class="max-w-[75%] rounded-xl px-4 py-2.5 shadow-sm transition-all duration-200 bg-gray-100 backdrop-blur-sm border border-gray-300 text-gray-900"
+            :class="(message.sender_role === 'user' || message.sender_id === authStore.user?.id)
+              ? 'animate-message-sent' 
+              : 'animate-message-received'"
+          >
+            <!-- Image if present -->
+            <div v-if="message.image_url" class="mb-2 rounded-lg overflow-hidden">
+              <img 
+                :src="getImageUrl(message.image_url)" 
+                alt="Chat image" 
+                class="max-w-full h-auto max-h-48 object-contain rounded-lg cursor-pointer"
+                @click="openImageModal(message.image_url)"
+              />
+            </div>
+            <!-- Message text -->
+            <p v-if="message.message" class="text-sm whitespace-pre-wrap">{{ message.message }}</p>
+            <p class="text-xs mt-1 opacity-70">
+              {{ formatTime(message.created_at) }}
+            </p>
+          </div>
+
+          <!-- Profile Icon (only for user messages, on the RIGHT) -->
+          <div
+            v-if="message.sender_role === 'user' || message.sender_id === authStore.user?.id"
+            class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0"
+          >
+            <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+          </div>
         </div>
       </div>
     </div>
@@ -140,7 +159,7 @@
         </div>
         <div class="flex-1">
           <p class="text-gray-900 text-sm font-medium">Image ready to send</p>
-          <p class="text-gray-900/60 text-xs">Click send to upload and send</p>
+          <p class="text-gray-500 text-xs">Click send to upload and send</p>
         </div>
         <button
           @click="sendImagePreview"
@@ -161,7 +180,7 @@
               v-model="messageInput"
               type="text"
               placeholder="Type your message..."
-              class="w-full px-4 py-3 pr-12 bg-gray-50 border border-gray-200 rounded-2xl text-gray-900 placeholder-white/30 focus:outline-none focus:border-blue-500/50 focus:bg-gray-100 transition-all duration-200 text-sm backdrop-blur-sm"
+              class="w-full px-4 py-3 pr-12 bg-gray-50 border border-gray-200 rounded-2xl text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500/50 focus:bg-gray-100 transition-all duration-200 text-sm backdrop-blur-sm"
               :disabled="loading || endingChat"
             />
             <div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
@@ -179,7 +198,7 @@
                 title="Attach photo"
                 :disabled="loading || endingChat"
               >
-                <svg class="w-4 h-4 text-gray-900/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </button>
@@ -188,7 +207,7 @@
           <button
             type="submit"
             :disabled="(!messageInput.trim() && !uploadingImage) || loading || endingChat || uploadingImage"
-            class="p-2 text-gray-900/70 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            class="p-2 text-gray-600 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <svg 
               v-if="!loading && !uploadingImage" 
@@ -223,20 +242,21 @@
             </svg>
             <h3 class="text-yellow-400 text-sm font-semibold">Chat Ended</h3>
           </div>
-          <p class="text-gray-900/60 text-xs text-center mb-2">
+          <p class="text-gray-500 text-xs text-center mb-2">
             This conversation has been ended. You can start a new chat to continue.
           </p>
           <div class="flex gap-3 w-full">
             <button
               @click="router.back()"
-              class="flex-1 px-4 py-2.5 rounded-full text-sm font-semibold glass-button-no-hover text-gray-900 border border-gray-300 hover:border-white/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              class="flex-1 px-4 py-2.5 rounded-full text-sm font-semibold bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Back
             </button>
             <button
               @click="startNewChat"
               :disabled="loading"
-              class="flex-1 px-4 py-2.5 rounded-full text-sm font-semibold glass-button-no-hover text-gray-900 border border-gray-300 hover:border-white/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              class="flex-1 px-4 py-2.5 rounded-full text-sm font-semibold bg-yellow-500 hover:bg-yellow-400 border border-yellow-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              style="color: #000000 !important;"
             >
               {{ loading ? 'Starting...' : 'Start New Chat' }}
             </button>
@@ -288,7 +308,7 @@
         <h3 class="text-gray-900 text-lg font-semibold text-center mb-2">End Chat?</h3>
         
         <!-- Message -->
-        <p class="text-gray-900/70 text-sm text-center mb-6">
+        <p class="text-gray-600 text-sm text-center mb-6">
           Are you sure you want to end this chat? The chat will be marked as ended, but the conversation history will be preserved.
         </p>
 
@@ -496,6 +516,26 @@ const {
 // Computed property to check if chat is ended
 const chatEnded = computed(() => {
   return conversation.value && (conversation.value.status === 'closed' || conversation.value.status === 'ended');
+});
+
+// Computed property to check if user has sent any messages in the CURRENT session
+const hasUserMessages = computed(() => {
+  // Find the index of the last "Start at" system message
+  let lastStartIndex = -1;
+  for (let i = messages.value.length - 1; i >= 0; i--) {
+    if (messages.value[i].sender_role === 'system' && messages.value[i].message.includes('Start at')) {
+      lastStartIndex = i;
+      break;
+    }
+  }
+  
+  // If there's a "Start" message, check for user messages after it
+  // Otherwise, check all messages
+  const messagesToCheck = lastStartIndex >= 0 
+    ? messages.value.slice(lastStartIndex + 1) 
+    : messages.value;
+    
+  return messagesToCheck.some(msg => msg.sender_role === 'user' || msg.sender_id === authStore.user?.id);
 });
 
 // Initialize chat when component mounts

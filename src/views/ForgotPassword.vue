@@ -1,15 +1,15 @@
-<template>
-  <div class="min-h-[100dvh] overflow-hidden text-gray-900 flex flex-col">
+﻿<template>
+  <div class="min-h-[100dvh] overflow-hidden text-white flex flex-col">
     <!-- Top bar -->
-    <div class="sticky top-0 z-10 glass-card-no-hover border-b border-gray-200">
-      <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <img :src="logoMarkUrl" alt="TradeXion" class="w-7 h-7 object-contain" />
-          <span class="font-semibold tracking-tight text-gray-900">TradeXion</span>
-        </div>
+    <div class="sticky top-0 z-10 bg-[#0f1115] border-b border-white/10 w-full">
+      <div class="w-full px-4 h-14 flex items-center justify-between">
+        <router-link to="/" class="flex items-center gap-2 group transition-colors">
+          <img :src="logoMarkUrl" alt="TrustXGlobal" class="w-7 h-7 object-contain" />
+          <span class="font-semibold tracking-tight text-white group-hover:text-binance-yellow transition-colors">TrustXGlobal</span>
+        </router-link>
         <router-link
           to="/login"
-          class="px-4 py-1.5 rounded-full text-sm font-semibold glass-button-no-hover text-gray-900 border border-gray-300 hover:border-white/30 transition-colors"
+          class="px-4 py-1.5 rounded-full text-sm font-bold bg-binance-yellow text-binance-black hover:bg-opacity-90 transition-all shadow-lg shadow-binance-yellow/10"
         >
           Log In
         </router-link>
@@ -25,19 +25,19 @@
 
         <!-- Right: Forgot password form -->
         <div class="min-w-0">
-          <h1 class="text-2xl md:text-3xl font-bold tracking-tight mb-3 text-gray-900">Forgot Password</h1>
-          <p class="text-sm text-gray-900/70 mb-6">Enter your email address and we'll send you a code to reset your password.</p>
+          <h1 class="text-2xl md:text-3xl font-bold tracking-tight mb-3 text-white">Forgot Password</h1>
+          <p class="text-sm text-white/70 mb-6">Enter your email address and we'll send you a code to reset your password.</p>
 
           <!-- Card -->
-          <div class="glass-card-no-hover rounded-xl border border-white/12 p-3">
+          <div class="glass-card-no-hover rounded-xl border border-white/10 p-4 bg-white/[0.02]">
             <form @submit.prevent="handleRequestReset" class="space-y-2.5">
-              <label class="block text-xs text-gray-900/80 font-medium">Email</label>
+              <label class="block text-xs text-white/70 font-medium">Email</label>
               <input
                 v-model.trim="email"
                 type="email"
                 autocomplete="email"
                 required
-                class="w-full px-3 py-2.5 text-sm glass-input rounded-lg text-gray-900 placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+                class="w-full px-4 py-3 text-sm rounded-lg border border-white/10 bg-white/5 text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-binance-yellow/40 transition-all focus:bg-white/10"
                 placeholder="Enter your email"
               />
 
@@ -48,7 +48,7 @@
                   to="/register" 
                   class="text-xs text-red-300 hover:text-red-200 underline font-semibold"
                 >
-                  Register an account first →
+                  Register an account first â†’
                 </router-link>
               </div>
 
@@ -60,15 +60,15 @@
               <button
                 type="submit"
                 :disabled="loading || !email || !canGoNext"
-                class="w-full py-2.5 text-sm rounded-full font-semibold glass-button-no-hover text-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-gray-300"
+                class="w-full py-2.5 text-sm rounded-full font-bold bg-binance-yellow text-binance-black hover:bg-opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-binance-yellow/10"
               >
                 {{ loading ? 'Sending...' : 'Send Reset Code' }}
               </button>
             </form>
           </div>
 
-          <div class="mt-4 text-center text-xs text-gray-900/70">
-            <router-link to="/login" class="font-semibold text-gray-900 hover:text-gray-900/80">Back to Log In</router-link>
+          <div class="mt-4 text-center text-xs text-white/70">
+            <router-link to="/login" class="font-bold text-white hover:text-binance-yellow transition-colors">Back to Log In</router-link>
           </div>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router';
+﻿import { createRouter, createWebHistory } from 'vue-router';
 import { ref } from 'vue';
 import { useAuthStore } from '../stores/auth';
 
@@ -121,10 +121,10 @@ const routes = [
     meta: { requiresAuth: true, title: 'Modify Password' },
   },
   {
-    path: '/about-tradexion',
-    name: 'AboutTradeXion',
-    component: () => import('../views/AboutTradeXion.vue'),
-    meta: { requiresAuth: true, title: 'About TradeXion' },
+    path: '/about-TrustXGlobal',
+    name: 'AboutTrustXGlobal',
+    component: () => import('../views/AboutTrustXGlobal.vue'),
+    meta: { requiresAuth: true, title: 'About TrustXGlobal' },
   },
   {
     path: '/chat',
@@ -169,7 +169,7 @@ router.beforeEach(async (to, from, next) => {
 
 router.afterEach((to) => {
   isRouteLoading.value = false;
-  const base = 'TradeXion';
+  const base = 'TrustXGlobal';
   const title = typeof to.meta?.title === 'function' ? to.meta.title(to) : to.meta?.title;
   document.title = title ? `${base} | ${title}` : base;
 });
