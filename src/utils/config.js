@@ -8,7 +8,7 @@
  * MUST be called at runtime, not at build time
  */
 export function getApiUrl() {
-  const DEFAULT_PROD_API = 'https://backend.trustxglobal.site/api';
+  const DEFAULT_PROD_API = 'https://backend.truexglobal.site/api';
   const DEFAULT_DEV_API = 'http://localhost:3000/api';
 
   // Build-time / SSR safety: never return localhost
